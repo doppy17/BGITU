@@ -8,13 +8,27 @@
 
 ## Запуск
 
+Проще всего — из корня проекта одной командой (сама создаст `.venv`, поставит зависимости,
+применит миграции, засеет демо-данные при первом запуске и поднимет сервер):
+
+```bash
+cd "$HOME/Documents/BGITU" && ./run.sh          # или make run
+```
+
+Вручную отсюда же:
+
 ```bash
 cd "$HOME/Documents/BGITU/ЛК-портал"
-uv venv --python 3.11 .venv && . .venv/bin/activate
-uv pip install -r requirements.txt
-python manage.py migrate
-python manage.py seed_demo          # роли, пользователи, курсы, расписание
-python manage.py runserver 127.0.0.1:8010
+./.venv/bin/python manage.py migrate
+./.venv/bin/python manage.py seed_demo          # роли, пользователи, курсы, расписание
+./.venv/bin/python manage.py runserver 127.0.0.1:8010
+```
+
+Если окружение потерялось (в PATH нет `uv` — он в `~/.hermes/bin/uv`):
+
+```bash
+"$HOME/.hermes/bin/uv" venv --python 3.11 .venv
+"$HOME/.hermes/bin/uv" pip install --python .venv/bin/python -r requirements.txt
 ```
 
 Открыть `http://127.0.0.1:8010/` — редирект на вход. Пароль всех демо-аккаунтов: `demo12345`.
