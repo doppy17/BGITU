@@ -14,14 +14,26 @@
 
 Окружение одно — `ЛК-портал/.venv` (Python 3.11 + Django 5.2.18). Корневых venv нет.
 
+**Одной командой** (сама создаст окружение, поставит зависимости, применит миграции,
+засеет демо-данные при первом запуске и поднимет сервер):
+
 ```bash
-cd "$HOME/Documents/BGITU/ЛК-портал"
-source .venv/bin/activate
-python manage.py runserver 127.0.0.1:8010
+cd "$HOME/Documents/BGITU" && ./run.sh
+# другой порт: ./run.sh --port 8020    без демо-данных: ./run.sh --no-seed
 ```
 
-Если окружение потерялось: `uv venv --python 3.11 .venv && . .venv/bin/activate && pip install -r requirements.txt`.
-Проверка: `python manage.py test` (19 тестов) и `python manage.py check`.
+То же через make: `make run`, `make test`, `make check`, `make setup` (пересоздать .venv),
+`make reset` (сбросить демо-БД и медиа).
+
+Вручную, без скрипта:
+
+```bash
+cd "$HOME/Documents/BGITU/ЛК-портал"
+./.venv/bin/python manage.py runserver 127.0.0.1:8010
+```
+
+Если окружение потерялось: `uv venv --python 3.11 .venv && uv pip install --python .venv/bin/python -r requirements.txt`
+(`uv` лежит в `~/.hermes/bin/uv`, в PATH его нет). Проверка: `python manage.py test` (19 тестов) и `python manage.py check`.
 
 Открыть [http://127.0.0.1:8010/](http://127.0.0.1:8010/) — вход или регистрация.
 Демо-пароль: `demo12345` (логины `student`, `teacher2`, `dean`, `developer` и др. — в

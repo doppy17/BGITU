@@ -1,14 +1,15 @@
 VENV ?= .venv
 PY ?= $(VENV)/bin/python
 PORT ?= 8010
+UV ?= $(shell command -v uv 2>/dev/null || echo $(HOME)/.hermes/bin/uv)
 
 .PHONY: venv install migrate seed run test check clean
 
 venv:
-	uv venv --python 3.11 $(VENV) || python3.11 -m venv $(VENV)
+	$(UV) venv --python 3.11 $(VENV) || python3.11 -m venv $(VENV)
 
 install: venv
-	. $(VENV)/bin/activate && uv pip install -r requirements.txt
+	$(UV) pip install --python $(PY) -r requirements.txt
 
 migrate:
 	$(PY) manage.py migrate
