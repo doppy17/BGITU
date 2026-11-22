@@ -178,3 +178,36 @@ class ServerImportPathTests(TestCase):
         for bad in ('../../config/settings/base.py', '/etc/passwd', 'manage.py', ''):
             response = self.client.post(reverse('schedule:import_server'), {'path': bad}, follow=True)
             self.assertContains(response, 'Некорректный путь к файлу.', msg_prefix=bad)
+
+
+class OneLessonPerPairTests(TestCase):
+    """В одной паре — один предмет: параллельные подгруппы схлопываются."""
+
+    @classmethod
+    def setUpTestData(cls):
+        from apps.education.models import Group
+        from .models import Lesson
+
+        cls.group = Group.objects.create(code='ИСТ-201', course=2)
+        cls.role = Role.objects.create(code='student', name='Студент', can_upload_works=True)
+        cls.student = User.objects.create_user('substudent', password='demo12345')
+        cls.student.profile.role = cls.role
+        cls.student.profile.group = cls.group
+        cls.student.profile.save()
+        Lesson.objects.create(group=cls.group, weekday=3, pair=5, week='all', subject='Подгруппа-один', subgroup='1')
+        Lesson.objects.create(group=cls.group, weekday=3, pair=5, week='all', subject='Подгруппа-два', subgroup='2')
+
+    def test_conflicting_pair_shows_single_lesson(self):
+        self.client.force_login(self.student)
+        response = self.client.get(reverse('schedule:schedule'), {'week': '12'})
+        self.assertContains(response, '<b>Подгруппа-один</b>')
+        self.assertNotContains(response, '<b>Подгруппа-два</b>')
+
+    def test_user_subgroup_wins(self):
+        profile = self.student.profile
+        profile.subgroup = 2
+        profile.save()
+        self.client.force_login(self.student)
+        response = self.client.get(reverse('schedule:schedule'), {'week': '12'})
+        self.assertContains(response, '<b>Подгруппа-два</b>')
+        self.assertNotContains(response, '<b>Подгруппа-один</b>')

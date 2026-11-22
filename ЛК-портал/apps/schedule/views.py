@@ -101,16 +101,30 @@ def schedule_view(request):
         )
     bells = {b.pair: b for b in Bell.objects.filter(building='2')}
 
-    # Таблица: строки — пары, колонки — дни недели.
-    max_pair = max((lesson.pair for lesson in lessons), default=0)
+    # Таблица: строки — пары, колонки — дни недели. В одной паре — один предмет:
+    # параллельные занятия подгрупп (П/Г 1/2/3) схлопываем до подгруппы студента.
+    user_subgroup = str(profile.subgroup) if profile and profile.subgroup is not None else None
+    by_cell = {}
+    for lesson in lessons:
+        key = (lesson.weekday, lesson.pair)
+        current = by_cell.get(key)
+        if current is None:
+            by_cell[key] = lesson
+            continue
+        # Приоритет: подгруппа пользователя → занятие без подгруппы → первое
+        if user_subgroup and lesson.subgroup == user_subgroup and current.subgroup != user_subgroup:
+            by_cell[key] = lesson
+        elif not current.subgroup and lesson.subgroup:
+            continue
+
     grid = []
-    for pair in range(1, max(max_pair, 6) + 1):
+    for pair in range(1, 7):
         bell = bells.get(pair)
         grid.append({
             'pair': pair,
             'time': f'{bell.start}–{bell.end}' if bell else '',
             'days': [
-                [lesson for lesson in lessons if lesson.pair == pair and lesson.weekday == weekday]
+                [by_cell[(weekday, pair)]] if (weekday, pair) in by_cell else []
                 for weekday in range(1, 7)
             ],
         })

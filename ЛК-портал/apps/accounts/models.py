@@ -49,6 +49,7 @@ class Profile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
     role = models.ForeignKey(Role, on_delete=models.PROTECT, related_name='profiles', null=True, blank=True)
     group = models.ForeignKey('education.Group', on_delete=models.SET_NULL, related_name='profiles', null=True, blank=True)
+    subgroup = models.PositiveSmallIntegerField('подгруппа', null=True, blank=True)
     record_book = models.CharField('зачётная книжка', max_length=32, blank=True)
     phone = models.CharField('телефон', max_length=32, blank=True)
     birth_date = models.DateField('дата рождения', null=True, blank=True)
