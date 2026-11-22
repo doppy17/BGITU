@@ -53,7 +53,8 @@ class SearchTests(TestCase):
         response = self.client.get(reverse('site:search'), {'q': 'ксерокопия'})
         self.assertContains(response, 'Ничего не нашлось')
 
-    def test_header_search_form_present_everywhere(self):
+    def test_search_dialog_present_everywhere(self):
+        """Диалог поиска в стиле макета есть и на сайте, и в кабинете."""
         from django.contrib.auth import get_user_model
 
         user = get_user_model().objects.create_user('searcher', password='demo12345')
@@ -61,8 +62,23 @@ class SearchTests(TestCase):
         for url in ('/', '/news/', reverse('portal:dashboard')):
             with self.subTest(url=url):
                 response = self.client.get(url)
-                self.assertContains(response, 'name="q"')
-                self.assertContains(response, reverse('site:search'))
+                self.assertContains(response, 'id="search"')
+                self.assertContains(response, 'data-search-open')
+                self.assertContains(response, 'id="bgitu-index"')
+
+    def test_search_index_includes_cabinet(self):
+        import json
+        import re
+
+        response = self.client.get('/')
+        match = re.search(r'id="bgitu-index" type="application/json">(.*?)</script>', response.content.decode(), re.S)
+        self.assertIsNotNone(match)
+        index = json.loads(match.group(1))
+        urls = {item['url'] for item in index}
+        self.assertIn(reverse('portal:stipendia'), urls)
+        self.assertIn(reverse('schedule:schedule'), urls)
+        self.assertIn(reverse('site:news'), urls)
+        self.assertTrue(any(item['category'] == 'Кабинет' for item in index))
 
 
 class NoOldSiteLinksTests(TestCase):

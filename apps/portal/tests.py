@@ -151,7 +151,7 @@ class NavCompositionTests(TestCase):
         response = self.client.get(reverse('portal:dashboard'))
         self.assertNotContains(response, 'badge badge--soft')
         self.assertNotContains(response, 'class="head-user"')
-        self.assertContains(response, 'id="headSearch"')
+        self.assertContains(response, 'data-search-open')
         # ФИО и роль видны в ящике (cab-nav__user)
         self.assertContains(response, 'cab-nav__user')
 

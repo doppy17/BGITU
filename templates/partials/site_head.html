@@ -20,10 +20,10 @@
     </nav>
 
     <div class="head-actions">
-      <form class="head-search-form" action="{% url 'site:search' %}" method="get" role="search">
-        <input class="head-search" id="headSearch" type="search" name="q" placeholder="Поиск по сайту и кабинету…"
-               aria-label="Поиск по сайту и кабинету" autocomplete="off" value="{{ query|default:'' }}">
-      </form>
+      <button class="search-btn" type="button" data-search-open aria-label="Поиск по сайту и кабинету">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7.5"/><path d="m21 21-4.5-4.5"/></svg>
+        <span>Поиск</span><kbd data-kbd>Ctrl K</kbd>
+      </button>
 
       {% if nav_mode != 'cabinet' %}
       <button class="theme-btn a11y-btn" type="button" popovertarget="a11y-pop" aria-label="Версия для слабовидящих">
@@ -77,3 +77,16 @@
   </div>
 </nav>
 {% endif %}
+
+<dialog class="search" id="search" aria-label="Поиск по сайту и кабинету">
+  <div class="search__bar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7.5"/><path d="m21 21-4.5-4.5"/></svg>
+    <input id="q" type="search" role="combobox" aria-expanded="true" aria-controls="results"
+           aria-autocomplete="list" aria-label="Запрос" placeholder="Раздел, институт, расписание, стипендия…"
+           autocomplete="off" spellcheck="false">
+    <kbd>Esc</kbd>
+  </div>
+  <ul class="search__list" id="results" role="listbox" aria-label="Результаты поиска"></ul>
+  <p class="search__hint mono"><span>↑↓ выбрать</span><span>↵ перейти</span><span>esc закрыть</span></p>
+</dialog>
+{{ search_index|json_script:"bgitu-index" }}

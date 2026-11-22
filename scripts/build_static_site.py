@@ -252,7 +252,13 @@ def main() -> None:
     scripts = extract_scripts(sample)
     (js_dir / 'mode.js').write_text(scripts[0] + '\n', encoding='utf-8')
     (js_dir / 'reveal.js').write_text(scripts[2] + '\n', encoding='utf-8')
-    (js_dir / 'core.js').write_text(scripts[3] + '\n', encoding='utf-8')
+    core_js = scripts[3]
+    start = core_js.find('/* ---------- Поиск: Ctrl/⌘ + K ---------- */')
+    end = core_js.find('/* ---------- Фон «шёлк»')
+    if start != -1 and end != -1:
+        # поиск живёт в отдельном общем модуле static/js/search.js
+        core_js = core_js[:start] + core_js[end:]
+    (js_dir / 'core.js').write_text(core_js + '\n', encoding='utf-8')
     (js_dir / 'trail.js').write_text(scripts[4] + '\n', encoding='utf-8')
     (js_dir / 'secbar.js').write_text(scripts[5] + '\n', encoding='utf-8')
     tail_blocks = split_tail_script(scripts[6])
