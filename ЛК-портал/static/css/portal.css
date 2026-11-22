@@ -382,3 +382,32 @@ code { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--text-mu
 @media (prefers-reduced-motion: reduce) {
   .bg-canvas { opacity: calc(var(--trail-op, 0.45) * 0.7); }
 }
+
+
+/* ---------- Футер: надпись «БГИТУ» с подсветкой, как на основном сайте ---------- */
+.footer__word {
+  position: relative;
+  margin: 48px 0 10px;
+  font: 800 clamp(3.25rem, 17vw, 15rem)/0.85 var(--font-display);
+  letter-spacing: -0.02em;
+  text-align: center;
+  color: color-mix(in oklab, var(--brand-ink) 6%, transparent);
+  user-select: none;
+  transition: --f0 2s var(--ease), --f1 2s var(--ease) 0.25s, --f2 2s var(--ease) 0.5s;
+}
+.footer__word::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  color: transparent;
+  background:
+    radial-gradient(ellipse calc(var(--f1, 0.4) * 34% + 0.1%) calc(var(--f1, 0.4) * 150% + 0.1%) at var(--x1, 20%) var(--y1, 60%), var(--accent) 55%, transparent 100%),
+    radial-gradient(ellipse calc(var(--f2, 0.4) * 34% + 0.1%) calc(var(--f2, 0.4) * 150% + 0.1%) at var(--x2, 80%) var(--y2, 60%), color-mix(in oklab, var(--brand-ink) 45%, var(--bg)) 55%, transparent 100%),
+    radial-gradient(ellipse calc(var(--f0, 0.4) * 34% + 0.1%) calc(var(--f0, 0.4) * 150% + 0.1%) at var(--x0, 50%) var(--y0, 60%), var(--text) 55%, transparent 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+@media (prefers-reduced-motion: reduce) {
+  .footer__word { transition: none; }
+}

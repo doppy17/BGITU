@@ -150,15 +150,15 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   gap: 2px;
   width: 60px;
   padding: 6px;
-  border: 1px solid transparent;
+  border: 1px solid var(--line);
   border-radius: var(--radius-m);
-  background: transparent;
+  background: var(--bg-raised);
   transition: width var(--dur) var(--ease), background var(--dur), border-color var(--dur), box-shadow var(--dur);
 }
 .cab-nav.is-expanded {
   width: 224px;
   background: var(--bg-panel);
-  border-color: var(--line);
+  border-color: var(--line-strong);
   box-shadow: 0 24px 70px rgb(0 0 0 / 0.4);
 }
 .cab-nav__label { margin: 0 0 10px 12px; color: var(--text-faint); }
@@ -203,6 +203,7 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   overflow: hidden;
   transition: opacity var(--dur-fast) var(--ease);
 }
+.cab-nav:not(.is-expanded) a { gap: 0; }
 .cab-nav.is-expanded a { justify-content: flex-start; padding: 0 12px; }
 .cab-nav.is-expanded .cab-nav__lbl { opacity: 1; width: auto; }
 @media (prefers-reduced-motion: reduce) {

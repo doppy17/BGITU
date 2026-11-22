@@ -24,6 +24,14 @@ class ThemeUITests(TestCase):
             self.assertContains(response, f'data-theme-set="{name}"')
         self.assertContains(response, 'js/theme.js')
 
+    def test_footer_wordmark_and_fixed_icons(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('portal:dashboard'))
+        self.assertContains(response, 'class="footer__word"')
+        self.assertContains(response, 'data-text="БГИТУ"')
+        # иконки-заливки наследуют цвет текста (не чёрные на тёмных темах)
+        self.assertContains(response, '<svg class="cab-nav__icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">')
+
     def test_pages_have_bg_canvas(self):
         self.client.force_login(self.user)
         response = self.client.get(reverse('portal:dashboard'))
