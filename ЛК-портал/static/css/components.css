@@ -3,29 +3,8 @@
    ============================================================ */
 
 /* ---------- Шапка-пилюля ---------- */
-.site-head {
-  position: fixed;
-  top: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 50;
-  width: min(100% - 24px, var(--container));
-  height: var(--head-h);
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 0 10px 0 16px;
-  background: var(--bg-glass);
-  -webkit-backdrop-filter: blur(16px) saturate(1.4);
-  backdrop-filter: blur(16px) saturate(1.4);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
-  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
-}
-.site-head.is-stuck {
-  background: color-mix(in oklab, var(--brand-base) 84%, transparent);
-  border-color: var(--line-strong);
-}
+/* Позиционирование и вид шапки задаёт общий site/css/header.css —
+   здесь остаются только элементы, специфичные для кабинета. */
 
 .logo {
   display: inline-flex;

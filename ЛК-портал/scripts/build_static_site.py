@@ -184,11 +184,27 @@ def main() -> None:
     for directory in (css_dir, js_dir, tpl_dir / 'pages'):
         directory.mkdir(parents=True, exist_ok=True)
 
-    (css_dir / 'site.css').write_text(extract_style(sample) + '\n', encoding='utf-8')
+    style_lines = extract_style(sample).split('\n')
+    # Правила шапки выносим отдельно: один и тот же header.css используют
+    # и публичные страницы, и кабинет — навбар выглядит одинаково.
+    header_ranges = ((170, 208), (507, 510), (548, 549))
+    header_lines: list[str] = []
+    for start, end in header_ranges:
+        header_lines.extend(style_lines[start - 1:end])
+    kept: list[str] = []
+    drop = {index for start, end in header_ranges for index in range(start - 1, end)}
+    for index, line in enumerate(style_lines):
+        if index not in drop:
+            kept.append(line)
+    (css_dir / 'header.css').write_text(
+        '/* Шапка сайта и кабинета: один компонент на обе части. */\n'
+        + '\n'.join(header_lines) + '\n',
+        encoding='utf-8',
+    )
+    (css_dir / 'site.css').write_text('\n'.join(kept) + '\n', encoding='utf-8')
 
     scripts = extract_scripts(sample)
     (js_dir / 'mode.js').write_text(scripts[0] + '\n', encoding='utf-8')
-    (js_dir / 'theme.js').write_text(scripts[1] + '\n', encoding='utf-8')
     (js_dir / 'reveal.js').write_text(scripts[2] + '\n', encoding='utf-8')
     (js_dir / 'core.js').write_text(scripts[3] + '\n', encoding='utf-8')
     (js_dir / 'trail.js').write_text(scripts[4] + '\n', encoding='utf-8')
@@ -221,7 +237,7 @@ def main() -> None:
 
     base = f"""{{% load static %}}
 <!DOCTYPE html>
-<html lang="ru" data-theme="paper">
+<html lang="ru" data-theme="{{{{ ui_theme|default:'paper' }}}}" data-auth="{{% if user.is_authenticated %}}1{{% else %}}0{{% endif %}}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -232,8 +248,9 @@ def main() -> None:
   <link rel="manifest" href="{{% static 'site/manifest.webmanifest' %}}">
   <link rel="apple-touch-icon" href="{{% static 'site/icon-180.png' %}}">
   <script src="{{% static 'site/js/mode.js' %}}"></script>
-  <script src="{{% static 'site/js/theme.js' %}}"></script>
+  <script src="{{% static 'js/theme.js' %}}"></script>
   <link rel="stylesheet" href="{{% static 'site/css/site.css' %}}">
+  <link rel="stylesheet" href="{{% static 'site/css/header.css' %}}">
 </head>
 <body id="top">
 {head}

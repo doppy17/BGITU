@@ -132,7 +132,7 @@ class NavCompositionTests(TestCase):
         """Верхний навбар ведёт на внутренние страницы сайта, а не на GitHub."""
         self.client.force_login(self.dev)
         response = self.client.get(reverse('portal:dashboard'))
-        self.assertContains(response, 'class="site-nav"')
+        self.assertContains(response, 'class="nav"')
         for name, label in [
             ('university', 'Университет'),
             ('admission', 'Поступающим'),

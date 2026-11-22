@@ -167,45 +167,6 @@ svg, canvas { display: block; max-width: 100%; }
 }
 
 /* ---------- Шапка ---------- */
-.site-head { position: fixed; top: 12px; left: 0; right: 0; z-index: 50; }
-.head-pill {
-  width: min(100% - 24px, var(--container)); height: var(--head-h); margin-inline: auto;
-  display: flex; align-items: center; gap: 12px; padding: 0 6px 0 18px;
-  border: 1px solid var(--line); border-radius: var(--radius-pill);
-  background: var(--bg-glass); backdrop-filter: blur(16px) saturate(1.4);
-  transition: border-color var(--dur), background var(--dur);
-}
-.site-head.is-stuck .head-pill { border-color: var(--line-strong); background: color-mix(in oklab, var(--brand-base) 84%, transparent); }
-.brand { display: inline-flex; align-items: center; gap: 10px; font: 800 1rem/1 var(--font-display); letter-spacing: 0.02em; }
-.brand svg { width: 28px; height: 28px; color: var(--accent); }
-.nav { margin-inline: auto; }
-.nav ul { display: flex; gap: 2px; }
-.nav a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 1em; border-radius: var(--radius-pill); color: var(--text-muted); font-size: 0.9375rem; font-weight: 500; transition: color var(--dur-fast), background var(--dur-fast); }
-.nav a:hover { color: var(--text); background: var(--line); }
-.head-actions { display: flex; align-items: center; gap: 8px; }
-
-.search-btn {
-  display: inline-flex; align-items: center; gap: 0.7em; min-height: 44px; padding: 0 0.95em;
-  border: 1px solid var(--line); border-radius: var(--radius-pill); color: var(--text-muted);
-  font-size: 0.875rem; font-weight: 500; transition: color var(--dur-fast), border-color var(--dur-fast), background var(--dur-fast);
-}
-.search-btn:hover { color: var(--text); border-color: var(--line-strong); background: var(--line); }
-.search-btn svg { width: 16px; height: 16px; flex: none; }
-kbd { font: 500 0.6875rem/1 var(--font-mono); padding: 0.3em 0.55em; border: 1px solid var(--line-strong); border-radius: 6px; color: var(--text-faint); letter-spacing: 0.04em; }
-
-.burger { display: none; position: relative; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); }
-.burger::before, .burger::after { content: ""; position: absolute; left: 13px; right: 13px; height: 2px; border-radius: 2px; background: currentColor; transition: transform var(--dur) var(--ease); }
-.burger::before { top: 17px; } .burger::after { bottom: 17px; }
-.burger[aria-expanded="true"]::before { transform: translateY(4px) rotate(45deg); }
-.burger[aria-expanded="true"]::after  { transform: translateY(-4px) rotate(-45deg); }
-
-.menu {
-  position: fixed; inset: 0; z-index: 40; overflow: auto; background: var(--bg);
-  padding: calc(var(--head-h) + 48px) var(--gutter) 32px; display: flex; flex-direction: column;
-}
-.menu a { display: block; padding: 16px 0; border-bottom: 1px solid var(--line); font: 600 clamp(1.25rem, 5vw, 1.75rem)/1.2 var(--font-display); }
-.menu a:hover { color: var(--accent); }
-.menu .btn { display: flex; margin-top: 24px; padding: 0 1.9em; border-bottom: 0; font: 600 1rem/1 var(--font-text); }
 
 /* ---------- Hero ---------- */
 .hero { position: relative; isolation: isolate; display: flex; align-items: center; min-height: 100svh; padding: calc(var(--head-h) + 72px) 0 112px; overflow: hidden; }
@@ -504,10 +465,6 @@ main :is(.btn, .btn *, .inst__row:hover *, .inst.is-open .inst__row *, .flow__n,
 
 /* ================= Шапка: кнопка темы и окно выбора ================= */
 kbd { white-space: nowrap; }
-.theme-btn { display: inline-flex; align-items: center; gap: 0.6em; min-height: 44px; padding: 0 0.95em; border: 1px solid var(--line); border-radius: var(--radius-pill);
-  color: var(--text-muted); font-size: 0.875rem; font-weight: 500; transition: color var(--dur-fast), border-color var(--dur-fast), background var(--dur-fast); }
-.theme-btn:hover { color: var(--text); border-color: var(--line-strong); background: var(--line); }
-.theme-btn svg { width: 16px; height: 16px; flex: none; }
 .theme-pop { position: fixed; inset: calc(12px + var(--head-h) + 8px) max(12px, calc((100vw - var(--container)) / 2)) auto auto; margin: 0; width: 290px; padding: 14px;
   color: var(--text); background: var(--bg-raised); border: 1px solid var(--line-strong); border-radius: var(--radius-m); box-shadow: 0 30px 80px rgb(0 0 0 / 0.25); }
 .theme-pop:popover-open { animation: pop 0.22s var(--ease); }
@@ -545,8 +502,6 @@ main section.section[id] { scroll-margin-top: calc(34px - 96px - clamp(72px, 11v
 .js .sec-head[data-reveal] { transform: none; }   /* без сдвига: плашка должна совпадать с заголовком даже при быстрой прокрутке */
 
 /* ================= Текущая страница в шапке — акцентом палитры ================= */
-.nav a[aria-current="page"] { color: var(--accent); background: var(--accent-soft); }
-.nav a[aria-current="page"]:hover { color: var(--accent); background: color-mix(in oklab, var(--brand-accent) 22%, transparent); }
 .menu a[aria-current="page"] { color: var(--accent); }
 .menu a[aria-current="page"]::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 0.6em; vertical-align: 0.15em; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
 
