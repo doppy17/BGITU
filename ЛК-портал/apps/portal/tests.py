@@ -129,18 +129,20 @@ class NavCompositionTests(TestCase):
             self.assertNotContains(response, removed)
 
     def test_top_nav_has_main_site_links(self):
+        """Верхний навбар: пункты основного сайта из проекта в Загрузках, ссылки — локальные."""
         self.client.force_login(self.dev)
         response = self.client.get(reverse('portal:dashboard'))
         self.assertContains(response, 'class="site-nav"')
         for href, label in [
-            ('university.html', 'Университет'),
-            ('admission.html', 'Поступающим'),
-            ('student.html', 'Студенту'),
-            ('science.html', 'Наука'),
-            ('news.html', 'Новости'),
-            ('contacts.html', 'Контакты'),
+            ('/news/', 'Новости'),
+            ('/admission/', 'Абитуриенту'),
+            ('/timetable/', 'Расписание'),
+            ('/institute/iei/', 'ИЭИ'),
+            ('/institute/li/', 'ЛИ'),
+            ('/institute/si/', 'СИ'),
         ]:
             self.assertContains(response, href)
+            self.assertContains(response, label)
             self.assertContains(response, f'>{label}</a>', html=False)
 
     def test_top_nav_has_no_role_and_no_fio(self):

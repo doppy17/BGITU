@@ -1,0 +1,18 @@
+{% extends 'main/base_site.html' %}
+{% block title %}{{ news.title }} — БГИТУ{% endblock %}
+
+{% block content %}
+<div class="page" style="max-width: 800px;">
+    <p class="page__eyebrow">
+        <a href="{% url 'main:news_list' %}" style="color: var(--accent);">← Все новости</a>
+        &nbsp;·&nbsp; {{ news.get_category_display }}
+    </p>
+    <h1 class="page__title" style="font-size: clamp(24px, 4vw, 38px);">{{ news.title }}</h1>
+    <time class="news-card__date" datetime="{{ news.published_at|date:'Y-m-d' }}" style="display: block; margin-bottom: 32px;">
+        {{ news.published_at|date:"d.m.Y" }}
+    </time>
+    <div style="line-height: 1.75; font-size: 17px;">
+        {{ news.body|linebreaks }}
+    </div>
+</div>
+{% endblock %}

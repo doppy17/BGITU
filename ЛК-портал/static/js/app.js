@@ -2,9 +2,57 @@
 (function () {
   'use strict';
 
+  // Выпадающее меню «Институты» в шапке
+  document.querySelectorAll('.site-nav__drop').forEach(function (drop) {
+    var btn = drop.querySelector('.site-nav__drop-btn');
+    if (!btn) return;
+    btn.addEventListener('click', function (event) {
+      event.stopPropagation();
+      var open = drop.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', String(open));
+    });
+    drop.addEventListener('mouseenter', function () {
+      drop.classList.add('is-open');
+      btn.setAttribute('aria-expanded', 'true');
+    });
+    drop.addEventListener('mouseleave', function () {
+      drop.classList.remove('is-open');
+      btn.setAttribute('aria-expanded', 'false');
+    });
+    document.addEventListener('click', function (event) {
+      if (!drop.contains(event.target)) {
+        drop.classList.remove('is-open');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    });
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') {
+        drop.classList.remove('is-open');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  });
+
   var burger = document.getElementById('burger');
   var nav = document.getElementById('cabNav');
   var backdrop = document.getElementById('navBackdrop');
+
+  // Мобильное меню публичных страниц
+  var mobileNav = document.getElementById('siteNavMobile');
+  if (burger && mobileNav) {
+    burger.addEventListener('click', function () {
+      var open = mobileNav.classList.toggle('is-open');
+      burger.setAttribute('aria-expanded', String(open));
+      document.body.classList.toggle('is-nav-open', open);
+    });
+    mobileNav.addEventListener('click', function (event) {
+      if (event.target.tagName === 'A') {
+        mobileNav.classList.remove('is-open');
+        burger.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('is-nav-open');
+      }
+    });
+  }
   var navClose = document.getElementById('navClose');
 
   function setMenu(open) {

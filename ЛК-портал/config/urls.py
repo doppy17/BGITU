@@ -6,6 +6,8 @@ from django.urls import include, path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # публичная часть сайта — главная, новости, институты, приём
+    path('', include('apps.main.urls')),
     path('', include('apps.portal.urls')),
     path('', include('apps.accounts.urls')),
     path('', include('apps.education.urls')),

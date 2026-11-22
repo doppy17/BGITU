@@ -1,0 +1,103 @@
+{% extends 'main/base_site.html' %}
+{% block title %}Абитуриенту — БГИТУ{% endblock %}
+{% block nav_admission %}site-nav__link--active{% endblock %}
+
+{% block content %}
+<div class="page">
+    <p class="page__eyebrow">Поступление</p>
+    <h1 class="page__title">Абитуриенту</h1>
+    <p class="page__lead">Всё, что нужно знать для поступления в БГИТУ в 2024 году.</p>
+
+    <div class="admission-grid">
+        <div class="info-block">
+            <h2 class="info-block__title">Документы для поступления</h2>
+            <ul class="info-block__list">
+                <li>Заявление установленного образца</li>
+                <li>Оригинал или копия аттестата / диплома</li>
+                <li>Копия паспорта (страницы 2–3 и прописка)</li>
+                <li>Сертификаты ЕГЭ (при поступлении на бакалавриат)</li>
+                <li>2 фотографии 3×4 матовые</li>
+                <li>Медицинская справка 086/у (для ряда специальностей)</li>
+            </ul>
+        </div>
+
+        <div class="info-block">
+            <h2 class="info-block__title">Контакты приёмной комиссии</h2>
+            <ul class="info-block__list">
+                <li>г. Брянск, пр-т Станке Димитрова, 3, корп. 1, ауд. 103</li>
+                <li>Телефон: <a href="tel:+74832746008">+7 (4832) 74-60-08</a></li>
+                <li>E-mail: <a href="mailto:pk@bgitu.ru">pk@bgitu.ru</a></li>
+                <li>Пн–Пт 9:00–17:00, Сб 10:00–14:00</li>
+            </ul>
+        </div>
+
+        <div class="info-block">
+            <h2 class="info-block__title">Способы подачи документов</h2>
+            <ul class="info-block__list">
+                <li>Лично в приёмной комиссии</li>
+                <li>Через портал Госуслуги</li>
+                <li>По почте заказным письмом</li>
+                <li>Через суперсервис «Поступление в вуз онлайн»</li>
+            </ul>
+        </div>
+
+        <div class="info-block">
+            <h2 class="info-block__title">Особые права</h2>
+            <ul class="info-block__list">
+                <li>Победители и призёры олимпиад (список утверждён Минобрнауки)</li>
+                <li>Дети-сироты и дети без попечения родителей</li>
+                <li>Инвалиды I и II группы</li>
+                <li>Ветераны боевых действий</li>
+                <li>Целевое направление от организации</li>
+            </ul>
+        </div>
+    </div>
+
+    <h2 style="font-family: var(--font-head); font-size: 22px; font-weight: 800; margin: 48px 0 20px;">
+        Сроки подачи документов 2024
+    </h2>
+
+    <table class="deadline-table">
+        <thead>
+            <tr>
+                <th>Этап</th>
+                <th>Бюджет, очно</th>
+                <th>Платно</th>
+                <th>Заочно</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Начало приёма документов</td>
+                <td>20 июня</td>
+                <td>20 июня</td>
+                <td>1 июля</td>
+            </tr>
+            <tr>
+                <td>Окончание приёма (ЕГЭ)</td>
+                <td>25 июля</td>
+                <td>20 августа</td>
+                <td>20 августа</td>
+            </tr>
+            <tr>
+                <td>Публикация конкурсных списков</td>
+                <td>27 июля</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr>
+                <td>Приоритетное зачисление</td>
+                <td>28 июля</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+            <tr>
+                <td>Основное зачисление</td>
+                <td>3 августа</td>
+                <td>30 августа</td>
+                <td>30 августа</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}
