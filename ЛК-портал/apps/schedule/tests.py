@@ -66,7 +66,7 @@ class ScheduleImportTests(TestCase):
         self.assertContains(response, f'неделя № {week}')
         self.assertContains(response, f'{monday.strftime("%d.%m")} — {sunday.strftime("%d.%m.%Y")}')
         self.assertContains(response, 'Базы данных')
-        self.assertContains(response, 'Семестр · предметы по неделям')
+        self.assertContains(response, 'Учебный план · вся программа обучения')
 
     def test_week_arrows_and_limits(self):
         """Стрелки листают недели; на границах семестра — выключены."""
@@ -141,11 +141,26 @@ class WeekParityTests(TestCase):
         self.assertContains(odd, '<b>Философия</b>')
         self.assertContains(even, '<b>Философия</b>')
 
-    def test_timeline_segments_for_all_weeks(self):
-        """Предмет «каждую неделю» занимает на оси весь семестр (1–18)."""
+    def test_curriculum_block_lists_program(self):
+        """Блок учебного плана: все дисциплины программы по семестрам."""
         self.client.force_login(self.student)
         response = self.client.get(reverse('schedule:schedule'))
-        self.assertContains(response, 'Философия: недели 1–18')
+        self.assertContains(response, 'Учебный план · вся программа обучения')
+        self.assertContains(response, 'Математический анализ')
+        self.assertContains(response, 'Иностранный язык')
+        # многолетняя дисциплина — отрезок по семестрам
+        self.assertContains(response, 'Иностранный язык: 1–4 семестры')
+        self.assertContains(response, '>3</b><em>сем.</em>')
+
+    def test_curriculum_marks_current_semester(self):
+        from datetime import date
+
+        from .views import current_program_semester
+
+        expected = current_program_semester(2, date.today())  # ИСТ-201 — 2 курс
+        self.client.force_login(self.student)
+        response = self.client.get(reverse('schedule:schedule'))
+        self.assertContains(response, f'is-now" style="--w: {expected}"')
 
 
 class ServerImportPathTests(TestCase):

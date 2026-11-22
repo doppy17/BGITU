@@ -94,29 +94,29 @@
   </div>
 </section>
 
-<!-- Ось семестра: предметы по неделям -->
+<!-- Учебный план: вся программа по семестрам -->
 <section class="panel semester-panel">
   <header class="panel__head">
     <div class="panel__title">
       <span class="panel__num mono">01</span>
-      <h2>Семестр · предметы по неделям</h2>
+      <h2>Учебный план · вся программа обучения</h2>
     </div>
   </header>
-  <p class="muted semester-panel__lead">Ось — недели семестра ({{ semester_weeks|length }} недель). Цветные отрезки показывают, на каких неделях идёт предмет.</p>
+  <p class="muted semester-panel__lead">Ось — семестры программы ({{ program_semesters|length }}). Цветные отрезки показывают, в каких семестрах читается дисциплина{% if program_semester %}; текущий семестр — {{ program_semester }}-й{% endif %}.</p>
 
   <div class="tl-scroll">
-    <div class="tl-grid" style="--weeks: {{ semester_weeks|length }}">
+    <div class="tl-grid tl-grid--semesters" style="--weeks: {{ program_semesters|length }}">
       <div class="tl-axis">
-        <span class="tl-subject mono dim">предмет</span>
+        <span class="tl-subject mono dim">семестры →</span>
         <div class="tl-ticks">
-          {% for w in semester_weeks %}
-          <span class="tl-tick{% if w == current_week %} is-now{% endif %}" style="--w: {{ w }}">
-            <i></i><b class="mono">{{ w }}</b>
+          {% for sem in program_semesters %}
+          <span class="tl-tick{% if sem == program_semester %} is-now{% endif %}" style="--w: {{ sem }}">
+            <i></i><b class="mono">{{ sem }}</b><em>сем.</em>
           </span>
           {% endfor %}
         </div>
       </div>
-      {% for item in timeline %}
+      {% for item in curriculum %}
       <div class="tl-row" style="--i: {{ forloop.counter }}">
         <span class="tl-subject">{{ item.subject }}</span>
         <div class="tl-track">
@@ -124,14 +124,14 @@
           {% for start, end in item.segments %}
           <span class="tl-seg tl-seg--{{ item.color }}"
                 style="--from: {{ start }}; --to: {{ end }}"
-                title="{{ item.subject }}: недели {{ start }}{% if end != start %}–{{ end }}{% endif %}">
-            {% if end == start %}{{ start }}{% endif %}
+                title="{{ item.subject }}: {% if end == start %}{{ start }}-й семестр{% else %}{{ start }}–{{ end }} семестры{% endif %}">
+            {% if end != start %}{{ start }}–{{ end }}{% else %}{{ start }}{% endif %}
           </span>
           {% endfor %}
         </div>
       </div>
       {% empty %}
-      <div class="empty"><b>Предметов нет</b><p>Расписание группы ещё не загружено.</p></div>
+      <div class="empty"><b>Учебный план не загружен</b><p>Для этого направления план появится позже.</p></div>
       {% endfor %}
     </div>
   </div>

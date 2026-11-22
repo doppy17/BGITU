@@ -174,3 +174,20 @@ class Grade(models.Model):
     @property
     def numeric(self):
         return int(self.value) if self.value in ('2', '3', '4', '5') else None
+
+
+class CurriculumEntry(models.Model):
+    """Строка учебного плана: дисциплина и семестры, в которых она читается."""
+
+    code = models.CharField('направление', max_length=16, default='ist')
+    subject = models.CharField('дисциплина', max_length=200)
+    semester_from = models.PositiveSmallIntegerField('с семестра', default=1)
+    semester_to = models.PositiveSmallIntegerField('по семестр', default=1)
+
+    class Meta:
+        verbose_name = 'учебный план'
+        verbose_name_plural = 'учебный план'
+        ordering = ['semester_from', 'subject']
+
+    def __str__(self):
+        return f'{self.subject} ({self.semester_from}–{self.semester_to})'

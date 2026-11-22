@@ -1205,6 +1205,17 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   from { transform: scaleX(0); opacity: 0; }
   to { transform: scaleX(1); opacity: 1; }
 }
+/* ось учебного плана: 8 семестров */
+.tl-grid--semesters .tl-ticks { height: 42px; }
+.tl-grid--semesters .tl-tick { gap: 1px; }
+.tl-grid--semesters .tl-tick em {
+  font-style: normal;
+  font-size: 0.5rem;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+}
+.tl-grid--semesters .tl-seg { font-size: 0.625rem; }
+
 /* палитра отрезков — на основе токенов темы, читается в любой теме */
 .tl-seg--0 { background: var(--accent); color: var(--accent-ink); }
 .tl-seg--1 { background: color-mix(in oklab, var(--accent) 62%, var(--aux)); color: var(--accent-ink); }

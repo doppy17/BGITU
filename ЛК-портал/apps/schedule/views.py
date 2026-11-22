@@ -1,6 +1,5 @@
 """Просмотр расписания и импорт файла с сайта БГИТУ."""
 import os
-from collections import defaultdict
 from datetime import date, timedelta
 
 from django.contrib import messages
@@ -10,7 +9,7 @@ from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
 
 from apps.accounts.permissions import role_can, role_required
-from apps.education.models import Group
+from apps.education.models import CurriculumEntry, Group
 
 from .models import Bell, Lesson, ScheduleImport
 from .services import run_import
@@ -23,6 +22,7 @@ DAY_FULL = ['', 'Понедельник', 'Вторник', 'Среда', 'Че�
 # Позже начало семестра стоит брать из импорта/настроек, а не константой.
 SEMESTER_START = date(2026, 8, 31)
 SEMESTER_WEEKS = 18
+PROGRAM_SEMESTERS = 8  # семестров в программе бакалавриата
 
 
 def semester_week_of(day):
@@ -36,6 +36,16 @@ def semester_monday(week):
 def parity_of_monday(monday):
     """Календарная чётность недели (по ISO-номеру) — как в файле БГИТУ."""
     return 'odd' if monday.isocalendar()[1] % 2 else 'even'
+
+
+def current_program_semester(course, today=None):
+    """Номер семестра программы: курс 2, осень → 3-й семестр."""
+    if not course:
+        return None
+    today = today or date.today()
+    autumn = today.month in (9, 10, 11, 12, 1)
+    offset = 1 if autumn else 2
+    return min(PROGRAM_SEMESTERS, (course - 1) * 2 + offset)
 
 
 def run_segments(weeks):
@@ -115,27 +125,18 @@ def schedule_view(request):
             'is_today': day == date.today(),
         })
 
-    # Ось семестра: предметы и недели, на которых они есть.
-    subject_weeks = defaultdict(set)
-    subject_order = []
-    if group:
-        for lesson in Lesson.objects.filter(group=group).order_by('weekday', 'pair', 'subgroup'):
-            if lesson.subject not in subject_weeks:
-                subject_order.append(lesson.subject)
-            if lesson.week == 'all':
-                subject_weeks[lesson.subject].update(range(1, SEMESTER_WEEKS + 1))
-            else:
-                subject_weeks[lesson.subject].update(
-                    w for w in range(1, SEMESTER_WEEKS + 1)
-                    if parity_of_monday(semester_monday(w)) == lesson.week
-                )
-    timeline = []
-    for index, subject in enumerate(subject_order):
-        timeline.append({
-            'subject': subject,
-            'segments': run_segments(subject_weeks[subject]),
-            'color': index % 6,
-        })
+    # Учебный план: все дисциплины программы и семестры, где они читаются.
+    direction_code = 'ist' if group and group.code.upper().startswith('ИСТ') else None
+    curriculum = []
+    if direction_code:
+        entries = CurriculumEntry.objects.filter(code=direction_code)
+        for index, entry in enumerate(entries):
+            curriculum.append({
+                'subject': entry.subject,
+                'segments': run_segments(range(entry.semester_from, entry.semester_to + 1)),
+                'color': index % 6,
+            })
+    program_semester = current_program_semester(group.course if group else None) if direction_code else None
 
     latest = ScheduleImport.objects.order_by('-imported_at').first()
     return render(request, 'schedule/schedule.html', {
@@ -148,11 +149,12 @@ def schedule_view(request):
         'sunday': sunday,
         'is_current': is_current,
         'direction': direction,
-        'semester_weeks': range(1, SEMESTER_WEEKS + 1),
+        'program_semesters': range(1, PROGRAM_SEMESTERS + 1),
+        'program_semester': program_semester,
         'current_week': current_week,
         'days_header': days_header,
         'grid': grid,
-        'timeline': timeline,
+        'curriculum': curriculum,
         'latest_import': latest,
     })
 
