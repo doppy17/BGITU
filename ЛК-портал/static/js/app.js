@@ -65,6 +65,7 @@
     var AMP = 0.13;      // максимум увеличения
     var SIGMA = 95;      // радиус влияния, px
     var base = null;     // базовые позиции пунктов (без трансформаций)
+    var dockExpandTimer = 0;
 
     function measure() {
       base = dockItems.map(function (el) {
@@ -114,18 +115,52 @@
       }, 50);
     }
 
-    dockNav.addEventListener('mouseenter', function () { measure(); });
+    // Рельс: при наведении раскрывается панель с подписями (только на десктопе),
+    // после раскрытия измеряются позиции и включается док-магнификация.
+    dockNav.addEventListener('mouseenter', function () {
+      if (window.innerWidth <= 1000) return;
+      dockNav.classList.add('is-expanded');
+      window.clearTimeout(dockExpandTimer);
+      dockExpandTimer = window.setTimeout(function () {
+        measure();
+        if (pendingY !== null) flush();
+      }, 340);
+    });
     dockNav.addEventListener('mousemove', function (event) {
       if (!base) return;
       schedule(event.clientY);
     });
     dockNav.addEventListener('mouseleave', function () {
+      window.clearTimeout(dockExpandTimer);
+      dockNav.classList.remove('is-expanded');
       base = null;
       pendingY = null;
       if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
       dockItems.forEach(function (el) { el.style.transform = ''; });
     });
   })();
+
+  // Поле поиска в шапке: ⌘K/Ctrl+K — фокус; Enter — пока честный ответ.
+  var search = document.getElementById('headSearch');
+  if (search) {
+    document.addEventListener('keydown', function (event) {
+      if ((event.metaKey || event.ctrlKey) && (event.key === 'k' || event.key === 'K')) {
+        event.preventDefault();
+        search.focus();
+      }
+    });
+    search.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        var toast = document.getElementById('toast');
+        if (toast) {
+          toast.textContent = 'Поиск в разработке — скоро появится.';
+          toast.classList.add('is-on');
+          window.setTimeout(function () { toast.classList.remove('is-on'); }, 2600);
+        }
+      }
+    });
+  }
 
   // Сообщения не мешают работе: плавно убираем через 7 секунд.
   var flashes = document.querySelectorAll('.flash');

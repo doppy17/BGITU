@@ -71,12 +71,12 @@ class NavCompositionTests(TestCase):
         self.dev.profile.role = self.dev_role
         self.dev.profile.save()
 
-    def test_developer_sees_all_seven_sections(self):
+    def test_developer_sees_all_sections(self):
         self.client.force_login(self.dev)
         response = self.client.get(reverse('portal:dashboard'))
         content = response.content.decode()
         for label in ('Обзор', 'Расписание', 'Стипендия', 'Курсы', 'Оценки', 'Роли', 'Профиль', 'Студенты'):
-            self.assertContains(response, f'>{label}</a>', html=False)
+            self.assertContains(response, f'class="cab-nav__lbl">{label}</span>')
 
     def test_nav_is_flat_single_list(self):
         """Единый список без подзаголовка «управление» и разделителей;
@@ -103,10 +103,29 @@ class NavCompositionTests(TestCase):
             self.assertContains(response, href)
             self.assertContains(response, f'>{label}</a>', html=False)
 
+    def test_top_nav_has_no_role_and_no_fio(self):
+        """В верхнем навбаре нет роли и ФИО — только поиск, тема, выход."""
+        self.client.force_login(self.dev)
+        response = self.client.get(reverse('portal:dashboard'))
+        self.assertNotContains(response, 'badge badge--soft')
+        self.assertNotContains(response, 'class="head-user"')
+        self.assertContains(response, 'id="headSearch"')
+        # ФИО и роль видны в ящике (cab-nav__user)
+        self.assertContains(response, 'cab-nav__user')
+
+    def test_all_sections_are_wip(self):
+        """Все разделы в режиме «в разработке»."""
+        self.client.force_login(self.dev)
+        for url in ('/cabinet/', '/cabinet/grades/', '/schedule/', '/courses/', '/works/',
+                    '/roles/', '/cabinet/stipendia/', '/cabinet/profile/', '/manage/students/'):
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200, url)
+            self.assertContains(response, 'Раздел в разработке')
+
     def test_student_does_not_see_students_link(self):
         self.client.force_login(self.student)
         response = self.client.get(reverse('portal:dashboard'))
         content = response.content.decode()
         self.assertNotIn('>Студенты</a>', content)
         for label in ('Обзор', 'Расписание', 'Стипендия', 'Курсы', 'Оценки', 'Роли', 'Профиль'):
-            self.assertIn(f'>{label}</a>', content)
+            self.assertIn(f'class="cab-nav__lbl">{label}</span>', content)

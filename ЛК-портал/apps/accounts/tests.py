@@ -134,7 +134,7 @@ class RegistrationTests(TestCase):
         self.assertEqual(user.profile.role, self.role)
         self.assertEqual(user.profile.group, self.group)
         self.assertEqual(self.client.session['_auth_user_id'], str(user.pk))
-        self.assertContains(self.client.get(reverse('portal:dashboard')), 'ИСТ-201')
+        self.assertContains(self.client.get(reverse('portal:dashboard')), 'Раздел в разработке')
 
     def test_register_ignores_posted_username(self):
         self.payload['username'] = 'hacker-name'

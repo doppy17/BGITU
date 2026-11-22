@@ -49,22 +49,21 @@ class ScheduleImportTests(TestCase):
         self.assertIn(lesson.weekday, range(1, 7))
         self.assertIn(lesson.pair, range(1, 7))
 
-    def test_student_schedule_shows_own_group(self):
+    def test_schedule_page_is_wip(self):
+        """Раздел «Расписание» в разработке — страница открывается, но без данных."""
         self.student.profile.group = Group.objects.get(code='ИСТ-201')
         self.student.profile.save()
         self.client.force_login(self.student)
         response = self.client.get(reverse('schedule:schedule'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'ИСТ-201')
-        self.assertContains(response, 'Базы данных')
-        self.assertNotContains(response, 'id="groupSelect"')
+        self.assertContains(response, 'Раздел в разработке')
+        self.assertNotContains(response, 'Базы данных')
 
-    def test_staff_can_switch_group(self):
+    def test_schedule_page_wip_for_staff(self):
         self.client.force_login(self.dean)
         response = self.client.get(reverse('schedule:schedule'), {'group': 'ИСТ-101'})
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Группа ИСТ-101')
-        self.assertContains(response, 'id="groupSelect"')
+        self.assertContains(response, 'Раздел в разработке')
 
     def test_student_cannot_open_import(self):
         self.client.force_login(self.student)
@@ -94,26 +93,16 @@ class WeekParityTests(TestCase):
         self.assertEqual(parse_cell('Математика чётн.')['week'], 'even')
         self.assertEqual(parse_cell('Базы данных\n482 (Козлова И.Р.)')['week'], 'all')
 
-    def test_no_parity_hides_toggle_and_week_label(self):
-        self.client.force_login(self.student)
-        response = self.client.get(reverse('schedule:schedule'))
-        self.assertNotContains(response, 'aria-label="Неделя"')
-        self.assertNotContains(response, 'нечётная неделя')
-        self.assertContains(response, 'Философия')
-
-    def test_parity_lessons_show_toggle_and_filter(self):
+    def test_schedule_wip_with_parity_lessons(self):
+        """Раздел WIP даже при наличии недельных занятий."""
         from .models import Lesson
 
         Lesson.objects.create(group=self.group, weekday=2, pair=1, week='odd', subject='Только нечёт')
-        Lesson.objects.create(group=self.group, weekday=2, pair=2, week='even', subject='Только чёт')
         self.client.force_login(self.student)
-        odd = self.client.get(reverse('schedule:schedule'), {'week': 'odd'})
-        even = self.client.get(reverse('schedule:schedule'), {'week': 'even'})
-        self.assertContains(odd, 'aria-label="Неделя"')
-        self.assertContains(odd, 'Только нечёт')
-        self.assertNotContains(odd, 'Только чёт')
-        self.assertContains(even, 'Только чёт')
-        self.assertNotContains(even, 'Только нечёт')
+        response = self.client.get(reverse('schedule:schedule'), {'week': 'odd'})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Раздел в разработке')
+        self.assertNotContains(response, 'Только нечёт')
 
 
 class ServerImportPathTests(TestCase):
