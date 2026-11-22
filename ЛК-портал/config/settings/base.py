@@ -102,3 +102,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Загрузка работ: 20 МБ на файл, чтобы демо не падало на PDF-методичках.
 FILE_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024
 DATA_UPLOAD_MAX_MEMORY_SIZE = 25 * 1024 * 1024
+
+
+# Вход в кабинет держится между визитами: 30 дней, продлевается каждым запросом.
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 30
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False

@@ -50,6 +50,11 @@ class Profile(models.Model):
     role = models.ForeignKey(Role, on_delete=models.PROTECT, related_name='profiles', null=True, blank=True)
     group = models.ForeignKey('education.Group', on_delete=models.SET_NULL, related_name='profiles', null=True, blank=True)
     subgroup = models.PositiveSmallIntegerField('подгруппа', null=True, blank=True)
+    theme = models.CharField(
+        'тема оформления', max_length=10, blank=True,
+        choices=[('paper', 'Бумага'), ('surik', 'Сурик'), ('latun', 'Латунь')],
+        help_text='Выбор пользователя переносится между устройствами',
+    )
     record_book = models.CharField('зачётная книжка', max_length=32, blank=True)
     phone = models.CharField('телефон', max_length=32, blank=True)
     birth_date = models.DateField('дата рождения', null=True, blank=True)

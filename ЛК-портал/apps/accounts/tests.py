@@ -193,3 +193,50 @@ class LoginTests(TestCase):
         })
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Неверная почта/логин или пароль')
+
+
+class ThemePreferenceTests(TestCase):
+    """Тема сохраняется за пользователем и переживает перезаход/выход."""
+
+    @classmethod
+    def setUpTestData(cls):
+        from apps.accounts.models import Role
+
+        cls.role = Role.objects.create(code='student', name='Студент', can_upload_works=True)
+        cls.user = User.objects.create_user('thememan', password='demo12345')
+        cls.user.profile.role = cls.role
+        cls.user.profile.save()
+
+    def test_theme_settings_endpoint_saves_to_profile(self):
+        self.client.force_login(self.user)
+        response = self.client.post(reverse('accounts:theme_set'), {'theme': 'latun'})
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content, {'ok': True, 'theme': 'latun'})
+        self.user.profile.refresh_from_db()
+        self.assertEqual(self.user.profile.theme, 'latun')
+        self.assertEqual(response.cookies['bgitu-theme'].value, 'latun')
+
+    def test_theme_rejects_unknown_value(self):
+        self.client.force_login(self.user)
+        response = self.client.post(reverse('accounts:theme_set'), {'theme': 'pink'})
+        self.assertEqual(response.status_code, 400)
+        self.user.profile.refresh_from_db()
+        self.assertEqual(self.user.profile.theme, '')
+
+    def test_theme_survives_new_session(self):
+        """После выхода и нового входа страница рендерится с сохранённой темой."""
+        self.client.force_login(self.user)
+        self.client.post(reverse('accounts:theme_set'), {'theme': 'surik'})
+        self.client.logout()
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('main:index'))
+        self.assertContains(response, 'data-theme="surik"')
+
+    def test_anonymous_uses_cookie(self):
+        self.client.cookies['bgitu-theme'] = 'latun'
+        response = self.client.get(reverse('main:index'))
+        self.assertContains(response, 'data-theme="latun"')
+
+    def test_anonymous_default_is_paper(self):
+        response = self.client.get(reverse('main:index'))
+        self.assertContains(response, 'data-theme="paper"')

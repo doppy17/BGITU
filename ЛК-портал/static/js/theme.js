@@ -4,15 +4,45 @@
   'use strict';
 
   var THEMES = ['paper', 'surik', 'latun'];
-  var STORAGE_KEY = 'bgitu-theme';
+  var COOKIE = 'bgitu-theme';
   var META_COLORS = { paper: '#f2eee6', surik: '#0d0d0d', latun: '#0d0d0d' };
   var root = document.documentElement;
 
-  /* Ранняя установка: до отрисовки контента (скрипт подключён в <head>). */
+  /* Тему задаёт сервер (профиль пользователя или cookie) — до отрисовки.
+     ?theme= остаётся для предпросмотра. */
   var q = new URLSearchParams(window.location.search);
   var theme = q.get('theme');
-  try { theme = theme || localStorage.getItem(STORAGE_KEY); } catch (e) {}
   if (THEMES.indexOf(theme) !== -1) root.dataset.theme = theme;
+
+  function cookie(name) {
+    return document.cookie.split('; ').reduce(function (acc, part) {
+      var i = part.indexOf('=');
+      return part.slice(0, i) === name ? decodeURIComponent(part.slice(i + 1)) : acc;
+    }, '');
+  }
+
+  /* Тема пришла с сервера (профиль) — продублируем её в cookie,
+     чтобы выбор остался и после выхода из кабинета. */
+  (function syncCookie() {
+    var current = root.dataset.theme || 'paper';
+    if (cookie(COOKIE) !== current) {
+      document.cookie = COOKIE + '=' + current + '; max-age=' + (365 * 24 * 3600) + '; path=/; samesite=Lax';
+    }
+  })();
+
+  /* Запомнить выбор: cookie на год + профиль (если пользователь вошёл). */
+  function persist(name) {
+    document.cookie = COOKIE + '=' + name + '; max-age=' + (365 * 24 * 3600) + '; path=/; samesite=Lax';
+    if (root.dataset.auth !== '1') return;
+    var token = cookie('csrftoken');
+    fetch('/theme/', {
+      method: 'POST',
+      credentials: 'same-origin',
+      keepalive: true,
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': token },
+      body: 'theme=' + encodeURIComponent(name)
+    }).catch(function () {});
+  }
 
   function syncMeta() {
     var meta = document.querySelector('meta[name="theme-color"]');
@@ -30,7 +60,7 @@
     root.classList.add('theme-anim');
     setTimeout(function () { root.classList.remove('theme-anim'); }, 500);
     root.dataset.theme = name;
-    try { localStorage.setItem(STORAGE_KEY, name); } catch (e) {}
+    persist(name);
     syncRadios();
     syncMeta();
     document.dispatchEvent(new Event('bgitu:palette'));

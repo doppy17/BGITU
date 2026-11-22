@@ -10,6 +10,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.db.models import Count
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
@@ -294,3 +295,24 @@ def manage_student_update(request, user_id):
     profile.save(update_fields=['role', 'group', 'record_book'])
     messages.success(request, f'Профиль {profile.display_name} обновлён.')
     return redirect('accounts:students')
+
+
+# Допустимые темы оформления сайта.
+THEMES = ('paper', 'surik', 'latun')
+
+
+@login_required
+@require_POST
+def theme_set(request):
+    """Сохраняет выбранную тему в профиле — переносится между устройствами."""
+    theme = (request.POST.get('theme') or '').strip()
+    if theme not in THEMES:
+        return JsonResponse({'ok': False, 'error': 'unknown theme'}, status=400)
+    profile = getattr(request.user, 'profile', None)
+    if profile is None:
+        return JsonResponse({'ok': False, 'error': 'no profile'}, status=400)
+    profile.theme = theme
+    profile.save(update_fields=['theme'])
+    response = JsonResponse({'ok': True, 'theme': theme})
+    response.set_cookie('bgitu-theme', theme, max_age=365 * 24 * 3600, samesite='Lax')
+    return response

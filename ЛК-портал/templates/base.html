@@ -1,7 +1,7 @@
 {% load static %}
 {% load bgitu %}
 <!DOCTYPE html>
-<html lang="ru" data-theme="paper">
+<html lang="ru" data-theme="{{ ui_theme|default:'paper' }}" data-auth="{% if user.is_authenticated %}1{% else %}0{% endif %}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">

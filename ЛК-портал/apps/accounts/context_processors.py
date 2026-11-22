@@ -14,10 +14,26 @@ PERMISSIONS = {
 }
 
 
+THEMES = ('paper', 'surik', 'latun')
+
+
+def ui_theme(cookie_value):
+    """Тема: выбор в профиле, иначе cookie браузера, иначе «Бумага»."""
+    return cookie_value if cookie_value in THEMES else 'paper'
+
+
 def role_context(request):
     user = getattr(request, 'user', None)
+    cookie = request.COOKIES.get('bgitu-theme', '')
     if not user or not user.is_authenticated:
-        return {'current_role': None, 'perms': {}}
+        return {'current_role': None, 'perms': {}, 'ui_theme': ui_theme(cookie)}
+    profile = getattr(user, 'profile', None)
+    chosen = (profile.theme if profile and profile.theme else '') or cookie
+    return {
+        'current_role': get_role(user),
+        'perms': {key: role_can(user, field) for key, field in PERMISSIONS.items()},
+        'ui_theme': ui_theme(chosen),
+    }
     return {
         'current_role': get_role(user),
         'perms': {key: role_can(user, field) for key, field in PERMISSIONS.items()},
