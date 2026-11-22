@@ -70,7 +70,7 @@
       base = dockItems.map(function (el) {
         el.style.transform = '';
         var r = el.getBoundingClientRect();
-        return { center: r.top + r.height / 2, h: r.height };
+        return { center: r.top + r.height / 2, h: r.height, w: r.width };
       });
     }
 
@@ -89,19 +89,40 @@
         ty[k] = ty[k + 1] - (base[k].h * (scales[k] - 1) + base[k + 1].h * (scales[k + 1] - 1)) / 2;
       }
       dockItems.forEach(function (el, i) {
-        el.style.transform = 'translateY(' + ty[i].toFixed(2) + 'px) scale(' + scales[i].toFixed(3) + ')';
+        // увеличение + выдвижение вправо (tx) + раздвижка по вертикали (ty)
+        var tx = (scales[i] - 1) * base[i].w * 0.5;
+        el.style.transform = 'translate(' + tx.toFixed(2) + 'px, ' + ty[i].toFixed(2) + 'px) scale(' + scales[i].toFixed(3) + ')';
       });
     }
 
+    // Один расчёт на кадр (rAF), с фолбэком для фоновых вкладок и headless,
+    // где rAF не тикает — иначе на каждый mousemove идут лишние записи стилей и лог.
+    var rafId = 0, pendingY = null;
+    function flush() {
+      if (pendingY === null) return;
+      var y = pendingY;
+      pendingY = null;
+      apply(y);
+    }
+    function schedule(y) {
+      pendingY = y;
+      if (rafId) return;
+      var fired = false;
+      rafId = requestAnimationFrame(function () { rafId = 0; fired = true; flush(); });
+      setTimeout(function () {
+        if (!fired && rafId) { cancelAnimationFrame(rafId); rafId = 0; flush(); }
+      }, 50);
+    }
+
     dockNav.addEventListener('mouseenter', function () { measure(); });
-    // Прямой расчёт без requestAnimationFrame: в фоновых вкладках rAF
-    // троттлится, а расчёт здесь дешёвый (десяток пунктов).
     dockNav.addEventListener('mousemove', function (event) {
       if (!base) return;
-      apply(event.clientY);
+      schedule(event.clientY);
     });
     dockNav.addEventListener('mouseleave', function () {
       base = null;
+      pendingY = null;
+      if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
       dockItems.forEach(function (el) { el.style.transform = ''; });
     });
   })();

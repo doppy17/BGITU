@@ -21,13 +21,24 @@
 
 <header class="site-head" id="siteHead">
   <a class="logo" href="{% url 'portal:dashboard' %}">
-    <svg class="logo__mark" viewBox="0 0 32 32" aria-hidden="true">
-      <rect x="1" y="1" width="30" height="30" rx="9" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <path d="M11.2 7.6h6.9c3.3 0 5.2 1.8 5.2 4.4 0 1.7-.9 3-2.4 3.7 1.9.5 3.1 2 3.1 4.2 0 3-2.2 4.7-5.8 4.7h-7V7.6Zm3.8 2.9v4.1h2.8c1.4 0 2.2-.8 2.2-2.1s-.8-2-2.2-2h-2.8Zm0 7v4.4h3.1c1.5 0 2.4-.8 2.4-2.2s-.9-2.2-2.4-2.2h-3.1Z" fill="currentColor"/>
+    <svg class="logo__mark" viewBox="0 0 24 24" aria-hidden="true">
+      <rect width="24" height="24" rx="7" fill="currentColor"/>
+      <path d="M16 6H8v12h5a3.5 3.5 0 0 0 0-7H8" fill="none" stroke="var(--accent-ink)" stroke-width="2.2" stroke-linejoin="round"/>
     </svg>
     <span class="logo__word">БГИТУ</span>
     <span class="head-sub mono">кабинет</span>
   </a>
+
+  <nav class="site-nav" aria-label="Основное">
+    <ul>
+      <li><a href="https://tenec2000-sketch.github.io/bgitu-site/university.html">Университет</a></li>
+      <li><a href="https://tenec2000-sketch.github.io/bgitu-site/admission.html">Поступающим</a></li>
+      <li><a href="https://tenec2000-sketch.github.io/bgitu-site/student.html">Студенту</a></li>
+      <li><a href="https://tenec2000-sketch.github.io/bgitu-site/science.html">Наука</a></li>
+      <li><a href="https://tenec2000-sketch.github.io/bgitu-site/news.html">Новости</a></li>
+      <li><a href="https://tenec2000-sketch.github.io/bgitu-site/contacts.html">Контакты</a></li>
+    </ul>
+  </nav>
 
   <div class="head-tools">
     {% if current_role %}<span class="badge badge--soft">{{ current_role.name }}</span>{% endif %}
@@ -61,11 +72,6 @@
     <a href="{% url 'portal:profile' %}" {% if request.path == '/cabinet/profile/' %}aria-current="page"{% endif %}>Профиль</a>
     {% if perms.can_manage_users %}
     <a href="{% url 'accounts:students' %}" {% if request.path == '/manage/students/' %}aria-current="page"{% endif %}>Студенты</a>
-    {% endif %}
-
-    {% if perms.can_manage_roles or perms.can_approve_roles or perms.can_manage_schedule %}
-    <div class="cab-nav__sep" aria-hidden="true"></div>
-    <p class="cab-nav__label mono">управление</p>
     {% endif %}
     {% if perms.can_approve_roles %}<a href="{% url 'accounts:role_requests' %}" {% if request.path == '/role-requests/' %}aria-current="page"{% endif %}>Заявки на роли</a>{% endif %}
     {% if perms.can_manage_roles %}<a href="{% url 'accounts:role_create' %}" {% if request.path == '/roles/new/' %}aria-current="page"{% endif %}>Создать роль</a>{% endif %}

@@ -63,6 +63,26 @@
 
 .head-tools { display: flex; align-items: center; gap: 8px; flex: none; }
 
+/* Навигация основного сайта в шапке — как на bgitu-site */
+.site-nav { margin-inline: auto; }
+.site-nav ul { display: flex; gap: 2px; }
+.site-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 1em;
+  border-radius: var(--radius-pill);
+  color: var(--text-muted);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color var(--dur-fast), background var(--dur-fast);
+}
+.site-nav a:hover { color: var(--text); background: var(--line); }
+@media (max-width: 1180px) {
+  .site-nav { display: none; }
+}
+
 .icon-btn {
   width: 44px;
   height: 44px;

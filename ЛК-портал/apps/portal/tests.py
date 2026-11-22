@@ -78,6 +78,28 @@ class NavCompositionTests(TestCase):
         for label in ('Обзор', 'Расписание', 'Стипендия', 'ЭОС', 'Роли', 'Профиль', 'Студенты'):
             self.assertContains(response, f'>{label}</a>', html=False)
 
+    def test_nav_is_flat_single_list(self):
+        """Единый список без подзаголовка «управление» и разделителей."""
+        self.client.force_login(self.dev)
+        response = self.client.get(reverse('portal:dashboard'))
+        self.assertNotContains(response, 'cab-nav__label')
+        self.assertNotContains(response, 'cab-nav__sep')
+
+    def test_top_nav_has_main_site_links(self):
+        self.client.force_login(self.dev)
+        response = self.client.get(reverse('portal:dashboard'))
+        self.assertContains(response, 'class="site-nav"')
+        for href, label in [
+            ('university.html', 'Университет'),
+            ('admission.html', 'Поступающим'),
+            ('student.html', 'Студенту'),
+            ('science.html', 'Наука'),
+            ('news.html', 'Новости'),
+            ('contacts.html', 'Контакты'),
+        ]:
+            self.assertContains(response, href)
+            self.assertContains(response, f'>{label}</a>', html=False)
+
     def test_student_does_not_see_students_link(self):
         self.client.force_login(self.student)
         response = self.client.get(reverse('portal:dashboard'))
