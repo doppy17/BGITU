@@ -149,15 +149,18 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   flex-direction: column;
   gap: 2px;
   width: 60px;
-  padding: 6px;
+  padding: 12px 6px;
   border: 1px solid var(--line);
-  border-radius: var(--radius-m);
-  background: var(--bg-raised);
+  border-radius: var(--radius-pill);
+  background: var(--bg-glass);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  backdrop-filter: blur(16px) saturate(1.4);
   transition: width var(--dur) var(--ease), background var(--dur), border-color var(--dur), box-shadow var(--dur);
 }
 .cab-nav.is-expanded {
   width: 224px;
-  background: var(--bg-panel);
+  border-radius: var(--radius-l);
+  background: color-mix(in oklab, var(--brand-base) 84%, transparent);
   border-color: var(--line-strong);
   box-shadow: 0 24px 70px rgb(0 0 0 / 0.4);
 }
