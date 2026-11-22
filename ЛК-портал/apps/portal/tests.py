@@ -44,13 +44,13 @@ class StubPagesTests(TestCase):
 
     def test_stub_pages_render_for_user(self):
         self.client.force_login(self.user)
-        for name, title in [('stipendia', 'Стипендия'), ('eos', 'ЭОС'), ('profile', 'Профиль')]:
+        for name, title in [('stipendia', 'Стипендия'), ('profile', 'Профиль')]:
             response = self.client.get(reverse(f'portal:{name}'))
             self.assertEqual(response.status_code, 200, name)
             self.assertContains(response, title)
 
     def test_stub_pages_redirect_anonymous(self):
-        for name in ('stipendia', 'eos', 'profile'):
+        for name in ('stipendia', 'profile'):
             response = self.client.get(reverse(f'portal:{name}'))
             self.assertEqual(response.status_code, 302, name)
             self.assertIn('/login/', response.url, name)
@@ -75,7 +75,7 @@ class NavCompositionTests(TestCase):
         self.client.force_login(self.dev)
         response = self.client.get(reverse('portal:dashboard'))
         content = response.content.decode()
-        for label in ('Обзор', 'Расписание', 'Стипендия', 'ЭОС', 'Роли', 'Профиль', 'Студенты'):
+        for label in ('Обзор', 'Расписание', 'Стипендия', 'Курсы', 'Оценки', 'Роли', 'Профиль', 'Студенты'):
             self.assertContains(response, f'>{label}</a>', html=False)
 
     def test_nav_is_flat_single_list(self):
@@ -85,7 +85,7 @@ class NavCompositionTests(TestCase):
         response = self.client.get(reverse('portal:dashboard'))
         self.assertNotContains(response, 'cab-nav__label')
         self.assertNotContains(response, 'cab-nav__sep')
-        for removed in ('>Заявки на роли</a>', '>Создать роль</a>', '>Импорт расписания</a>'):
+        for removed in ('>Заявки на роли</a>', '>Создать роль</a>', '>Импорт расписания</a>', '>ЭОС</a>'):
             self.assertNotContains(response, removed)
 
     def test_top_nav_has_main_site_links(self):
@@ -108,5 +108,5 @@ class NavCompositionTests(TestCase):
         response = self.client.get(reverse('portal:dashboard'))
         content = response.content.decode()
         self.assertNotIn('>Студенты</a>', content)
-        for label in ('Обзор', 'Расписание', 'Стипендия', 'ЭОС', 'Роли', 'Профиль'):
+        for label in ('Обзор', 'Расписание', 'Стипендия', 'Курсы', 'Оценки', 'Роли', 'Профиль'):
             self.assertIn(f'>{label}</a>', content)

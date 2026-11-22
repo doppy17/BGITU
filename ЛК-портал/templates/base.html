@@ -67,7 +67,8 @@
     <a href="{% url 'portal:dashboard' %}" {% if request.path == '/cabinet/' %}aria-current="page"{% endif %}>Обзор</a>
     <a href="{% url 'schedule:schedule' %}" {% if request.path == '/schedule/' %}aria-current="page"{% endif %}>Расписание</a>
     <a href="{% url 'portal:stipendia' %}" {% if request.path == '/cabinet/stipendia/' %}aria-current="page"{% endif %}>Стипендия</a>
-    <a href="{% url 'portal:eos' %}" {% if request.path == '/cabinet/eos/' %}aria-current="page"{% endif %}>ЭОС</a>
+    <a href="{% url 'education:courses' %}" {% if '/courses/' in request.path %}aria-current="page"{% endif %}>Курсы</a>
+    <a href="{% url 'portal:grades' %}" {% if request.path == '/cabinet/grades/' %}aria-current="page"{% endif %}>Оценки</a>
     <a href="{% url 'accounts:roles' %}" {% if request.path == '/roles/' %}aria-current="page"{% endif %}>Роли</a>
     <a href="{% url 'portal:profile' %}" {% if request.path == '/cabinet/profile/' %}aria-current="page"{% endif %}>Профиль</a>
     {% if perms.can_manage_users %}

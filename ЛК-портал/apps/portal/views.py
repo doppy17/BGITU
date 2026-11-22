@@ -37,11 +37,6 @@ def stipendia_view(request):
 
 
 @login_required
-def eos_view(request):
-    return render(request, 'portal/eos.html')
-
-
-@login_required
 def profile_view(request):
     return render(request, 'portal/profile.html')
 
