@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="{% static 'css/portal.css' %}">
 </head>
 <body id="top">
+<canvas class="bg-canvas" aria-hidden="true"></canvas>
 <a class="skip" href="#content">К содержимому</a>
 
 <header class="site-head" id="siteHead">
@@ -136,6 +137,7 @@
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="{% static 'js/bg.js' %}"></script>
 <script src="{% static 'js/app.js' %}"></script>
 </body>
 </html>

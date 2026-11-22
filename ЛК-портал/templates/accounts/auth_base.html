@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="{% static 'css/portal.css' %}">
 </head>
 <body class="auth-page">
+<canvas class="bg-canvas" aria-hidden="true"></canvas>
 <button class="theme-btn theme-btn--float" type="button" popovertarget="theme-pop" aria-label="Оформление сайта" title="Тема">
   <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg>
 </button>
@@ -54,5 +55,6 @@
     </section>
   </main>
 </div>
+<script src="{% static 'js/bg.js' %}"></script>
 </body>
 </html>

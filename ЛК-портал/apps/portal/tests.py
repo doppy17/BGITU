@@ -24,6 +24,17 @@ class ThemeUITests(TestCase):
             self.assertContains(response, f'data-theme-set="{name}"')
         self.assertContains(response, 'js/theme.js')
 
+    def test_pages_have_bg_canvas(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('portal:dashboard'))
+        self.assertContains(response, 'class="bg-canvas"')
+        self.assertContains(response, 'js/bg.js')
+        from django.test import Client
+        anon = Client()
+        auth = anon.get(reverse('accounts:login'))
+        self.assertContains(auth, 'class="bg-canvas"')
+        self.assertContains(auth, 'js/bg.js')
+
     def test_dashboard_has_theme_button(self):
         self.client.force_login(self.user)
         response = self.client.get(reverse('portal:dashboard'))

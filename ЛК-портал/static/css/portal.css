@@ -365,3 +365,20 @@ code { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--text-mu
   .course-grid, .role-grid { grid-template-columns: 1fr; }
   .stat-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+
+/* ---------- Фон кабинета: звёзды и линии под контентом ---------- */
+.bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: var(--trail-op, 0.45);
+}
+/* контент поверх фона */
+.app-layout, .site-foot, .auth-shell { position: relative; z-index: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .bg-canvas { opacity: calc(var(--trail-op, 0.45) * 0.7); }
+}
