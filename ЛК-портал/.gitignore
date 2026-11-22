@@ -6,3 +6,6 @@ media/
 staticfiles/
 .DS_Store
 .env
+
+# локальный порт последнего запуска
+.run-port

@@ -377,6 +377,17 @@ code { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--text-mu
   pointer-events: none;
   opacity: var(--trail-op, 0.45);
 }
+/* фон-«след» с основного сайта: линии, уходящие в подвал */
+.trail {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  pointer-events: none;
+  opacity: var(--trail-op, 0.5);
+}
 /* контент поверх фона */
 .app-layout, .site-foot, .auth-shell { position: relative; z-index: 1; }
 @media (prefers-reduced-motion: reduce) {

@@ -169,40 +169,8 @@
     }
   }
 
-  // Футер: подсветка надписи «БГИТУ» следует за курсором, размеры пятен дышат.
-  var fw = document.querySelector('.footer__word');
-  if (fw) {
-    var spots = [
-      { x: '--x0', y: '--y0' },
-      { x: '--x1', y: '--y1' },
-      { x: '--x2', y: '--y2' },
-    ];
-    addEventListener('pointermove', function (e) {
-      var r = fw.getBoundingClientRect();
-      if (e.clientY < r.top - 140 || e.clientY > r.bottom + 80) return;
-      var px = ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%';
-      var py = ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%';
-      fw.style.setProperty(spots[0].x, px);
-      fw.style.setProperty(spots[0].y, py);
-      setTimeout(function () {
-        fw.style.setProperty(spots[1].x, px);
-        fw.style.setProperty(spots[1].y, py);
-      }, 140);
-      setTimeout(function () {
-        fw.style.setProperty(spots[2].x, px);
-        fw.style.setProperty(spots[2].y, py);
-      }, 300);
-    });
-    var breathe = function () {
-      var t = reduce ? 0 : performance.now() / 1000;
-      var k = 1 + 1.1 * footerBoost; // линии врезались — надпись разгорается
-      fw.style.setProperty('--f0', (k * (0.22 + 0.2 * (1 + Math.sin(t * 0.5)))).toFixed(2));
-      fw.style.setProperty('--f1', (k * (0.28 + 0.26 * (1 + Math.sin(t * 0.5 + 2.1)))).toFixed(2));
-      fw.style.setProperty('--f2', (k * (0.18 + 0.16 * (1 + Math.sin(t * 0.5 + 4.2)))).toFixed(2));
-    };
-    breathe();
-    if (!reduce) setInterval(breathe, 800);
-  }
+  // Футер «БГИТУ» теперь подсвечивает фон-«след» (static/js/trail.js):
+  // он сам ставит --x0..2/--y0..2 по точкам входа линий и --f0..2, когда линии доходят.
 
   var t0 = performance.now();
   var timer = 0;

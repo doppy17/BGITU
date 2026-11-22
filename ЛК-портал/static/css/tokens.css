@@ -1,3 +1,8 @@
+/* Плавное «разгорание» букв «БГИТУ», когда линии следа доходят до подвала */
+@property --f0 { syntax: '<number>'; inherits: true; initial-value: 0; }
+@property --f1 { syntax: '<number>'; inherits: true; initial-value: 0; }
+@property --f2 { syntax: '<number>'; inherits: true; initial-value: 0; }
+
 /* ============================================================
    БГИТУ — дизайн-токены
    Единственное место, где задаются брендовые значения.
