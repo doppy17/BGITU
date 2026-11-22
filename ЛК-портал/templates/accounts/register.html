@@ -24,13 +24,9 @@
     </div>
   </div>
   <div class="field">
-    <label for="username">Логин</label>
-    <input class="input" id="username" name="username" type="text" autocomplete="username" value="{{ form_data.username|default:'' }}" required>
-    <small class="field-hint">3–30 символов: латиница, цифры, точка, дефис, подчёркивание.</small>
-  </div>
-  <div class="field">
     <label for="email">E-mail</label>
     <input class="input" id="email" name="email" type="email" autocomplete="email" value="{{ form_data.email|default:'' }}" required>
+    <small class="field-hint">Почта будет логином: отдельный логин придумывать не нужно.</small>
   </div>
   <div class="field">
     <label for="group">Группа <span class="dim">(если учитесь)</span></label>

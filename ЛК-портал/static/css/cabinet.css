@@ -175,7 +175,13 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   color: var(--text-muted);
   font: 500 0.9375rem/1.2 var(--font-text);
   text-decoration: none;
-  transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast);
+  transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast), transform 140ms cubic-bezier(0.22, 1, 0.36, 1);
+  /* док-эффект: масштаб и раздвижка задаются из app.js */
+  transform-origin: left center;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cab-nav a { transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast); transform: none !important; }
 }
 .cab-nav a:hover { background: var(--bg-raised); color: var(--text); }
 .cab-nav a[aria-current="page"] {

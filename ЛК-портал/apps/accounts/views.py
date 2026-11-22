@@ -1,4 +1,5 @@
 """Вход, роли, заявки на роли, управление пользователями."""
+import hashlib
 import re
 
 from django.contrib import messages
@@ -18,18 +19,36 @@ from apps.education.models import Group
 from .models import Profile, Role, RoleRequest
 from .permissions import get_role, role_can, role_required
 
-_USERNAME_RE = re.compile(r'^[a-zA-Z0-9_.@+-]{3,30}$')
+def username_from_email(email):
+    """Логин выводится из почты — отдельный логин пользователь не придумывает."""
+    candidate = email.strip().lower()
+    try:
+        from django.contrib.auth.validators import UnicodeUsernameValidator
+        UnicodeUsernameValidator()(candidate)
+    except ValidationError:
+        digest = hashlib.sha256(candidate.encode()).hexdigest()[:10]
+        candidate = 'user-' + digest
+    if len(candidate) > 150:
+        digest = hashlib.sha256(candidate.encode()).hexdigest()[:10]
+        candidate = candidate[:139] + '-' + digest
+    return candidate
 
 
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('portal:dashboard')
     if request.method == 'POST':
-        username = request.POST.get('username', '').strip()
+        identifier = request.POST.get('username', '').strip()
         password = request.POST.get('password', '')
-        user = authenticate(request, username=username, password=password)
+        user = None
+        if '@' in identifier:
+            found = User.objects.filter(email__iexact=identifier).first()
+            if found:
+                user = authenticate(request, username=found.username, password=password)
         if user is None:
-            messages.error(request, 'Неверный логин или пароль.')
+            user = authenticate(request, username=identifier, password=password)
+        if user is None:
+            messages.error(request, 'Неверная почта/логин или пароль.')
         else:
             login(request, user)
             next_url = request.POST.get('next') or request.GET.get('next') or '/cabinet/'
@@ -48,7 +67,7 @@ def register_view(request):
     if request.method == 'POST':
         data = {
             field: request.POST.get(field, '').strip()
-            for field in ('last_name', 'first_name', 'username', 'email', 'group')
+            for field in ('last_name', 'first_name', 'email', 'group')
         }
         password1 = request.POST.get('password1', '')
         password2 = request.POST.get('password2', '')
@@ -56,10 +75,6 @@ def register_view(request):
 
         if not data['last_name'] or not data['first_name']:
             errors.append('Укажите фамилию и имя.')
-        if not _USERNAME_RE.fullmatch(data['username']):
-            errors.append('Логин: 3–30 символов, латиница, цифры, точка, дефис, подчёркивание.')
-        elif User.objects.filter(username__iexact=data['username']).exists():
-            errors.append('Такой логин уже занят.')
         try:
             validate_email(data['email'])
         except ValidationError:
@@ -86,7 +101,7 @@ def register_view(request):
 
         if not errors:
             user = User.objects.create_user(
-                username=data['username'],
+                username=username_from_email(data['email']),
                 email=data['email'],
                 password=password1,
                 first_name=data['first_name'],

@@ -32,6 +32,21 @@ def numeric_average(grades):
 
 
 @login_required
+def stipendia_view(request):
+    return render(request, 'portal/stipendia.html')
+
+
+@login_required
+def eos_view(request):
+    return render(request, 'portal/eos.html')
+
+
+@login_required
+def profile_view(request):
+    return render(request, 'portal/profile.html')
+
+
+@login_required
 def dashboard(request):
     user = request.user
     profile = getattr(user, 'profile', None)

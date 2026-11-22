@@ -31,3 +31,57 @@ class ThemeUITests(TestCase):
         self.assertContains(response, 'class="theme-btn"')
         self.assertContains(response, 'popovertarget="theme-pop"')
         self.assertContains(response, 'id="theme-pop"')
+
+
+class StubPagesTests(TestCase):
+    """Заглушки новых разделов: доступны залогиненным, скрыты от анонимов."""
+
+    def setUp(self):
+        self.role = Role.objects.create(code='student', name='Студент', can_upload_works=True)
+        self.user = get_user_model().objects.create_user('stubstudent', password='demo12345')
+        self.user.profile.role = self.role
+        self.user.profile.save()
+
+    def test_stub_pages_render_for_user(self):
+        self.client.force_login(self.user)
+        for name, title in [('stipendia', 'Стипендия'), ('eos', 'ЭОС'), ('profile', 'Профиль')]:
+            response = self.client.get(reverse(f'portal:{name}'))
+            self.assertEqual(response.status_code, 200, name)
+            self.assertContains(response, title)
+
+    def test_stub_pages_redirect_anonymous(self):
+        for name in ('stipendia', 'eos', 'profile'):
+            response = self.client.get(reverse(f'portal:{name}'))
+            self.assertEqual(response.status_code, 302, name)
+            self.assertIn('/login/', response.url, name)
+
+
+class NavCompositionTests(TestCase):
+    """Состав левого навбара: 7 разделов, «Студенты» только с правом."""
+
+    def setUp(self):
+        self.student_role = Role.objects.create(code='student', name='Студент', can_upload_works=True)
+        self.dev_role = Role.objects.create(code='developer', name='Разработчик', is_developer=True,
+                                            can_manage_users=True, can_manage_roles=True,
+                                            can_approve_roles=True, can_manage_schedule=True)
+        self.student = get_user_model().objects.create_user('navstudent', password='demo12345')
+        self.student.profile.role = self.student_role
+        self.student.profile.save()
+        self.dev = get_user_model().objects.create_user('navdev', password='demo12345')
+        self.dev.profile.role = self.dev_role
+        self.dev.profile.save()
+
+    def test_developer_sees_all_seven_sections(self):
+        self.client.force_login(self.dev)
+        response = self.client.get(reverse('portal:dashboard'))
+        content = response.content.decode()
+        for label in ('Обзор', 'Расписание', 'Стипендия', 'ЭОС', 'Роли', 'Профиль', 'Студенты'):
+            self.assertContains(response, f'>{label}</a>', html=False)
+
+    def test_student_does_not_see_students_link(self):
+        self.client.force_login(self.student)
+        response = self.client.get(reverse('portal:dashboard'))
+        content = response.content.decode()
+        self.assertNotIn('>Студенты</a>', content)
+        for label in ('Обзор', 'Расписание', 'Стипендия', 'ЭОС', 'Роли', 'Профиль'):
+            self.assertIn(f'>{label}</a>', content)

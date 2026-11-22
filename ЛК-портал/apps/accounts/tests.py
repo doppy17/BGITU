@@ -120,7 +120,6 @@ class RegistrationTests(TestCase):
         self.payload = {
             'last_name': 'Портнов',
             'first_name': 'Георгий',
-            'username': 'newstudent',
             'email': 'newstudent@example.ru',
             'group': str(self.group.id),
             'password1': 'Bgu2026!study',
@@ -130,22 +129,67 @@ class RegistrationTests(TestCase):
     def test_register_creates_profile_and_logs_in(self):
         response = self.client.post(reverse('accounts:register'), self.payload)
         self.assertRedirects(response, reverse('portal:dashboard'))
-        user = User.objects.get(username='newstudent')
+        user = User.objects.get(email='newstudent@example.ru')
+        self.assertEqual(user.username, 'newstudent@example.ru')
         self.assertEqual(user.profile.role, self.role)
         self.assertEqual(user.profile.group, self.group)
         self.assertEqual(self.client.session['_auth_user_id'], str(user.pk))
         self.assertContains(self.client.get(reverse('portal:dashboard')), 'ИСТ-201')
 
-    def test_register_rejects_duplicate_username(self):
-        User.objects.create_user('newstudent', email='other@example.ru', password='Bgu2026!study')
+    def test_register_ignores_posted_username(self):
+        self.payload['username'] = 'hacker-name'
+        self.client.post(reverse('accounts:register'), self.payload)
+        user = User.objects.get(email='newstudent@example.ru')
+        self.assertEqual(user.username, 'newstudent@example.ru')
+
+    def test_register_rejects_duplicate_email(self):
+        User.objects.create_user('legacy-login', email='newstudent@example.ru', password='Bgu2026!study')
         response = self.client.post(reverse('accounts:register'), self.payload)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'уже занят')
-        self.assertEqual(User.objects.filter(username='newstudent').count(), 1)
+        self.assertContains(response, 'уже зарегистрирован')
+        self.assertEqual(User.objects.filter(email='newstudent@example.ru').count(), 1)
 
     def test_register_rejects_password_mismatch(self):
         self.payload['password2'] = 'Other2026!study'
         response = self.client.post(reverse('accounts:register'), self.payload)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'не совпадают')
-        self.assertFalse(User.objects.filter(username='newstudent').exists())
+        self.assertFalse(User.objects.filter(email='newstudent@example.ru').exists())
+
+
+class LoginTests(TestCase):
+    """Вход по почте; вход по старому логину остаётся совместимым."""
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            'legacy-login', email='student@example.ru', password='Bgu2026!study'
+        )
+
+    def test_login_by_email(self):
+        response = self.client.post(reverse('accounts:login'), {
+            'username': 'student@example.ru',
+            'password': 'Bgu2026!study',
+        })
+        self.assertRedirects(response, '/cabinet/')
+
+    def test_login_by_email_case_insensitive(self):
+        response = self.client.post(reverse('accounts:login'), {
+            'username': 'STUDENT@example.ru',
+            'password': 'Bgu2026!study',
+        })
+        self.assertRedirects(response, '/cabinet/')
+
+    def test_login_by_legacy_username(self):
+        response = self.client.post(reverse('accounts:login'), {
+            'username': 'legacy-login',
+            'password': 'Bgu2026!study',
+        })
+        self.assertRedirects(response, '/cabinet/')
+
+    def test_login_wrong_password_shows_error(self):
+        response = self.client.post(reverse('accounts:login'), {
+            'username': 'student@example.ru',
+            'password': 'wrong-pass-2026',
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Неверная почта/логин или пароль')

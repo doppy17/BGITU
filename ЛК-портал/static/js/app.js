@@ -53,6 +53,59 @@
     onScroll();
   }
 
+  // Док-эффект левого меню (как в macOS): пункт под курсором увеличивается,
+  // соседние разъезжаются наружу с сохранением зазора.
+  (function () {
+    var dockNav = document.getElementById('cabNav');
+    if (!dockNav || !window.matchMedia('(hover: hover)').matches) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var dockItems = Array.prototype.slice.call(dockNav.querySelectorAll('a'));
+    if (dockItems.length < 2) return;
+
+    var AMP = 0.13;      // максимум увеличения
+    var SIGMA = 95;      // радиус влияния, px
+    var base = null;     // базовые позиции пунктов (без трансформаций)
+
+    function measure() {
+      base = dockItems.map(function (el) {
+        el.style.transform = '';
+        var r = el.getBoundingClientRect();
+        return { center: r.top + r.height / 2, h: r.height };
+      });
+    }
+
+    function apply(clientY) {
+      var dists = base.map(function (b) { return Math.abs(b.center - clientY); });
+      var h = dists.indexOf(Math.min.apply(Math, dists));
+      var scales = dists.map(function (d) {
+        return 1 + AMP * Math.exp(-(d * d) / (2 * SIGMA * SIGMA));
+      });
+      // раздвижка: якорь — пункт под курсором, соседи едут наружу от него
+      var ty = new Array(dockItems.length).fill(0);
+      for (var j = h + 1; j < dockItems.length; j++) {
+        ty[j] = ty[j - 1] + (base[j - 1].h * (scales[j - 1] - 1) + base[j].h * (scales[j] - 1)) / 2;
+      }
+      for (var k = h - 1; k >= 0; k--) {
+        ty[k] = ty[k + 1] - (base[k].h * (scales[k] - 1) + base[k + 1].h * (scales[k + 1] - 1)) / 2;
+      }
+      dockItems.forEach(function (el, i) {
+        el.style.transform = 'translateY(' + ty[i].toFixed(2) + 'px) scale(' + scales[i].toFixed(3) + ')';
+      });
+    }
+
+    dockNav.addEventListener('mouseenter', function () { measure(); });
+    // Прямой расчёт без requestAnimationFrame: в фоновых вкладках rAF
+    // троттлится, а расчёт здесь дешёвый (десяток пунктов).
+    dockNav.addEventListener('mousemove', function (event) {
+      if (!base) return;
+      apply(event.clientY);
+    });
+    dockNav.addEventListener('mouseleave', function () {
+      base = null;
+      dockItems.forEach(function (el) { el.style.transform = ''; });
+    });
+  })();
+
   // Сообщения не мешают работе: плавно убираем через 7 секунд.
   var flashes = document.querySelectorAll('.flash');
   if (flashes.length) {
