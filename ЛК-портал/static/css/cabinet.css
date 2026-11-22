@@ -1180,8 +1180,9 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
 .tl-gridline {
   position: absolute;
   inset: 11px 0;
-  background: var(--line);
-  border-radius: var(--radius-pill);
+  background: repeating-linear-gradient(to right, var(--line-strong) 0 4px, transparent 4px 9px);
+  border-radius: 0;
+  opacity: 0.7;
 }
 .tl-seg {
   position: absolute;
@@ -1205,6 +1206,40 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   from { transform: scaleX(0); opacity: 0; }
   to { transform: scaleX(1); opacity: 1; }
 }
+/* пунктирные направляющие учебного плана */
+.tl-track { isolation: isolate; }
+.tl-grid--semesters .tl-track::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  /* вертикальный пунктир на каждой границе 8 семестров (12.5% … 87.5%) */
+  background-image:
+    linear-gradient(to bottom, var(--line) 0 4px, transparent 4px 8px),
+    linear-gradient(to bottom, var(--line) 0 4px, transparent 4px 8px),
+    linear-gradient(to bottom, var(--line) 0 4px, transparent 4px 8px),
+    linear-gradient(to bottom, var(--line) 0 4px, transparent 4px 8px),
+    linear-gradient(to bottom, var(--line) 0 4px, transparent 4px 8px),
+    linear-gradient(to bottom, var(--line) 0 4px, transparent 4px 8px),
+    linear-gradient(to bottom, var(--line) 0 4px, transparent 4px 8px);
+  background-size: 1px 100%;
+  background-repeat: no-repeat;
+  background-position: 12.5% 0, 25% 0, 37.5% 0, 50% 0, 62.5% 0, 75% 0, 87.5% 0;
+  opacity: 0.8;
+}
+/* короткий пунктирный коннектор от названия дисциплины к её дорожке */
+.tl-subject { position: relative; }
+.tl-row > .tl-subject::after {
+  content: "";
+  position: absolute;
+  right: -10px;
+  top: 50%;
+  width: 10px;
+  border-top: 1px dotted var(--line-strong);
+  opacity: 0.8;
+}
+
 /* ось учебного плана: 8 семестров */
 .tl-grid--semesters .tl-ticks { height: 42px; }
 .tl-grid--semesters .tl-tick { gap: 1px; }
