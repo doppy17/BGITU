@@ -113,6 +113,90 @@
 .burger[aria-expanded="true"] span:nth-child(1) { top: 21px; transform: rotate(45deg); }
 .burger[aria-expanded="true"] span:nth-child(2) { top: 21px; transform: rotate(-45deg); }
 
+/* ---------- Переключатель темы (как на bgitu-site) ---------- */
+.theme-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  min-height: 44px;
+  padding: 0 0.95em;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color var(--dur-fast), border-color var(--dur-fast), background var(--dur-fast);
+}
+.theme-btn:hover { color: var(--text); border-color: var(--line-strong); background: var(--line); }
+.theme-btn svg { width: 16px; height: 16px; flex: none; }
+.theme-btn--float {
+  position: fixed;
+  top: 12px;
+  right: max(12px, calc((100vw - var(--container)) / 2));
+  z-index: 60;
+}
+
+.theme-pop {
+  position: fixed;
+  inset: calc(12px + var(--head-h) + 8px) max(12px, calc((100vw - var(--container)) / 2)) auto auto;
+  margin: 0;
+  width: 290px;
+  padding: 14px;
+  color: var(--text);
+  background: var(--bg-raised);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-m);
+  box-shadow: 0 30px 80px rgb(0 0 0 / 0.25);
+}
+.theme-pop:popover-open { animation: theme-pop 0.22s var(--ease); }
+.theme-pop > .mono { padding: 2px 6px 10px; }
+.theme-pop [role="radiogroup"] { display: grid; gap: 4px; }
+.theme-pop button {
+  display: grid;
+  grid-template-columns: 30px 1fr 16px;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  min-height: 52px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: var(--radius-s);
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--dur-fast);
+}
+.theme-pop button:hover { background: var(--line); }
+.theme-pop button::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  justify-self: center;
+}
+.theme-pop button[aria-checked="true"]::after {
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+.theme-pop i {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: conic-gradient(var(--a) 0 50%, var(--b) 0);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+.theme-pop b { display: block; font-weight: 600; line-height: 1.2; }
+.theme-pop small { display: block; color: var(--text-muted); font-size: 0.8125rem; line-height: 1.3; }
+.theme-pop__note { padding: 10px 6px 2px; color: var(--text-faint); font-size: 0.8125rem; }
+
+@keyframes theme-pop {
+  from { opacity: 0; transform: translateY(-12px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
 /* ---------- Мобильное меню ---------- */
 .menu {
   position: fixed;
@@ -466,6 +550,9 @@ body.menu-open { overflow: hidden; }
   .site-head { padding-left: 12px; gap: 8px; }
   .logo__word { font-size: 0.9375rem; }
   .head-tools .icon-btn:not(.icon-btn--avatar) { display: none; }
+  .site-head .badge, .site-head .head-user { display: none; }
+  .theme-btn span { display: none; }
+  .theme-btn { padding-inline: 0.72em; }
   .foot-grid { grid-template-columns: 1fr; gap: 22px; }
   .dialog__body { padding: 18px; }
   .dialog__head, .dialog__foot { padding-inline: 18px; }

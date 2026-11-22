@@ -1,11 +1,12 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="paper">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Вход{% endblock %} — БГИТУ</title>
-  <meta name="theme-color" content="#0d0d0d">
+  <meta name="theme-color" content="#f2eee6">
+  <script src="{% static 'js/theme.js' %}"></script>
   <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
   <link rel="stylesheet" href="{% static 'css/tokens.css' %}">
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
@@ -13,6 +14,18 @@
   <link rel="stylesheet" href="{% static 'css/portal.css' %}">
 </head>
 <body class="auth-page">
+<button class="theme-btn theme-btn--float" type="button" popovertarget="theme-pop" aria-label="Оформление сайта" title="Тема">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg>
+</button>
+<div class="theme-pop" id="theme-pop" popover aria-label="Оформление сайта">
+  <p class="mono dim">оформление</p>
+  <div role="radiogroup" aria-label="Тема">
+    <button type="button" role="radio" aria-checked="false" data-theme-set="paper"><i style="--a:#b8322a;--b:#f2eee6" aria-hidden="true"></i><span><b>Бумага</b><small>светлая · киноварь</small></span></button>
+    <button type="button" role="radio" aria-checked="false" data-theme-set="surik"><i style="--a:#ff5a2e;--b:#0d0d0d" aria-hidden="true"></i><span><b>Сурик</b><small>тёмная · красно-оранжевый</small></span></button>
+    <button type="button" role="radio" aria-checked="false" data-theme-set="latun"><i style="--a:#d6b072;--b:#0d0d0d" aria-hidden="true"></i><span><b>Латунь</b><small>тёмная · золото</small></span></button>
+  </div>
+  <p class="theme-pop__note">Выбор сохранится в этом браузере</p>
+</div>
 <div class="auth-shell">
   <aside class="auth-aside">
     <div>
