@@ -216,7 +216,7 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   .cab-nav__item { transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast); transform: none !important; }
   .cab-nav { transition: none; }
   .cab-nav__toggle svg { transition: none; }
-  .cab-nav__item[aria-current="page"] .cab-nav__icon { animation: none !important; }
+  .cab-nav__item:is(:hover, :focus-visible) .cab-nav__icon { animation: none !important; }
 }
 .cab-nav__item:hover { background: var(--bg-raised); color: var(--text); }
 .cab-nav__item[aria-current="page"] {
@@ -1274,14 +1274,14 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
 
 
 /* ---------- Анимации иконок активного раздела ---------- */
-.cab-nav__item[aria-current="page"] .cab-nav__icon--overview { animation: icon-overview 0.5s var(--ease); }
-.cab-nav__item[aria-current="page"] .cab-nav__icon--schedule { animation: icon-schedule 0.55s var(--ease); }
-.cab-nav__item[aria-current="page"] .cab-nav__icon--stipendia { animation: icon-stipendia 0.6s var(--ease); }
-.cab-nav__item[aria-current="page"] .cab-nav__icon--courses { animation: icon-courses 0.55s var(--ease); }
-.cab-nav__item[aria-current="page"] .cab-nav__icon--grades { animation: icon-grades 0.6s var(--ease); }
-.cab-nav__item[aria-current="page"] .cab-nav__icon--roles { animation: icon-roles 0.6s var(--ease); }
-.cab-nav__item[aria-current="page"] .cab-nav__icon--profile { animation: icon-profile 0.6s var(--ease); }
-.cab-nav__item[aria-current="page"] .cab-nav__icon--students { animation: icon-students 0.6s var(--ease); }
+.cab-nav__item:is(:hover, :focus-visible) .cab-nav__icon--overview { animation: icon-overview 0.5s var(--ease); }
+.cab-nav__item:is(:hover, :focus-visible) .cab-nav__icon--schedule { animation: icon-schedule 0.55s var(--ease); }
+.cab-nav__item:is(:hover, :focus-visible) .cab-nav__icon--stipendia { animation: icon-stipendia 0.6s var(--ease); }
+.cab-nav__item:is(:hover, :focus-visible) .cab-nav__icon--courses { animation: icon-courses 0.55s var(--ease); }
+.cab-nav__item:is(:hover, :focus-visible) .cab-nav__icon--grades { animation: icon-grades 0.6s var(--ease); }
+.cab-nav__item:is(:hover, :focus-visible) .cab-nav__icon--roles { animation: icon-roles 0.6s var(--ease); }
+.cab-nav__item:is(:hover, :focus-visible) .cab-nav__icon--profile { animation: icon-profile 0.6s var(--ease); }
+.cab-nav__item:is(:hover, :focus-visible) .cab-nav__icon--students { animation: icon-students 0.6s var(--ease); }
 
 @keyframes icon-overview {
   0% { transform: scale(0.4) rotate(-20deg); opacity: 0; }
