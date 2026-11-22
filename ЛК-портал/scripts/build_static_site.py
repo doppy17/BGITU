@@ -31,6 +31,26 @@ SLUGS = {
     'lk': None,                # страница входа не нужна: ведём в наш ЛК
 }
 
+# Старые адреса bgitu.ru → наши страницы (сайт заменяет старый)
+LINK_MAP = [
+    (r'https://bgitu\.ru/studentu/raspisanie/[^"]*', 'CABINET_SCHEDULE'),
+    (r'https://bgitu\.ru/studentu/stipendii[^"]*', 'scholarships'),
+    (r'https://bgitu\.ru/studentu/eos[^"]*', 'eos'),
+    (r'https://bgitu\.ru/studentu/obshchezhitie[^"]*', 'life'),
+    (r'https://bgitu\.ru/studentu[^"]*', 'student'),
+    (r'https://bgitu\.ru/obyavl[^"]*', 'news'),
+    (r'https://bgitu\.ru/news[^"]*', 'news'),
+    (r'https://bgitu\.ru/abitur[^"]*', 'admission'),
+    (r'https://bgitu\.ru/universitet/kontakty/telefonnyy-spravochnik[^"]*', 'contacts'),
+    (r'https://bgitu\.ru/universitet/kadrovyy-sostav[^"]*', 'staff'),
+    (r'https://bgitu\.ru/universitet/voennyy-uchebnyy-tsentr[^"]*', 'inst-vuc'),
+    (r'https://bgitu\.ru/sveden/document[^"]*', 'sveden'),
+    (r'https://bgitu\.ru/sveden[^"]*', 'sveden'),
+    (r'https://eos\.bgitu\.ru/Account/[^"]*', 'eos'),
+    (r'https://eos\.bgitu\.ru[^"]*', 'eos'),
+    (r'https://bgitu\.ru/', 'index'),
+]
+
 # Какая страница к какому пункту верхнего меню относится (для aria-current)
 SECTIONS = {
     'university': 'university', 'institutes': 'university', 'inst-econ': 'university',
@@ -118,6 +138,8 @@ def rewrite_links(fragment: str, pages: dict[str, Page]) -> str:
     def href(match: re.Match) -> str:
         target = match.group(1)
         page_name, _, anchor = target.partition('#')
+        if page_name == 'CABINET_SCHEDULE':
+            return 'href="{% url \'schedule:schedule\' %}"'
         page = pages.get(page_name.removesuffix('.html'))
         if page is None:
             return match.group(0)
@@ -125,6 +147,30 @@ def rewrite_links(fragment: str, pages: dict[str, Page]) -> str:
         return f'href="{{% url \'site:{page.name}\' %}}{suffix}"'
 
     fragment = fragment.replace('href="lk.html"', 'href="{% url \'portal:dashboard\' %}"')
+    # старые адреса университета → наши страницы
+    for pattern, page_name in LINK_MAP:
+        target = (
+            "{% url 'schedule:schedule' %}"
+            if page_name == 'CABINET_SCHEDULE'
+            else "{% url 'site:" + page_name + "' %}"
+        )
+        fragment = re.sub('href="' + pattern + '"', 'href="' + target + '"', fragment)
+    # внутренние ссылки: без новой вкладки, без хвостов «bgitu.ru» и стрелок
+    def clean_internal(match: re.Match) -> str:
+        tag = match.group(0).replace(' target="_blank"', '').replace(' rel="noopener"', '')
+        return tag
+
+    fragment = re.sub(r'<a\b[^>]*href="\{% url[^"]*"[^>]*>', clean_internal, fragment)
+    fragment = re.sub(
+        r'(<a\b[^>]*href="\{% url[^"]*"[^>]*>.*?</a>)',
+        lambda m: m.group(1)
+            .replace('bgitu.ru ↗', '')
+            .replace('bgitu.ru', '')
+            .replace('eos.bgitu.ru', '')
+            .replace(' ↗', ''),
+        fragment,
+        flags=re.S,
+    )
     fragment = re.sub(r'href="([\w\-]+\.html(?:#[^"]*)?)"', href, fragment)
 
     for asset in ('icon-180.png', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png',
@@ -251,9 +297,10 @@ def main() -> None:
   <script src="{{% static 'js/theme.js' %}}"></script>
   <link rel="stylesheet" href="{{% static 'site/css/site.css' %}}">
   <link rel="stylesheet" href="{{% static 'site/css/header.css' %}}">
+  <link rel="stylesheet" href="{{% static 'site/css/search.css' %}}">
 </head>
 <body id="top">
-{head}
+{{% include 'partials/site_head.html' with nav_section=page.section nav_mode='site' %}}
 
 <main id="main">
   {{% block content %}}{{% endblock %}}
@@ -291,6 +338,48 @@ def main() -> None:
             + page_content.strip() + '\n{% endblock %}\n',
             encoding='utf-8',
         )
+
+    # --- поисковый индекс: заголовки, подзаголовки и начало текста страниц
+    def page_text(fragment: str) -> str:
+        text = re.sub(r'<script.*?</script>', ' ', fragment, flags=re.S)
+        text = re.sub(r'<style.*?</style>', ' ', text, flags=re.S)
+        text = re.sub(r'<[^>]+>', ' ', text)
+        text = text.replace('&nbsp;', ' ').replace('&mdash;', '—').replace('&laquo;', '«')
+        return re.sub(r'\s+', ' ', text).strip()
+
+    search_lines = [
+        '"""Поисковый индекс публичного сайта (генерируется build_static_site.py)."""',
+        '',
+        'from dataclasses import dataclass',
+        '',
+        '',
+        '@dataclass(frozen=True)',
+        'class SearchEntry:',
+        '    title: str',
+        '    url_name: str',
+        '    section: str',
+        '    snippet: str',
+        '    keywords: str',
+        '',
+        '',
+    ]
+    entries: list[str] = []
+    for page in registry:
+        html_page = read(SOURCE / f'{page.name}.html')
+        _, body, _ = split_body(extract_body(html_page))
+        text = page_text(body)[:1200]
+        snippet = text[:180].strip()
+        heads = ' '.join(re.findall(r'<h[12][^>]*>(.*?)</h[12]>', body, re.S))
+        keywords = page_text(heads)[:400]
+        entries.append(
+            '    SearchEntry('
+            f'title={page.title!r}, url_name={page.name!r}, section={page.section!r}, '
+            f'snippet={snippet!r}, keywords={keywords!r}),'
+        )
+    search_lines.append('SITE_ENTRIES: tuple[SearchEntry, ...] = (')
+    search_lines.extend(entries)
+    search_lines.append(')')
+    (ROOT / 'apps' / 'site' / 'search_site.py').write_text('\n'.join(search_lines) + '\n', encoding='utf-8')
 
     lines = ['''"""Реестр страниц публичной части сайта.
 

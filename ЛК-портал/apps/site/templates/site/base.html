@@ -14,51 +14,10 @@
   <script src="{% static 'js/theme.js' %}"></script>
   <link rel="stylesheet" href="{% static 'site/css/site.css' %}">
   <link rel="stylesheet" href="{% static 'site/css/header.css' %}">
+  <link rel="stylesheet" href="{% static 'site/css/search.css' %}">
 </head>
 <body id="top">
-
-<a class="skip" href="#main">К содержимому</a>
-<canvas class="trail" aria-hidden="true"></canvas>
-<div class="theme-pop a11y-pop" id="a11y-pop" popover aria-label="Версия для слабовидящих"><p class="mono dim">версия для слабовидящих</p><div class="a11y-row"><p class="mono dim">Размер шрифта</p><div class="chips" role="group" aria-label="Размер шрифта"><button type="button" data-a11y="fs" data-v="0" aria-pressed="false">А</button><button type="button" data-a11y="fs" data-v="1" aria-pressed="false">А+</button><button type="button" data-a11y="fs" data-v="2" aria-pressed="false">А++</button></div></div><div class="a11y-row"><p class="mono dim">Интервалы</p><div class="chips" role="group" aria-label="Интервалы"><button type="button" data-a11y="sp" data-v="0" aria-pressed="false">Обычные</button><button type="button" data-a11y="sp" data-v="1" aria-pressed="false">Увеличенные</button></div></div><div class="a11y-row"><p class="mono dim">Цвет</p><div class="chips" role="group" aria-label="Цвет"><button type="button" data-a11y="cl" data-v="0" aria-pressed="false">Обычный</button><button type="button" data-a11y="cl" data-v="gray" aria-pressed="false">Ч/б</button><button type="button" data-a11y="cl" data-v="hc" aria-pressed="false">Контраст</button></div></div><div class="a11y-row"><p class="mono dim">Изображения и анимация</p><div class="chips" role="group" aria-label="Изображения и анимация"><button type="button" data-a11y="im" data-v="0" aria-pressed="false">Показывать</button><button type="button" data-a11y="im" data-v="1" aria-pressed="false">Скрыть</button></div></div><button type="button" class="btn btn--ghost btn--sm a11y-reset" data-a11y-reset>Сбросить настройки</button><p class="theme-pop__note">По ГОСТ Р 52872-2019 и ПП РФ № 102</p></div>
-<div class="secbar" aria-hidden="true" hidden><div class="container secbar__slot"></div></div>
-<div class="theme-pop" id="theme-pop" popover aria-label="Оформление сайта"><p class="mono dim">оформление</p><div role="radiogroup" aria-label="Тема"><button type="button" role="radio" aria-checked="false" data-theme-set="paper"><i style="--a:#b8322a;--b:#f2eee6" aria-hidden="true"></i><span><b>Бумага</b><small>светлая · киноварь</small></span></button><button type="button" role="radio" aria-checked="false" data-theme-set="surik"><i style="--a:#ff5a2e;--b:#0d0d0d" aria-hidden="true"></i><span><b>Сурик</b><small>тёмная · красно-оранжевый</small></span></button><button type="button" role="radio" aria-checked="false" data-theme-set="latun"><i style="--a:#d6b072;--b:#0d0d0d" aria-hidden="true"></i><span><b>Латунь</b><small>тёмная · золото</small></span></button></div><p class="theme-pop__note">Выбор сохранится в этом браузере</p></div>
-
-<!-- ============ ШАПКА ============ -->
-<header class="site-head" id="head">
-  <div class="head-pill">
-    <a class="brand" href="{% url 'site:index' %}" aria-label="БГИТУ — наверх">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="7" fill="currentColor"/><path d="M16 6H8v12h5a3.5 3.5 0 000-7H8" fill="none" stroke="var(--accent-ink)" stroke-width="2.2" stroke-linejoin="round"/></svg>
-      БГИТУ
-    </a>
-    <nav class="nav" aria-label="Основное">
-      <ul><li><a href="{% url 'site:university' %}"{% if page.section == 'university' %} aria-current="page"{% endif %} data-s="Раздел" data-k="о вузе история руководство структура институты кампус">Университет</a></li><li><a href="{% url 'site:admission' %}"{% if page.section == 'admission' %} aria-current="page"{% endif %} data-s="Раздел" data-k="абитуриенту приёмная комиссия направления калькулятор егэ">Поступающим</a></li><li><a href="{% url 'site:student' %}"{% if page.section == 'student' %} aria-current="page"{% endif %} data-s="Раздел" data-k="расписание стипендия эос библиотека общежитие справки">Студенту</a></li><li><a href="{% url 'site:science' %}"{% if page.section == 'science' %} aria-current="page"{% endif %} data-s="Раздел" data-k="исследования гранты аспирантура конференции">Наука</a></li><li><a href="{% url 'site:news' %}"{% if page.section == 'news' %} aria-current="page"{% endif %} data-s="Раздел" data-k="события объявления">Новости</a></li><li><a href="{% url 'site:contacts' %}"{% if page.section == 'contacts' %} aria-current="page"{% endif %} data-s="Раздел" data-k="адрес телефон почта справочник">Контакты</a></li></ul>
-    </nav>
-    <div class="head-actions">
-      <button class="theme-btn a11y-btn" type="button" popovertarget="a11y-pop" aria-label="Версия для слабовидящих"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span>Доступность</span></button>
-      <button class="theme-btn" type="button" popovertarget="theme-pop" aria-label="Оформление сайта"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg><span>Тема</span></button>
-      <button class="search-btn" type="button" data-search-open aria-haspopup="dialog" aria-label="Поиск по сайту">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7.5"/><path d="m21 21-4.5-4.5"/></svg>
-        <span>Поиск</span><kbd data-kbd>Ctrl K</kbd>
-      </button>
-      <a class="btn btn--accent btn--sm" href="{% url 'portal:dashboard' %}" data-s="Раздел" data-t="Личный кабинет" data-k="лк расписание стипендия студент">Личный кабинет</a>
-      <button class="burger" type="button" aria-expanded="false" aria-controls="menu" aria-label="Открыть меню"></button>
-    </div>
-  </div>
-</header>
-
-<div class="menu" id="menu" hidden>
-  <a href="{% url 'site:university' %}"{% if page.section == 'university' %} aria-current="page"{% endif %}>Университет</a>
-  <a href="{% url 'site:admission' %}"{% if page.section == 'admission' %} aria-current="page"{% endif %}>Поступающим</a>
-  <a href="{% url 'site:student' %}"{% if page.section == 'student' %} aria-current="page"{% endif %}>Студенту</a>
-  <a href="{% url 'site:science' %}"{% if page.section == 'science' %} aria-current="page"{% endif %}>Наука</a>
-  <a href="{% url 'site:news' %}"{% if page.section == 'news' %} aria-current="page"{% endif %}>Новости</a>
-  <a href="{% url 'site:contacts' %}"{% if page.section == 'contacts' %} aria-current="page"{% endif %}>Контакты</a>
-  <a class="btn btn--accent btn--lg" href="{% url 'portal:dashboard' %}">Личный кабинет</a>
-  <button class="btn btn--ghost btn--lg" type="button" popovertarget="a11y-pop" style="margin-top:12px">Версия для слабовидящих</button>
-  <div class="menu-theme" role="radiogroup" aria-label="Тема"><p class="mono">оформление</p><button type="button" role="radio" aria-checked="false" data-theme-set="paper"><i style="--a:#b8322a;--b:#f2eee6" aria-hidden="true"></i><span><b>Бумага</b><small>светлая · киноварь</small></span></button><button type="button" role="radio" aria-checked="false" data-theme-set="surik"><i style="--a:#ff5a2e;--b:#0d0d0d" aria-hidden="true"></i><span><b>Сурик</b><small>тёмная · красно-оранжевый</small></span></button><button type="button" role="radio" aria-checked="false" data-theme-set="latun"><i style="--a:#d6b072;--b:#0d0d0d" aria-hidden="true"></i><span><b>Латунь</b><small>тёмная · золото</small></span></button></div>
-</div>
-
-
+{% include 'partials/site_head.html' with nav_section=page.section nav_mode='site' %}
 
 <main id="main">
   {% block content %}{% endblock %}

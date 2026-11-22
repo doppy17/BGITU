@@ -146,7 +146,7 @@
         <h3>Как поступить в БГИТУ</h3>
         <p>Четыре шага от выбора направления до приказа о зачислении. Приёмная комиссия поможет на каждом.</p>
         <div class="hero__cta">
-          <a class="btn btn--accent btn--lg" href="https://bgitu.ru/abitur/areas-training/" target="_blank" rel="noopener">Направления на bgitu.ru <span aria-hidden="true">↗</span></a>
+          <a class="btn btn--accent btn--lg" href="{% url 'site:admission' %}">Направления на  <span aria-hidden="true">↗</span></a>
           <a class="btn btn--ghost btn--lg" href="tel:+74832649912">Позвонить</a>
         </div>
       </div>
@@ -195,11 +195,11 @@
   <div class="container">
     <header class="sec-head" data-reveal><h2 class="mono" id="news-h">05 — Новости</h2><a class="mono dim" href="{% url 'site:news' %}">все новости и объявления →</a></header>
     <ul class="news">
-      <li data-k="n"><a href="https://bgitu.ru/news/index.php?news=4933" target="_blank" rel="noopener" data-s="Новости" data-t="Тренинг предпринимательских компетенций"><time class="mono">05.11.2026</time><h3>Тренинг предпринимательских компетенций</h3><span class="mono dim">студенты ↗</span></a></li>
-      <li data-k="n"><a href="https://bgitu.ru/news/index.php?news=4931" target="_blank" rel="noopener" data-s="Новости" data-t="Научно-образовательный проект «IT-предпринимательство»"><time class="mono">29.10.2026</time><h3>Научно-образовательный проект «IT-предпринимательство»</h3><span class="mono dim">IT · проекты ↗</span></a></li>
-      <li data-k="n"><a href="https://bgitu.ru/news/index.php?news=4927" target="_blank" rel="noopener" data-s="Новости" data-t="Научно-практическая конференция «120 лет практической лесной науке на Брянщине»"><time class="mono">27.10.2026</time><h3>Научно-практическая конференция «120 лет практической лесной науке на Брянщине»</h3><span class="mono dim">наука · лес ↗</span></a></li>
+      <li data-k="n"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Тренинг предпринимательских компетенций"><time class="mono">05.11.2026</time><h3>Тренинг предпринимательских компетенций</h3><span class="mono dim">студенты</span></a></li>
+      <li data-k="n"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Научно-образовательный проект «IT-предпринимательство»"><time class="mono">29.10.2026</time><h3>Научно-образовательный проект «IT-предпринимательство»</h3><span class="mono dim">IT · проекты</span></a></li>
+      <li data-k="n"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Научно-практическая конференция «120 лет практической лесной науке на Брянщине»"><time class="mono">27.10.2026</time><h3>Научно-практическая конференция «120 лет практической лесной науке на Брянщине»</h3><span class="mono dim">наука · лес</span></a></li>
       <li data-k="n"><a href="{% url 'site:article' %}" data-s="Новости" data-t="Победа на первенстве России по спортивному программированию"><time class="mono">23.10.2026</time><h3>Победа на первенстве России по спортивному программированию</h3><span class="mono dim">студенты · IT</span></a></li>
-      <li data-k="n"><a href="https://bgitu.ru/news/index.php?news=4930" target="_blank" rel="noopener" data-s="Новости" data-t="Учредительное заседание Комитета по инновациям"><time class="mono">21.10.2026</time><h3>Учредительное заседание Комитета по инновациям</h3><span class="mono dim">университет ↗</span></a></li>
+      <li data-k="n"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Учредительное заседание Комитета по инновациям"><time class="mono">21.10.2026</time><h3>Учредительное заседание Комитета по инновациям</h3><span class="mono dim">университет</span></a></li>
     </ul>
   </div>
 </section>
