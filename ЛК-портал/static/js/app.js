@@ -32,8 +32,17 @@
       });
     }
     nav.addEventListener('click', function (event) {
-      if (event.target.closest('a') && window.matchMedia('(max-width: 1000px)').matches) {
+      if (event.target.closest('.cab-nav__item') && window.matchMedia('(max-width: 1000px)').matches) {
         setMenu(false);
+      }
+    });
+
+    // Пункты навбара — кнопки с data-href (не <a>: у браузера не показывается
+    // адрес в статусной строке при наведении).
+    document.addEventListener('click', function (event) {
+      var item = event.target.closest('.cab-nav__item');
+      if (item && item.dataset.href) {
+        window.location.href = item.dataset.href;
       }
     });
     document.addEventListener('keydown', function (event) {
@@ -59,7 +68,7 @@
     var dockNav = document.getElementById('cabNav');
     if (!dockNav || !window.matchMedia('(hover: hover)').matches) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    var dockItems = Array.prototype.slice.call(dockNav.querySelectorAll('a'));
+    var dockItems = Array.prototype.slice.call(dockNav.querySelectorAll('.cab-nav__item'));
     if (dockItems.length < 2) return;
 
     var AMP = 0.13;      // максимум увеличения
@@ -115,29 +124,36 @@
       }, 50);
     }
 
-    // Рельс: при наведении раскрывается панель с подписями (только на десктопе),
-    // после раскрытия измеряются позиции и включается док-магнификация.
+    // Док-магнификация работает при наведении; раскрытие рельса — ТОЛЬКО
+    // по кнопке-стрелке (см. cabToggle ниже).
     dockNav.addEventListener('mouseenter', function () {
       if (window.innerWidth <= 1000) return;
-      dockNav.classList.add('is-expanded');
-      window.clearTimeout(dockExpandTimer);
-      dockExpandTimer = window.setTimeout(function () {
-        measure();
-        if (pendingY !== null) flush();
-      }, 340);
+      measure();
     });
     dockNav.addEventListener('mousemove', function (event) {
       if (!base) return;
       schedule(event.clientY);
     });
     dockNav.addEventListener('mouseleave', function () {
-      window.clearTimeout(dockExpandTimer);
-      dockNav.classList.remove('is-expanded');
       base = null;
       pendingY = null;
       if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
       dockItems.forEach(function (el) { el.style.transform = ''; });
     });
+
+    // Перемер позиций после раскрытия/сворачивания рельса.
+    var toggle = document.getElementById('cabToggle');
+    if (toggle && dockNav) {
+      toggle.addEventListener('click', function () {
+        var open = !dockNav.classList.contains('is-expanded');
+        dockNav.classList.toggle('is-expanded', open);
+        toggle.setAttribute('aria-expanded', String(open));
+        window.setTimeout(function () {
+          measure();
+          if (pendingY !== null) flush();
+        }, 340);
+      });
+    }
   })();
 
   // Поле поиска в шапке: ⌘K/Ctrl+K — фокус; Enter — пока честный ответ.

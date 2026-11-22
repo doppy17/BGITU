@@ -65,39 +65,43 @@
     </div>
     <p class="cab-nav__user mono">{{ user|fio }}{% if current_role %} · {{ current_role.name }}{% endif %}</p>
 
-    <a href="{% url 'portal:dashboard' %}" {% if request.path == '/cabinet/' %}aria-current="page"{% endif %}>
-      <svg class="cab-nav__icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><rect x="3.5" y="3.5" width="7.2" height="7.2" rx="1.6"/><rect x="13.3" y="3.5" width="7.2" height="7.2" rx="1.6"/><rect x="3.5" y="13.3" width="7.2" height="7.2" rx="1.6"/><rect x="13.3" y="13.3" width="7.2" height="7.2" rx="1.6"/></svg>
+    <button class="cab-nav__toggle" id="cabToggle" type="button" aria-label="Развернуть меню" aria-expanded="false" aria-controls="cabNav">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+    </button>
+
+    <button class="cab-nav__item" type="button" data-href="{% url 'portal:dashboard' %}" {% if request.path == '/cabinet/' %}aria-current="page"{% endif %} style="--i: 1">
+      <svg class="cab-nav__icon cab-nav__icon--overview" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><rect x="3.5" y="3.5" width="7.2" height="7.2" rx="1.6"/><rect x="13.3" y="3.5" width="7.2" height="7.2" rx="1.6"/><rect x="3.5" y="13.3" width="7.2" height="7.2" rx="1.6"/><rect x="13.3" y="13.3" width="7.2" height="7.2" rx="1.6"/></svg>
       <span class="cab-nav__lbl">Обзор</span>
-    </a>
-    <a href="{% url 'schedule:schedule' %}" {% if request.path == '/schedule/' %}aria-current="page"{% endif %}>
-      <svg class="cab-nav__icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg>
+    </button>
+    <button class="cab-nav__item" type="button" data-href="{% url 'schedule:schedule' %}" {% if request.path == '/schedule/' %}aria-current="page"{% endif %} style="--i: 2">
+      <svg class="cab-nav__icon cab-nav__icon--schedule" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg>
       <span class="cab-nav__lbl">Расписание</span>
-    </a>
-    <a href="{% url 'portal:stipendia' %}" {% if request.path == '/cabinet/stipendia/' %}aria-current="page"{% endif %}>
-      <svg class="cab-nav__icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 10v.01M18 14v.01"/></svg>
+    </button>
+    <button class="cab-nav__item" type="button" data-href="{% url 'portal:stipendia' %}" {% if request.path == '/cabinet/stipendia/' %}aria-current="page"{% endif %} style="--i: 3">
+      <svg class="cab-nav__icon cab-nav__icon--stipendia" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 10v.01M18 14v.01"/></svg>
       <span class="cab-nav__lbl">Стипендия</span>
-    </a>
-    <a href="{% url 'education:courses' %}" {% if '/courses/' in request.path %}aria-current="page"{% endif %}>
-      <svg class="cab-nav__icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15.5H6.5A2.5 2.5 0 0 0 4 21V5.5Z"/><path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20"/></svg>
+    </button>
+    <button class="cab-nav__item" type="button" data-href="{% url 'education:courses' %}" {% if '/courses/' in request.path %}aria-current="page"{% endif %} style="--i: 4">
+      <svg class="cab-nav__icon cab-nav__icon--courses" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15.5H6.5A2.5 2.5 0 0 0 4 21V5.5Z"/><path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20"/></svg>
       <span class="cab-nav__lbl">Курсы</span>
-    </a>
-    <a href="{% url 'portal:grades' %}" {% if request.path == '/cabinet/grades/' %}aria-current="page"{% endif %}>
-      <svg class="cab-nav__icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 3.2l2.5 5.4 5.9.7-4.4 4 1.2 5.9L12 16.4l-5.2 2.8 1.2-5.9-4.4-4 5.9-.7L12 3.2Z"/></svg>
+    </button>
+    <button class="cab-nav__item" type="button" data-href="{% url 'portal:grades' %}" {% if request.path == '/cabinet/grades/' %}aria-current="page"{% endif %} style="--i: 5">
+      <svg class="cab-nav__icon cab-nav__icon--grades" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 3.2l2.5 5.4 5.9.7-4.4 4 1.2 5.9L12 16.4l-5.2 2.8 1.2-5.9-4.4-4 5.9-.7L12 3.2Z"/></svg>
       <span class="cab-nav__lbl">Оценки</span>
-    </a>
-    <a href="{% url 'accounts:roles' %}" {% if request.path == '/roles/' %}aria-current="page"{% endif %}>
-      <svg class="cab-nav__icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.6-3 7.6-7 9-4-1.4-7-4.4-7-9V6l7-3Z"/><path d="M9 12l2 2 4-4.2"/></svg>
+    </button>
+    <button class="cab-nav__item" type="button" data-href="{% url 'accounts:roles' %}" {% if request.path == '/roles/' %}aria-current="page"{% endif %} style="--i: 6">
+      <svg class="cab-nav__icon cab-nav__icon--roles" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.6-3 7.6-7 9-4-1.4-7-4.4-7-9V6l7-3Z"/><path d="M9 12l2 2 4-4.2"/></svg>
       <span class="cab-nav__lbl">Роли</span>
-    </a>
-    <a href="{% url 'portal:profile' %}" {% if request.path == '/cabinet/profile/' %}aria-current="page"{% endif %}>
-      <svg class="cab-nav__icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="8.5" r="3.5"/><path d="M4.5 20c1.5-3.5 4.2-5 7.5-5s6 1.5 7.5 5"/></svg>
+    </button>
+    <button class="cab-nav__item" type="button" data-href="{% url 'portal:profile' %}" {% if request.path == '/cabinet/profile/' %}aria-current="page"{% endif %} style="--i: 7">
+      <svg class="cab-nav__icon cab-nav__icon--profile" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="8.5" r="3.5"/><path d="M4.5 20c1.5-3.5 4.2-5 7.5-5s6 1.5 7.5 5"/></svg>
       <span class="cab-nav__lbl">Профиль</span>
-    </a>
+    </button>
     {% if perms.can_manage_users %}
-    <a href="{% url 'accounts:students' %}" {% if request.path == '/manage/students/' %}aria-current="page"{% endif %}>
-      <svg class="cab-nav__icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="9" cy="9" r="3"/><circle cx="16.5" cy="10" r="2.4"/><path d="M3.5 19.5c1-3 3-4.5 5.5-4.5s4.5 1.5 5.5 4.5"/><path d="M14.8 15.2c1.9.3 3.6 1.4 4.7 4.3"/></svg>
+    <button class="cab-nav__item" type="button" data-href="{% url 'accounts:students' %}" {% if request.path == '/manage/students/' %}aria-current="page"{% endif %} style="--i: 8">
+      <svg class="cab-nav__icon cab-nav__icon--students" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="9" cy="9" r="3"/><circle cx="16.5" cy="10" r="2.4"/><path d="M3.5 19.5c1-3 3-4.5 5.5-4.5s4.5 1.5 5.5 4.5"/><path d="M14.8 15.2c1.9.3 3.6 1.4 4.7 4.3"/></svg>
       <span class="cab-nav__lbl">Студенты</span>
-    </a>
+    </button>
     {% endif %}
     <form method="post" action="{% url 'accounts:logout' %}" class="cab-nav__logout">
       {% csrf_token %}

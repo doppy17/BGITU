@@ -30,7 +30,7 @@ class ThemeUITests(TestCase):
         self.assertContains(response, 'class="footer__word"')
         self.assertContains(response, 'data-text="БГИТУ"')
         # иконки-заливки наследуют цвет текста (не чёрные на тёмных темах)
-        self.assertContains(response, '<svg class="cab-nav__icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">')
+        self.assertContains(response, 'class="cab-nav__icon cab-nav__icon--overview" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">')
 
     def test_pages_have_bg_canvas(self):
         self.client.force_login(self.user)
@@ -96,6 +96,17 @@ class NavCompositionTests(TestCase):
         content = response.content.decode()
         for label in ('Обзор', 'Расписание', 'Стипендия', 'Курсы', 'Оценки', 'Роли', 'Профиль', 'Студенты'):
             self.assertContains(response, f'class="cab-nav__lbl">{label}</span>')
+
+    def test_nav_items_are_buttons_with_toggle(self):
+        """Пункты — кнопки с data-href (нет показа адреса при наведении),
+        раскрытие рельса — кнопкой-стрелкой, у иконок свои классы."""
+        self.client.force_login(self.dev)
+        response = self.client.get(reverse('portal:dashboard'))
+        self.assertContains(response, 'class="cab-nav__item"')
+        self.assertContains(response, 'data-href="/schedule/"')
+        self.assertContains(response, 'id="cabToggle"')
+        for cls in ('overview', 'schedule', 'stipendia', 'courses', 'grades', 'roles', 'profile'):
+            self.assertContains(response, f'cab-nav__icon--{cls}')
 
     def test_nav_is_flat_single_list(self):
         """Единый список без подзаголовка «управление» и разделителей;
