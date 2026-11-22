@@ -6,15 +6,16 @@
   <h1>{% if group %}Группа {{ group.code }}{% else %}Расписание{% endif %}</h1>
   <p class="muted">
     Источник — файл с bgitu.ru{% if latest_import %} от {{ latest_import.imported_at|date:"d.m.Y H:i" }}{% endif %}.
-    {{ week_label|capfirst }} неделя, № {{ week_number }}.
+    {% if has_parity %}{{ week_label|capfirst }} неделя, {% endif %}№ {{ week_number }}.
   </p>
 </div>
 
 <div class="sched-toolbar">
-  <div class="sched-tabs" role="group" aria-label="Неделя">
+  {% if has_parity %}<div class="sched-tabs" role="group" aria-label="Неделя">
     <a class="sched-tab" href="?week=odd{% if group %}&group={{ group.code }}{% endif %}" {% if week == 'odd' %}aria-current="page"{% endif %}>Нечётная</a>
     <a class="sched-tab" href="?week=even{% if group %}&group={{ group.code }}{% endif %}" {% if week == 'even' %}aria-current="page"{% endif %}>Чётная</a>
   </div>
+  {% endif %}
   <div class="sched-toolbar__right">
     {% if can_choose_group %}
       <form method="get" class="inline-form">
@@ -37,7 +38,7 @@
       <div class="sched-day {% if day.is_today %}is-today{% endif %}">
         <div class="sched-day__name">
           <span>{{ day.name }}</span>
-          <span>{{ day.full|slice:":2" }}</span>
+          <span class="sched-day__full">{{ day.full|capfirst }}</span>
         </div>
         {% for item in day.lessons %}
           <div class="sched-pair">

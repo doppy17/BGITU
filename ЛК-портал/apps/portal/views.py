@@ -40,10 +40,13 @@ def dashboard(request):
     weekday = today.weekday() + 1
     week = parity()
 
+    has_parity = bool(group) and Lesson.objects.filter(group=group).exclude(week='all').exists()
+    week_filter = ['all', week] if has_parity else ['all']
+
     lessons = []
     if group:
         lessons = list(
-            Lesson.objects.filter(group=group, weekday=weekday, week__in=['all', week]).order_by('pair', 'subgroup')
+            Lesson.objects.filter(group=group, weekday=weekday, week__in=week_filter).order_by('pair', 'subgroup')
         )
     bells = {b.pair: b for b in Bell.objects.filter(building='2')}
     today_lessons = [{'lesson': lesson, 'time': bells.get(lesson.pair)} for lesson in lessons]
@@ -59,7 +62,8 @@ def dashboard(request):
             candidate_week = parity_for(candidate)
             candidate_lessons = list(
                 Lesson.objects.filter(
-                    group=group, weekday=candidate.weekday() + 1, week__in=['all', candidate_week]
+                    group=group, weekday=candidate.weekday() + 1,
+                    week__in=['all', candidate_week] if has_parity else ['all'],
                 ).order_by('pair', 'subgroup')
             )
             if candidate_lessons:
@@ -102,7 +106,8 @@ def dashboard(request):
         'group': group,
         'today': today,
         'weekday_name': WEEKDAYS.get(weekday, '').capitalize(),
-        'week_label': 'нечётная' if week == 'odd' else 'чётная',
+        'has_parity': has_parity,
+        'week_label': 'нечётная' if lessons_week == 'odd' else 'чётная',
         'today_lessons': today_lessons,
         'lessons_day': lessons_day,
         'lessons_is_today': lessons_day == today,

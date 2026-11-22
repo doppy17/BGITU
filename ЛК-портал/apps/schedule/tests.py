@@ -69,3 +69,65 @@ class ScheduleImportTests(TestCase):
     def test_student_cannot_open_import(self):
         self.client.force_login(self.student)
         self.assertEqual(self.client.get(reverse('schedule:import')).status_code, 403)
+
+
+class WeekParityTests(TestCase):
+    """Чётность недели: без пометок в файле — одно расписание, без переключателя."""
+
+    @classmethod
+    def setUpTestData(cls):
+        from apps.education.models import Group
+        from .models import Lesson
+
+        cls.group = Group.objects.create(code='ИСТ-201', course=2)
+        cls.student_role = Role.objects.create(code='student', name='Студент', can_upload_works=True)
+        cls.student = User.objects.create_user('pstudent', password='demo12345')
+        cls.student.profile.role = cls.student_role
+        cls.student.profile.group = cls.group
+        cls.student.profile.save()
+        Lesson.objects.create(group=cls.group, weekday=1, pair=1, week='all', subject='Философия')
+
+    def test_parser_detects_week_marker(self):
+        from .import_service import parse_cell
+
+        self.assertEqual(parse_cell('Физика нечётная\n314 (Симохин С.П.)')['week'], 'odd')
+        self.assertEqual(parse_cell('Математика чётн.')['week'], 'even')
+        self.assertEqual(parse_cell('Базы данных\n482 (Козлова И.Р.)')['week'], 'all')
+
+    def test_no_parity_hides_toggle_and_week_label(self):
+        self.client.force_login(self.student)
+        response = self.client.get(reverse('schedule:schedule'))
+        self.assertNotContains(response, 'aria-label="Неделя"')
+        self.assertNotContains(response, 'нечётная неделя')
+        self.assertContains(response, 'Философия')
+
+    def test_parity_lessons_show_toggle_and_filter(self):
+        from .models import Lesson
+
+        Lesson.objects.create(group=self.group, weekday=2, pair=1, week='odd', subject='Только нечёт')
+        Lesson.objects.create(group=self.group, weekday=2, pair=2, week='even', subject='Только чёт')
+        self.client.force_login(self.student)
+        odd = self.client.get(reverse('schedule:schedule'), {'week': 'odd'})
+        even = self.client.get(reverse('schedule:schedule'), {'week': 'even'})
+        self.assertContains(odd, 'aria-label="Неделя"')
+        self.assertContains(odd, 'Только нечёт')
+        self.assertNotContains(odd, 'Только чёт')
+        self.assertContains(even, 'Только чёт')
+        self.assertNotContains(even, 'Только нечёт')
+
+
+class ServerImportPathTests(TestCase):
+    """Импорт по пути: только файлы расписания из fixtures/schedule."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.dean_role = Role.objects.create(code='dean', name='Деканат', can_manage_schedule=True)
+        cls.dean = User.objects.create_user('pdean', password='demo12345')
+        cls.dean.profile.role = cls.dean_role
+        cls.dean.profile.save()
+
+    def test_rejects_path_outside_schedule_dir(self):
+        self.client.force_login(self.dean)
+        for bad in ('../../config/settings/base.py', '/etc/passwd', 'manage.py', ''):
+            response = self.client.post(reverse('schedule:import_server'), {'path': bad}, follow=True)
+            self.assertContains(response, 'Некорректный путь к файлу.', msg_prefix=bad)

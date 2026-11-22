@@ -95,6 +95,12 @@ def parse_cell(text):
             room = found.group(1)
             flat = flat[: found.start()].strip()
 
+    week = 'all'
+    marker = re.search(r'(?:^|\s)(нечётн\w*|нечетн\w*|чётн\w*|четн\w*)\.?\s*$', flat, re.I)
+    if marker:
+        week = 'odd' if marker.group(1).lower().startswith('неч') or marker.group(1).lower().startswith('нечет') else 'even'
+        flat = flat[: marker.start()].strip()
+
     subject = re.sub(r'\s+', ' ', flat).strip(' -–—.,')
     if len(subject) < 2:
         return None
@@ -108,7 +114,7 @@ def parse_cell(text):
         kind = 'практика'
     elif 'консультац' in low:
         kind = 'консультация'
-    return {'subject': subject, 'room': room, 'teacher_name': teacher, 'kind': kind}
+    return {'subject': subject, 'room': room, 'teacher_name': teacher, 'kind': kind, 'week': week}
 
 
 def parse_schedule(path):
@@ -160,8 +166,8 @@ def parse_schedule(path):
                         'group': group_code,
                         'weekday': weekday,
                         'pair': pair_number,
-                        'week': 'all',
                         'subgroup': sub,
+                        'week': 'all',
                         **item,
                     })
     if not lessons:

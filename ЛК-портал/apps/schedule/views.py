@@ -34,15 +34,19 @@ def schedule_view(request):
     if group is None and can_choose:
         group = groups.first()
 
+    # Чётность недели показываем только если в расписании группы есть занятия,
+    # привязанные к конкретной неделе. Иначе одно расписание на обе недели.
+    has_parity = bool(group) and Lesson.objects.filter(group=group).exclude(week='all').exists()
     week = request.GET.get('week')
-    if week not in ('odd', 'even'):
-        week = current_parity()
-    week_label = 'нечётная' if week == 'odd' else 'чётная'
+    if not has_parity or week not in ('odd', 'even'):
+        week = current_parity() if has_parity else 'all'
+    week_label = {'odd': 'нечётная', 'even': 'чётная'}.get(week, '')
 
     lessons = []
     if group:
+        week_filter = ['all', week] if has_parity else ['all']
         lessons = list(
-            Lesson.objects.filter(group=group, week__in=['all', week])
+            Lesson.objects.filter(group=group, week__in=week_filter)
             .select_related('source')
             .order_by('weekday', 'pair', 'subgroup')
         )
@@ -71,6 +75,7 @@ def schedule_view(request):
         'groups': groups,
         'can_choose_group': can_choose,
         'week': week,
+        'has_parity': has_parity,
         'week_label': week_label,
         'week_number': today.isocalendar()[1],
         'days': days,
@@ -124,14 +129,19 @@ def import_view(request):
 @role_required('can_manage_schedule')
 def import_from_server_file(request):
     """Импорт приложенного в проект файла БГИТУ (для демо/первичной заливки)."""
-    path = request.POST.get('path', '')
-    if os.path.isabs(path) or '..' in path:
-        messages.error(request, 'Некорректный путь к файлу.')
-        return redirect('schedule:import')
     from django.conf import settings
 
-    full_path = settings.BASE_DIR / path
-    if not full_path.exists():
+    path = request.POST.get('path', '')
+    allowed_root = (settings.BASE_DIR / 'fixtures' / 'schedule').resolve()
+    full_path = (settings.BASE_DIR / path).resolve()
+    # Только файлы расписания внутри fixtures/schedule — без выхода за пределы папки.
+    if not path or os.path.isabs(path) or not full_path.is_relative_to(allowed_root):
+        messages.error(request, 'Некорректный путь к файлу.')
+        return redirect('schedule:import')
+    if full_path.suffix.lower() not in ('.xls', '.xlsx'):
+        messages.error(request, 'Поддерживаются только .xls и .xlsx.')
+        return redirect('schedule:import')
+    if not full_path.is_file():
         messages.error(request, 'Файл не найден.')
         return redirect('schedule:import')
     with full_path.open('rb') as handle:

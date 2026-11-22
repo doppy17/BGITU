@@ -8,7 +8,7 @@
   <p class="muted">
     {{ role.name|default:"роль не назначена" }}
     {% if group %} · группа {{ group.code }} · {{ group.course }} курс{% else %} · группа не назначена{% endif %}
-    · {{ today|date:"l, j F Y" }} · {{ week_label }} неделя
+    · {{ today|date:"l, j F Y" }}{% if has_parity %} · {{ week_label }} неделя{% endif %}
   </p>
 </div>
 
@@ -43,7 +43,7 @@
   <section class="panel">
     <header class="panel__head">
       <div class="panel__title"><span class="panel__num mono">01</span><h2>{% if lessons_is_today %}Сегодня{% else %}Ближайшие занятия{% endif %}</h2></div>
-      <span class="mono dim">{{ lessons_day|date:"l, j F" }} · {{ lessons_week_label }}</span>
+      <span class="mono dim">{{ lessons_day|date:"l, j F" }}{% if has_parity %} · {{ lessons_week_label }}{% endif %}</span>
     </header>
     {% if today_lessons %}
       <div class="lesson-list">
