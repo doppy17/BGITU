@@ -187,8 +187,9 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   gap: 10px;
   width: 100%;
   min-height: 44px;
-  /* иконка зафиксирована: 6px паддинг рельса + 20px = центр 60px */
-  padding: 0 0 0 20px;
+  /* иконка зафиксирована: 6px паддинг рельса + 12px = 18px до иконки, с учётом
+     бордера 1px центр иконки совпадает с центром 60px-рельса */
+  padding: 0 0 0 12px;
   justify-content: flex-start;
   border: 1px solid transparent;
   border-radius: var(--radius-s);
@@ -228,7 +229,7 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   display: none;
   align-items: center;
   justify-content: flex-start;
-  padding-left: 15px;
+  padding-left: 13px;
   width: 100%;
   min-height: 36px;
   margin-bottom: 4px;
@@ -1243,6 +1244,35 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   border-top: 1px dotted var(--line-strong);
   opacity: 0.8;
 }
+
+/* импорт расписания из файла БГИТУ */
+.import-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.import-form .file-input { flex: 1 1 320px; }
+.import-form .btn { flex: none; }
+.panel-note { margin-top: 10px; font-size: 0.8125rem; }
+
+/* пилюли подгрупп */
+.sub-line { display: flex; align-items: center; gap: 8px; margin: 10px 0 0; }
+.sub-pills { display: inline-flex; gap: 4px; align-items: center; }
+.sub-pills__lbl { color: var(--text-faint); font-size: 0.6875rem; margin-right: 4px; }
+.sub-pill {
+  min-width: 28px;
+  padding: 4px 9px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-muted);
+  font: 500 0.75rem/1 var(--font-text);
+  cursor: pointer;
+  transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast);
+}
+.sub-pill:hover { border-color: var(--line-strong); color: var(--text); }
+.sub-pill.is-active { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 
 /* ось учебного плана: 8 семестров */
 .tl-grid--semesters .tl-ticks { height: 42px; }

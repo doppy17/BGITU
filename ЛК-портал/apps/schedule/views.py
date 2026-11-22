@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.files import File
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from apps.accounts.permissions import role_can, role_required
@@ -94,11 +95,19 @@ def schedule_view(request):
     is_current = week == current_week
 
     lessons = []
+    subgroups = []
+    sub = (request.GET.get('sub') or '').strip()
     if group:
+        all_lessons = Lesson.objects.filter(group=group)
+        subgroups = sorted({item.subgroup for item in all_lessons if item.subgroup})
+        if sub not in subgroups:
+            sub = ''
         lessons = list(
-            Lesson.objects.filter(group=group, week__in=['all', parity])
+            all_lessons.filter(week__in=['all', parity])
             .order_by('weekday', 'pair', 'subgroup')
         )
+        if sub:
+            lessons = [item for item in lessons if item.subgroup in ('', sub)]
     bells = {b.pair: b for b in Bell.objects.filter(building='2')}
 
     # Таблица: строки — пары, колонки — дни недели. В одной паре — один предмет:
@@ -170,6 +179,9 @@ def schedule_view(request):
         'grid': grid,
         'curriculum': curriculum,
         'latest_import': latest,
+        'subgroups': subgroups,
+        'sub': sub,
+        'can_import': role_can(request.user, 'can_manage_schedule') or role_can(request.user, 'can_view_all'),
     })
 
 
@@ -203,9 +215,9 @@ def import_view(request):
             return redirect('schedule:import')
         messages.success(
             request,
-            f'Импортировано занятий: {record.lessons_count}, групп: {record.groups_count}.',
+            f'Расписание обновлено: занятий — {record.lessons_count}, групп — {record.groups_count}.',
         )
-        return redirect('schedule:schedule')
+        return redirect(f"{reverse('schedule:schedule')}?group={request.POST.get('group', '')}")
 
     return render(request, 'schedule/import.html', {
         'imports': ScheduleImport.objects.select_related('imported_by')[:20],

@@ -141,6 +141,32 @@ class WeekParityTests(TestCase):
         self.assertContains(odd, '<b>Философия</b>')
         self.assertContains(even, '<b>Философия</b>')
 
+    def test_same_slot_odd_even_switches_by_week(self):
+        """Один слот дня и пары: на нечётной неделе — один предмет, на чётной — другой."""
+        from .models import Lesson
+
+        Lesson.objects.create(group=self.group, weekday=3, pair=6, week='odd', subject='Слот-нечёт')
+        Lesson.objects.create(group=self.group, weekday=3, pair=6, week='even', subject='Слот-чёт')
+        self.client.force_login(self.student)
+        odd = self.client.get(reverse('schedule:schedule'), {'week': '12'})
+        self.assertContains(odd, '<b>Слот-нечёт</b>')
+        self.assertNotContains(odd, '<b>Слот-чёт</b>')
+        even = self.client.get(reverse('schedule:schedule'), {'week': '13'})
+        self.assertContains(even, '<b>Слот-чёт</b>')
+        self.assertNotContains(even, '<b>Слот-нечёт</b>')
+
+    def test_subgroup_filter(self):
+        """?sub=2 показывает занятия второй подгруппы."""
+        from .models import Lesson
+
+        Lesson.objects.create(group=self.group, weekday=4, pair=5, week='all', subject='Первая-подгр', subgroup='1')
+        Lesson.objects.create(group=self.group, weekday=4, pair=5, week='all', subject='Вторая-подгр', subgroup='2')
+        self.client.force_login(self.student)
+        response = self.client.get(reverse('schedule:schedule'), {'week': '12', 'sub': '2'})
+        self.assertContains(response, '<b>Вторая-подгр</b>')
+        self.assertNotContains(response, '<b>Первая-подгр</b>')
+        self.assertContains(response, 'sub-pill is-active')
+
     def test_curriculum_block_lists_program(self):
         """Блок учебного плана: все дисциплины программы по семестрам."""
         self.client.force_login(self.student)
