@@ -70,32 +70,81 @@
   var scrollY = 0;
   addEventListener('scroll', function () { scrollY = window.scrollY; }, { passive: true });
 
-  function drawLines(t) {
-    var ampH = H * 0.16;
-    for (var l = 0; l < 2; l++) {
-      var y0 = H * (0.28 + 0.35 * l) + Math.sin(t * 0.11 + l * 2.1) * H * 0.03;
+  // Линии-следы как на основном сайте: идут через всю страницу и врезаются
+  // в надпись «БГИТУ» в футере (каждая — в свою часть слова).
+  var ANCHOR_FRACTIONS = [0.22, 0.5, 0.78];
+  var TRAIL_COLORS = function (l) { return l === 0 ? ACC : (l === 1 ? AUX : INK); };
+
+  function trailAnchor(l) {
+    var fw = document.querySelector('.footer__word');
+    if (fw) {
+      var wr = fw.getBoundingClientRect();
+      var wTop = wr.top + scrollY;
+      return {
+        x: wr.left + wr.width * ANCHOR_FRACTIONS[l],
+        y: wTop + wr.height * 0.55,
+        wordTop: wTop,
+      };
+    }
+    var endY = Math.max(document.documentElement.scrollHeight, H) - 80;
+    return { x: W * 0.5, y: endY, wordTop: endY };
+  }
+
+  function drawTrails() {
+    for (var l = 0; l < 3; l++) {
+      var anchor = trailAnchor(l);
+      var seed = l * 2.7 + 1.3;
+      var amp = W * (0.30 - 0.08 * l);
+      var startY = 150; // страничные координаты, под шапкой
+      var endY = anchor.y;
+      var span = Math.max(1, endY - startY);
       ctx.beginPath();
-      for (var x = 0; x <= W; x += 24) {
-        var y = y0 + Math.sin(x * 0.004 + l * 2.4 + t * 0.35) * ampH;
-        if (x === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
+      var began = false;
+      for (var y = startY; y <= endY; y += 8) {
+        var t = (y - startY) / span;
+        var x = W * 0.5
+          + Math.sin(y * 0.0011 + seed) * amp
+          + Math.sin(y * 0.0042 + seed * 5.1) * 42;
+        // финальный участок: линия врезается в свою точку надписи
+        if (endY - y < 380) {
+          var u = 1 - (endY - y) / 380;
+          u = u * u * (3 - 2 * u); // smoothstep
+          x = x + (anchor.x - x) * u;
+        }
+        var vy = y - scrollY;
+        if (vy > -60 && vy < H + 60) {
+          if (!began) { ctx.moveTo(x, vy); began = true; }
+          else ctx.lineTo(x, vy);
+        }
       }
-      var grad = ctx.createLinearGradient(0, 0, W, 0);
-      var c = l === 0 ? ACC : AUX;
+      if (!began) continue;
+      var grad = ctx.createLinearGradient(0, startY - scrollY, 0, endY - scrollY);
+      var c = TRAIL_COLORS(l);
       grad.addColorStop(0, rgba(c, 0));
-      grad.addColorStop(0.22, rgba(c, 0.09));
-      grad.addColorStop(0.5, rgba(c, 0.045));
-      grad.addColorStop(0.78, rgba(c, 0.09));
-      grad.addColorStop(1, rgba(c, 0));
+      grad.addColorStop(0.10, rgba(c, 0.07));
+      grad.addColorStop(0.55, rgba(c, 0.06));
+      grad.addColorStop(0.85, rgba(c, 0.16));
+      grad.addColorStop(0.96, rgba(c, 0.34));
+      grad.addColorStop(1, rgba(c, 0.5)); // вспышка у надписи
       ctx.strokeStyle = grad;
-      ctx.lineWidth = 1.2;
+      ctx.lineWidth = l === 0 ? 1.4 : 1;
       ctx.stroke();
     }
   }
 
+  // Насколько футер вошёл в кадр: 0..1 — подпитка свечения надписи.
+  var footerBoost = 0;
+  function measureFooterBoost() {
+    var fw = document.querySelector('.footer__word');
+    if (!fw) { footerBoost = 0; return; }
+    var top = fw.getBoundingClientRect().top;
+    footerBoost = 1 - Math.min(1, Math.max(0, (top - H * 0.75) / (H * 0.5)));
+  }
+
   function frame(t) {
     ctx.clearRect(0, 0, W, H);
-    drawLines(t);
+    drawTrails();
+    measureFooterBoost();
     if (!PARTS.length) seedParts();
     var span = H + 40;
     for (var i = 0; i < PARTS.length; i++) {
@@ -146,9 +195,10 @@
     });
     var breathe = function () {
       var t = reduce ? 0 : performance.now() / 1000;
-      fw.style.setProperty('--f0', (0.22 + 0.2 * (1 + Math.sin(t * 0.5))).toFixed(2));
-      fw.style.setProperty('--f1', (0.28 + 0.26 * (1 + Math.sin(t * 0.5 + 2.1))).toFixed(2));
-      fw.style.setProperty('--f2', (0.18 + 0.16 * (1 + Math.sin(t * 0.5 + 4.2))).toFixed(2));
+      var k = 1 + 1.1 * footerBoost; // линии врезались — надпись разгорается
+      fw.style.setProperty('--f0', (k * (0.22 + 0.2 * (1 + Math.sin(t * 0.5)))).toFixed(2));
+      fw.style.setProperty('--f1', (k * (0.28 + 0.26 * (1 + Math.sin(t * 0.5 + 2.1)))).toFixed(2));
+      fw.style.setProperty('--f2', (k * (0.18 + 0.16 * (1 + Math.sin(t * 0.5 + 4.2)))).toFixed(2));
     };
     breathe();
     if (!reduce) setInterval(breathe, 800);
