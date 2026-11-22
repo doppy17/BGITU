@@ -24,6 +24,16 @@ class ThemeUITests(TestCase):
             self.assertContains(response, f'data-theme-set="{name}"')
         self.assertContains(response, 'js/theme.js')
 
+    def test_custom_select_component_included(self):
+        """Кастомный дропдаун: скрипт компонента подключён на кабинете и в auth-формах."""
+        self.client.force_login(self.user)
+        schedule = self.client.get(reverse('schedule:schedule'))
+        self.assertContains(schedule, 'js/select.js')
+        self.client.logout()
+        register = self.client.get(reverse('accounts:register'))
+        self.assertContains(register, 'js/select.js')
+        self.assertContains(register, 'class="input"')
+
     def test_footer_wordmark_and_fixed_icons(self):
         self.client.force_login(self.user)
         response = self.client.get(reverse('portal:dashboard'))
