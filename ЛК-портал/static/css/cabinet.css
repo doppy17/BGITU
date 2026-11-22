@@ -152,6 +152,7 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   padding: 12px 6px;
   border: 1px solid var(--line);
   border-radius: var(--radius-pill);
+  overflow: hidden;
   background: var(--bg-glass);
   -webkit-backdrop-filter: blur(16px) saturate(1.4);
   backdrop-filter: blur(16px) saturate(1.4);
@@ -186,8 +187,9 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   gap: 10px;
   width: 100%;
   min-height: 44px;
-  padding: 0;
-  justify-content: center;
+  /* иконка зафиксирована: 6px паддинг рельса + 20px = центр 60px */
+  padding: 0 0 0 20px;
+  justify-content: flex-start;
   border: 1px solid transparent;
   border-radius: var(--radius-s);
   background: transparent;
@@ -201,15 +203,11 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
 .cab-nav__icon { width: 20px; height: 20px; flex: none; }
 .cab-nav__lbl {
   opacity: 0;
-  width: 0;
-  overflow: hidden;
   transition: opacity var(--dur-fast) var(--ease);
 }
-.cab-nav:not(.is-expanded) .cab-nav__item { gap: 0; }
-.cab-nav.is-expanded .cab-nav__item { justify-content: flex-start; padding: 0 12px; }
+.cab-nav__item { white-space: nowrap; }
 .cab-nav.is-expanded .cab-nav__lbl {
   opacity: 1;
-  width: auto;
   transition: opacity var(--dur-fast) var(--ease) calc(var(--i, 1) * 30ms);
 }
 @media (prefers-reduced-motion: reduce) {
@@ -229,7 +227,8 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
 .cab-nav__toggle {
   display: none;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  padding-left: 15px;
   width: 100%;
   min-height: 36px;
   margin-bottom: 4px;
@@ -244,16 +243,11 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
 .cab-nav__toggle svg {
   width: 18px;
   height: 18px;
-  margin-left: 0;
-  transition: transform var(--dur) var(--ease), margin-left var(--dur) var(--ease);
+  transition: transform var(--dur) var(--ease);
 }
-/* при раскрытии стрелка не уезжает вправо — остаётся слева, как была */
-.cab-nav.is-expanded .cab-nav__toggle {
-  justify-content: flex-start;
-}
+/* стрелка зафиксирована слева; при раскрытии только поворот */
 .cab-nav.is-expanded .cab-nav__toggle svg {
   transform: rotate(180deg);
-  margin-left: 12px;
 }
 @media (min-width: 1001px) {
   .cab-nav__toggle { display: flex; }
@@ -449,7 +443,7 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
     background: transparent;
   }
   .cab-nav__toggle { display: none; }
-  .cab-nav__lbl { opacity: 1; width: auto; }
+  .cab-nav__lbl { opacity: 1; }
   .nav-backdrop {
     display: none;
     position: fixed;
