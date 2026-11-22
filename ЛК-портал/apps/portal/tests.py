@@ -79,11 +79,14 @@ class NavCompositionTests(TestCase):
             self.assertContains(response, f'>{label}</a>', html=False)
 
     def test_nav_is_flat_single_list(self):
-        """Единый список без подзаголовка «управление» и разделителей."""
+        """Единый список без подзаголовка «управление» и разделителей;
+        одна вкладка на раздел — без отдельных ссылок заявок/создания/импорта."""
         self.client.force_login(self.dev)
         response = self.client.get(reverse('portal:dashboard'))
         self.assertNotContains(response, 'cab-nav__label')
         self.assertNotContains(response, 'cab-nav__sep')
+        for removed in ('>Заявки на роли</a>', '>Создать роль</a>', '>Импорт расписания</a>'):
+            self.assertNotContains(response, removed)
 
     def test_top_nav_has_main_site_links(self):
         self.client.force_login(self.dev)

@@ -73,9 +73,6 @@
     {% if perms.can_manage_users %}
     <a href="{% url 'accounts:students' %}" {% if request.path == '/manage/students/' %}aria-current="page"{% endif %}>Студенты</a>
     {% endif %}
-    {% if perms.can_approve_roles %}<a href="{% url 'accounts:role_requests' %}" {% if request.path == '/role-requests/' %}aria-current="page"{% endif %}>Заявки на роли</a>{% endif %}
-    {% if perms.can_manage_roles %}<a href="{% url 'accounts:role_create' %}" {% if request.path == '/roles/new/' %}aria-current="page"{% endif %}>Создать роль</a>{% endif %}
-    {% if perms.can_manage_schedule %}<a href="{% url 'schedule:import' %}" {% if request.path == '/schedule/import/' %}aria-current="page"{% endif %}>Импорт расписания</a>{% endif %}
     <form method="post" action="{% url 'accounts:logout' %}" class="cab-nav__logout">
       {% csrf_token %}
       <button class="btn btn--ghost btn--sm" type="submit">Выйти из кабинета</button>
