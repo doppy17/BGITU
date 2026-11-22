@@ -33,12 +33,12 @@
 
   <nav class="site-nav" aria-label="Основное">
     <ul>
-      <li><a href="https://tenec2000-sketch.github.io/bgitu-site/university.html">Университет</a></li>
-      <li><a href="https://tenec2000-sketch.github.io/bgitu-site/admission.html">Поступающим</a></li>
-      <li><a href="https://tenec2000-sketch.github.io/bgitu-site/student.html">Студенту</a></li>
-      <li><a href="https://tenec2000-sketch.github.io/bgitu-site/science.html">Наука</a></li>
-      <li><a href="https://tenec2000-sketch.github.io/bgitu-site/news.html">Новости</a></li>
-      <li><a href="https://tenec2000-sketch.github.io/bgitu-site/contacts.html">Контакты</a></li>
+      <li><a href="{% url 'site:university' %}">Университет</a></li>
+      <li><a href="{% url 'site:admission' %}">Поступающим</a></li>
+      <li><a href="{% url 'site:student' %}">Студенту</a></li>
+      <li><a href="{% url 'site:science' %}">Наука</a></li>
+      <li><a href="{% url 'site:news' %}">Новости</a></li>
+      <li><a href="{% url 'site:contacts' %}">Контакты</a></li>
     </ul>
   </nav>
 
