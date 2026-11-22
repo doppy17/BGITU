@@ -1,0 +1,46 @@
+{% extends "site/base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="page-hero" aria-labelledby="ph">
+  <div class="container">
+    <nav class="crumbs mono" aria-label="Вы здесь"><a href="{% url 'site:index' %}">Главная</a><span aria-hidden="true">/</span><span aria-current="page">Новости</span></nav>
+    <p class="tag mono"><i></i>Пресс-центр</p>
+    <h1 id="ph">Новости <span class="hl" data-scramble>и объявления</span></h1>
+    <p class="page-hero__lead">События университета, конференции, конкурсы и объявления для студентов и сотрудников. Источник — bgitu.ru.</p>
+  </div>
+</section>
+
+<section class="section" id="featured" aria-labelledby="featured-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="featured-h">01 — Главное</h2><span class="mono dim">неделя</span></header>
+    <a class="feature" href="{% url 'site:article' %}" data-s="Новости" data-t="Победа на первенстве России по спортивному программированию"><span class="mono">23.10.2026 · студенты · IT</span><h2>Победа на первенстве России по спортивному программированию</h2><p>Студенты БГИТУ в составе сборной Брянской области выиграли первенство России среди молодёжи, а мужская команда с проректором университета заняла четвёртое место.</p><span class="more" style="justify-content:flex-start;margin:0"><span class="mono" style="color:var(--accent)">читать →</span></span></a>
+  </div>
+</section>
+
+<section class="section section--raised" id="feed" aria-labelledby="feed-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="feed-h">02 — Лента</h2><span class="mono dim">15 материалов</span></header>
+    <div data-filter="#feedlist">
+      <div class="filter-bar"><div class="chips" role="group" aria-label="Тип"><button type="button" data-k="all" aria-pressed="true">Все</button><button type="button" data-k="n" aria-pressed="false">Новости</button><button type="button" data-k="a" aria-pressed="false">Объявления</button></div>
+      <input type="search" placeholder="Поиск по новостям" aria-label="Поиск по новостям"></div>
+      <div><ul class="news" id="feedlist">
+      <li data-k="n"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Тренинг предпринимательских компетенций"><time class="mono">05.11.2026</time><h3>Тренинг предпринимательских компетенций</h3><span class="mono dim">студенты</span></a></li>
+      <li data-k="a"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Всероссийская программа по развитию молодёжного предпринимательства"><time class="mono">05.11.2026</time><h3>Всероссийская программа по развитию молодёжного предпринимательства</h3><span class="mono dim">объявление</span></a></li>
+      <li data-k="n"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Научно-образовательный проект «IT-предпринимательство»"><time class="mono">29.10.2026</time><h3>Научно-образовательный проект «IT-предпринимательство»</h3><span class="mono dim">IT · проекты</span></a></li>
+      <li data-k="n"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Научно-практическая конференция «120 лет практической лесной науке на Брянщине»"><time class="mono">27.10.2026</time><h3>Научно-практическая конференция «120 лет практической лесной науке на Брянщине»</h3><span class="mono dim">наука · лес</span></a></li>
+      <li data-k="n"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Стратегический диалог «Университеты и Сбер — открытый диалог для сильных решений»"><time class="mono">27.10.2026</time><h3>Стратегический диалог «Университеты и Сбер — открытый диалог для сильных решений»</h3><span class="mono dim">партнёры</span></a></li>
+      <li data-k="n"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Научно-образовательный проект «IT предпринимательство»"><time class="mono">27.10.2026</time><h3>Научно-образовательный проект «IT предпринимательство»</h3><span class="mono dim">IT · проекты</span></a></li>
+      <li data-k="n"><a href="{% url 'site:article' %}" data-s="Новости" data-t="Победа на первенстве России по спортивному программированию"><time class="mono">23.10.2026</time><h3>Победа на первенстве России по спортивному программированию</h3><span class="mono dim">студенты · IT</span></a></li>
+      <li data-k="a"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Всероссийский конкурс-премия «Безграничные возможности»"><time class="mono">22.10.2026</time><h3>Всероссийский конкурс-премия «Безграничные возможности»</h3><span class="mono dim">объявление</span></a></li>
+      <li data-k="n"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Учредительное заседание Комитета по инновациям"><time class="mono">21.10.2026</time><h3>Учредительное заседание Комитета по инновациям</h3><span class="mono dim">университет</span></a></li>
+      <li data-k="n"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Встреча иностранных студентов БГИТУ из стран Африки с Луисом Гоуендом"><time class="mono">21.10.2026</time><h3>Встреча иностранных студентов БГИТУ из стран Африки с Луисом Гоуендом</h3><span class="mono dim">студенты</span></a></li>
+      <li data-k="a"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Конференция работников и обучающихся БГИТУ по выборам Учёного совета университета"><time class="mono">20.10.2026</time><h3>Конференция работников и обучающихся БГИТУ по выборам Учёного совета университета</h3><span class="mono dim">объявление</span></a></li>
+      <li data-k="a"><a href="{% url 'site:news' %}" data-s="Новости" data-t="IV Всероссийский научно-технологический диктант"><time class="mono">19.10.2026</time><h3>IV Всероссийский научно-технологический диктант</h3><span class="mono dim">объявление</span></a></li>
+      <li data-k="a"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Юбилейная общероссийская образовательная акция ВЭО «Всероссийский экономический диктант»"><time class="mono">15.10.2026</time><h3>Юбилейная общероссийская образовательная акция ВЭО «Всероссийский экономический диктант»</h3><span class="mono dim">объявление</span></a></li>
+      <li data-k="a"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Профессиональная переподготовка «Ценообразование и сметное нормирование в строительстве»"><time class="mono">15.10.2026</time><h3>Профессиональная переподготовка «Ценообразование и сметное нормирование в строительстве»</h3><span class="mono dim">объявление</span></a></li>
+      <li data-k="a"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Список кандидатов в состав Учёного совета ФГБОУ ВО БГИТУ"><time class="mono">12.10.2026</time><h3>Список кандидатов в состав Учёного совета ФГБОУ ВО БГИТУ</h3><span class="mono dim">объявление</span></a></li>
+      </ul><p class="dirs__empty" hidden>Ничего не нашлось.</p></div></div>
+  </div>
+</section>
+{% endblock %}

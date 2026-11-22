@@ -1,23 +1,35 @@
-# Запуск проекта одной командой
+# ЛК БГИТУ — типовые команды.
+# Интерпретатор: сначала LK_VENV (рабочая копия вне iCloud), затем .venv, затем python3 —
+# берётся первый, в котором есть Django. .venv в ~/Documents под iCloud ломается (Resource deadlock).
+LK_VENV ?= $(HOME)/.hermes/cache/scratch/lk-run/.venv
+PY ?= $(shell for p in "$(LK_VENV)/bin/python" .venv/bin/python python3 python; do \
+        $$p -c 'import django' >/dev/null 2>&1 && { echo $$p; break; }; done)
+PORT ?= 8010
+UV ?= $(shell command -v uv 2>/dev/null || echo $(HOME)/.hermes/bin/uv)
+
+.PHONY: venv install migrate seed run test check clean
+
+venv:
+	$(UV) venv --python 3.11 $(LK_VENV) || python3.11 -m venv $(LK_VENV)
+
+install: venv
+	$(UV) pip install --python $(PY) -r requirements.txt
+
+migrate:
+	$(PY) manage.py migrate
+
+seed:
+	$(PY) manage.py seed_demo
+
 run:
 	./run.sh
 
-# Проверки
 test:
-	cd "ЛК-портал" && .venv/bin/python manage.py test
+	$(PY) manage.py test
 
 check:
-	cd "ЛК-портал" && .venv/bin/python manage.py check
+	$(PY) manage.py check
 
-# Пересоздать окружение с нуля (если .venv сломан)
-setup:
-	rm -rf "ЛК-портал/.venv"
-	./run.sh --setup-only
-
-# Полный сброс демо-БД и медиа, затем запуск
-reset:
-	rm -f "ЛК-портал/db.sqlite3"
-	rm -rf "ЛК-портал/media/works" "ЛК-портал/media/materials" "ЛК-портал/media/schedule"
-	./run.sh
-
-.PHONY: run test check setup reset
+clean:
+	rm -f db.sqlite3
+	rm -rf media staticfiles

@@ -1,20 +1,11 @@
-# macOS
-.DS_Store
-
-# IDE
-.idea/
-
-# Python
+.venv/
 __pycache__/
 *.py[cod]
-.venv/
-*.egg-info/
-
-# Django
 db.sqlite3
 media/
 staticfiles/
+.DS_Store
 .env
 
-# служебное
-*.log
+# локальный порт последнего запуска
+.run-port

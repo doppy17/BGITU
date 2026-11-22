@@ -1,0 +1,40 @@
+{% extends "site/base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="page-hero" aria-labelledby="ph">
+  <div class="container">
+    <nav class="crumbs mono" aria-label="Вы здесь"><a href="{% url 'site:index' %}">Главная</a><span aria-hidden="true">/</span><a href="{% url 'site:student' %}">Студенту</a><span aria-hidden="true">/</span><span aria-current="page">Расписание</span></nav>
+    <p class="tag mono"><i></i>Расписание</p>
+    <h1 id="ph">Расписание <span class="hl" data-scramble>и звонки</span></h1>
+    <p class="page-hero__lead">Время пар в обоих корпусах, номер текущей недели и поиск по группе, преподавателю или аудитории.</p><div class="meta-row"><span class="week" data-week></span></div>
+  </div>
+</section>
+
+<section class="section section--raised" id="zvonki" aria-labelledby="zvonki-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="zvonki-h">01 — Расписание звонков</h2><span class="mono dim">текущая пара подсвечена</span></header>
+    <div class="tbl-wrap"><table class="tbl" id="bells"><thead><tr><th>Пара</th><th>Корпус №1 · пр-т Станке Димитрова, 3</th><th>Корпус №2 · пр-т Ленина, 26</th></tr></thead><tbody><tr data-a="8:20" data-b="9:55" data-c="8:50" data-d="10:25"><td>1</td><td>8:20 – 9:55</td><td>8:50 – 10:25</td></tr><tr data-a="10:05" data-b="11:40" data-c="10:35" data-d="12:10"><td>2</td><td>10:05 – 11:40</td><td>10:35 – 12:10</td></tr><tr data-a="11:50" data-b="13:25" data-c="12:20" data-d="13:55"><td>3</td><td>11:50 – 13:25</td><td>12:20 – 13:55</td></tr><tr data-a="14:00" data-b="15:35" data-c="14:30" data-d="16:05"><td>4</td><td>14:00 – 15:35</td><td>14:30 – 16:05</td></tr><tr data-a="15:45" data-b="17:20" data-c="16:15" data-d="17:50"><td>5</td><td>15:45 – 17:20</td><td>16:15 – 17:50</td></tr><tr data-a="17:30" data-b="19:05" data-c="18:00" data-d="19:35"><td>6</td><td>17:30 – 19:05</td><td>18:00 – 19:35</td></tr></tbody></table></div>
+  </div>
+</section>
+
+<section class="section" id="find" aria-labelledby="find-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="find-h">02 — Поиск и выгрузка в календарь</h2><span class="mono dim">группа · преподаватель · аудитория</span></header>
+    <div class="tool">
+      <div class="filter-bar" style="margin-bottom:16px"><div class="chips" role="group" aria-label="Режим поиска" id="smode"><button type="button" data-k="g" aria-pressed="true">По группе</button><button type="button" data-k="t" aria-pressed="false">По преподавателю</button><button type="button" data-k="r" aria-pressed="false">По аудитории</button></div><span class="demo">демо-данные макета</span></div>
+      <div class="form"><label>Группа, преподаватель или аудитория<input id="sq" list="sopts" placeholder="например, ПИ-201"></label><datalist id="sopts"></datalist>
+      <label>Корпус (для времени пар)<select id="scorp"><option value="1">№1 · Станке Димитрова, 3</option><option value="2" selected>№2 · Ленина, 26</option></select></label></div>
+      <div class="tool__out" id="sout"><p class="dim">Введите группу — покажем пары на текущую неделю.</p></div>
+      <div class="btn-row"><button class="btn btn--accent btn--sm" type="button" id="sics">Выгрузить неделю в календарь (.ics)</button></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section--raised" id="official" aria-labelledby="official-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="official-h">03 — Официальные расписания</h2><span class="mono dim">bgitu.ru и ЭОС</span></header>
+    <ul class="news"><li><a href="{% url 'schedule:schedule' %}" data-s="Ссылка" data-t="Очное обучение"><time class="mono">очное</time><h3>Очное обучение</h3><span class="mono dim"></span></a></li><li><a href="{% url 'schedule:schedule' %}" data-s="Ссылка" data-t="Заочное обучение"><time class="mono">заочное</time><h3>Заочное обучение</h3><span class="mono dim"></span></a></li><li><a href="{% url 'schedule:schedule' %}" data-s="Ссылка" data-t="Очно-заочное обучение"><time class="mono">о-з</time><h3>Очно-заочное обучение</h3><span class="mono dim"></span></a></li><li><a href="{% url 'schedule:schedule' %}" data-s="Ссылка" data-t="Магистратура, очная"><time class="mono">маг.</time><h3>Магистратура, очная</h3><span class="mono dim"></span></a></li><li><a href="{% url 'schedule:schedule' %}" data-s="Ссылка" data-t="Магистратура, заочная"><time class="mono">маг.</time><h3>Магистратура, заочная</h3><span class="mono dim"></span></a></li><li><a href="{% url 'schedule:schedule' %}" data-s="Ссылка" data-t="Колледж (СПО)"><time class="mono">спо</time><h3>Колледж (СПО)</h3><span class="mono dim"></span></a></li><li><a href="{% url 'schedule:schedule' %}" data-s="Ссылка" data-t="Государственная итоговая аттестация"><time class="mono">гиа</time><h3>Государственная итоговая аттестация</h3><span class="mono dim"></span></a></li><li><a href="{% url 'site:eos' %}" data-s="Ссылка" data-t="Расписание в ЭОС: группа / преподаватель / аудитория"><time class="mono">эос</time><h3>Расписание в ЭОС: группа / преподаватель / аудитория</h3><span class="mono dim">eos.</span></a></li><li><a href="{% url 'site:inst-vuc' %}" data-s="Ссылка" data-t="Военный учебный центр"><time class="mono">вуц</time><h3>Военный учебный центр</h3><span class="mono dim"></span></a></li></ul>
+  </div>
+</section>
+{% endblock %}

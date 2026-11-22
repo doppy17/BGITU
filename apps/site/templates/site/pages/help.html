@@ -1,0 +1,40 @@
+{% extends "site/base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="page-hero" aria-labelledby="ph">
+  <div class="container">
+    <nav class="crumbs mono" aria-label="Вы здесь"><a href="{% url 'site:index' %}">Главная</a><span aria-hidden="true">/</span><a href="{% url 'site:student' %}">Студенту</a><span aria-hidden="true">/</span><span aria-current="page">Помощь</span></nav>
+    <p class="tag mono"><i></i>Помощь</p>
+    <h1 id="ph">Ответы, инструкции <span class="hl" data-scramble>и инструменты</span></h1>
+    <p class="page-hero__lead">Частые вопросы, генератор титульного листа по ГОСТ и помощник, который отвечает по материалам сайта.</p>
+  </div>
+</section>
+
+<section class="section section--raised" id="faq" aria-labelledby="faq-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="faq-h">01 — Частые вопросы</h2><span class="mono dim">студентам и абитуриентам</span></header>
+    <div class="faq"><details data-s="Вопрос" data-t="Как получить справку об обучении?"><summary>Как получить справку об обучении?</summary><div><p>Закажите её в личном кабинете — когда справка будет готова, придёт уведомление.</p></div></details><details data-s="Вопрос" data-t="Как перевестись с платного обучения на бюджет?"><summary>Как перевестись с платного обучения на бюджет?</summary><div><p>Порядок и сроки — на странице <a href="{% url 'site:transfer' %}">«Перевод и восстановление»</a>.</p></div></details><details data-s="Вопрос" data-t="Как закрыть академическую задолженность?"><summary>Как закрыть академическую задолженность?</summary><div><p>Список долгов и даты пересдач — в личном кабинете, раздел «Задолженности».</p></div></details><details data-s="Вопрос" data-t="Как зарегистрироваться в ЭБС IPR SMART?"><summary>Как зарегистрироваться в ЭБС IPR SMART?</summary><div><p>Вход — через учётную запись ЭОС, подробности на странице <a href="{% url 'site:library' %}">«Библиотека»</a>.</p></div></details><details data-s="Вопрос" data-t="Где расписание звонков?"><summary>Где расписание звонков?</summary><div><p>На странице <a href="{% url 'site:schedule' %}">«Расписание»</a> — для обоих корпусов, с подсветкой текущей пары.</p></div></details></div>
+  </div>
+</section>
+
+<section class="section" id="report" aria-labelledby="report-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="report-h">02 — Титульный лист по ГОСТ</h2><span class="mono dim">лабораторные · РГР · курсовые</span></header>
+    <div class="split-layout"><div class="tool"><form class="form" id="rf" onsubmit="return false">
+      <label class="wide">Институт<select name="inst"><option>Институт лесного комплекса, ландшафтной архитектуры, транспорта и экологии</option><option>Строительный институт</option><option>Инженерно-экономический институт</option><option>Факультет общенаучной подготовки и повышения квалификации</option></select></label><label class="wide">Кафедра<select name="dep"><option>Кафедра лесного дела и технологии деревообработки</option><option>Кафедра ландшафтной архитектуры и садово-паркового строительства</option><option>Кафедра общетехнических дисциплин и физики</option><option>Кафедра транспортно-технологических машин и сервиса</option><option>Кафедра промышленной экологии и техносферной безопасности</option><option>Кафедра строительного производства</option><option>Кафедра строительных конструкций</option><option>Кафедра производства строительных конструкций</option><option>Кафедра автомобильных дорог</option><option>Кафедра графики и геодезии</option><option>Кафедра экономики и экономической безопасности</option><option>Кафедра информационных технологий</option><option>Кафедра математики</option><option>Кафедра философии, истории и социологии</option><option>Кафедра русского и иностранных языков</option><option>Кафедра физвоспитания</option></select></label>
+      <label>Вид работы<select name="kind"><option>Отчёт по лабораторной работе</option><option>Расчётно-графическая работа</option><option>Курсовая работа</option><option>Курсовой проект</option><option>Отчёт по практике</option></select></label>
+      <label>Номер<input name="num" placeholder="1"></label><label class="wide">Дисциплина<input name="disc" placeholder="Программная инженерия"></label><label class="wide">Тема<input name="topic" placeholder="необязательно"></label>
+      <label>Группа<input name="group" placeholder="ПИ-201"></label><label>Студент<input name="student" placeholder="Фамилия И. О."></label><label class="wide">Преподаватель<input name="teacher" placeholder="должность, Фамилия И. О."></label></form>
+      <div class="btn-row"><button class="btn btn--accent btn--sm" type="button" id="rprint">Печать / PDF</button><button class="btn btn--ghost btn--sm" type="button" id="rdoc">Скачать .doc</button></div></div>
+      <div><div class="paper" id="paper" aria-label="Предпросмотр титульного листа"></div><p class="dim" style="margin-top:12px;font-size:.875rem">Поля по ГОСТ: левое 30 мм, правое 15 мм, верхнее и нижнее 20 мм; Times New Roman 14 пт. Сверьте с требованиями своей кафедры.</p></div></div>
+  </div>
+</section>
+
+<section class="section section--raised" id="assistant" aria-labelledby="assistant-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="assistant-h">03 — Помощник</h2><span class="mono dim">отвечает по материалам сайта</span></header>
+    <p style="margin-bottom:16px"><span class="demo">демо-данные макета</span></p><div class="chat" id="chat"><div class="chat__log" id="chatlog" aria-live="polite"></div><form id="chatf"><input placeholder="Ваш вопрос" aria-label="Вопрос помощнику"><button class="btn btn--accent btn--sm">Спросить</button></form></div>
+  </div>
+</section>
+{% endblock %}

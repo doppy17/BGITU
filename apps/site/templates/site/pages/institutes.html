@@ -1,0 +1,69 @@
+{% extends "site/base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="page-hero" aria-labelledby="ph">
+  <div class="container">
+    <nav class="crumbs mono" aria-label="Вы здесь"><a href="{% url 'site:index' %}">Главная</a><span aria-hidden="true">/</span><span aria-current="page">Институты</span></nav>
+    <p class="tag mono"><i></i>Подразделения</p>
+    <h1 id="ph">Три института, факультет и <span class="hl" data-scramble>военный центр</span></h1>
+    <p class="page-hero__lead">Выберите подразделение — внутри направления подготовки, кафедры с заведующими и контакты.</p>
+  </div>
+</section>
+
+<section class="section section--raised" id="units" aria-labelledby="units-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="units-h">01 — Институты и факультет</h2><span class="mono dim">нажмите на строку</span></header>
+    <ul class="inst-list">
+      <li class="inst"><h3 class="inst__h"><a class="inst__row" href="{% url 'site:inst-les' %}">
+        <span class="inst__idx mono" aria-hidden="true">001</span>
+        <span class="inst__title" data-s="Институт" data-k="лесное дело · ландшафт · транспорт · экология">Институт лесного комплекса, ландшафтной архитектуры, транспорта и экологии<span class="ia" aria-hidden="true"><svg viewBox="0 0 160 60" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="0" y1="50.5" x2="160" y2="50.5" opacity=".3"/><g class="ia-sw"><path d="M16 24 L7 38 H12 L4 50 H28 L20 38 H25 Z"/></g><g class="ia-sw" style="animation-delay:-1.6s"><path d="M34 30 L27 41 H31 L25 50 H43 L37 41 H41 Z"/></g><g class="ia-sw" style="animation-delay:-3.1s"><path d="M52 27 L44 39 H49 L42 50 H62 L55 39 H60 Z"/></g><g class="ia-tr"><rect x="84" y="40" width="26" height="8"/><path d="M96 40 v8 M104 40 v8" opacity=".45"/><path d="M110 43 h6 v5 h-6 z"/><circle cx="90" cy="48" r="2.4"/><circle cx="106" cy="48" r="2.4"/><circle cx="115" cy="48" r="2.4"/></g></svg></span></span>
+        <span class="inst__note mono">лесное дело · ландшафт · транспорт · экология</span>
+        <span class="inst__plus inst__go" aria-hidden="true"></span>
+      </a></h3></li>
+      <li class="inst"><h3 class="inst__h"><a class="inst__row" href="{% url 'site:inst-stroy' %}">
+        <span class="inst__idx mono" aria-hidden="true">002</span>
+        <span class="inst__title" data-s="Институт" data-k="автодороги · конструкции · геодезия · стройпроизводство">Строительный институт<span class="ia" aria-hidden="true"><svg viewBox="0 0 160 60" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="0" y1="50.5" x2="160" y2="50.5" opacity=".3"/><path d="M4 50 C10 30 42 30 48 50"/><line x1="0" y1="37" x2="55" y2="37" opacity=".85"/><path d="M14 37 v6 M26 37 v4 M38 37 v6" opacity=".5"/><rect class="ia-car ia-acc" x="6" y="34" width="8" height="3.2"/><rect x="106" y="17" width="44" height="33.5" opacity=".55"/><path d="M128 17 V10" opacity=".55"/><rect class="ia-fl" x="110" y="21" width="36" height="5.4"/><rect class="ia-fl" style="animation-delay:.4s" x="110" y="28" width="36" height="5.4"/><rect class="ia-fl" style="animation-delay:.8s" x="110" y="35" width="36" height="5.4"/><rect class="ia-fl" style="animation-delay:1.2s" x="110" y="42" width="36" height="5.4"/></svg></span></span>
+        <span class="inst__note mono">автодороги · конструкции · геодезия · стройпроизводство</span>
+        <span class="inst__plus inst__go" aria-hidden="true"></span>
+      </a></h3></li>
+      <li class="inst"><h3 class="inst__h"><a class="inst__row" href="{% url 'site:inst-econ' %}">
+        <span class="inst__idx mono" aria-hidden="true">003</span>
+        <span class="inst__title" data-s="Институт" data-k="информационные технологии · экономика · менеджмент · безопасность">Инженерно-экономический институт<span class="ia" aria-hidden="true"><svg viewBox="0 0 160 60" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="8" y1="50.5" x2="152" y2="50.5" opacity=".3"/><rect class="ia-bar" x="20" y="38" width="11" height="12.5" fill="currentColor" fill-opacity=".16"/><rect class="ia-bar" style="animation-delay:.35s" x="40" y="30" width="11" height="20.5" fill="currentColor" fill-opacity=".16"/><rect class="ia-bar" style="animation-delay:.7s" x="60" y="21" width="11" height="29.5" fill="currentColor" fill-opacity=".16"/><rect class="ia-bar" style="animation-delay:1.05s" x="80" y="12" width="11" height="38.5" fill="currentColor" fill-opacity=".16"/><path class="ia-arrow ia-acc" d="M24 33 L46 25 L66 17 L88 8 L112 2 M106 4 L112 2 L110 8" stroke-width="1.6"/></svg></span></span>
+        <span class="inst__note mono">информационные технологии · экономика · менеджмент · безопасность</span>
+        <span class="inst__plus inst__go" aria-hidden="true"></span>
+      </a></h3></li>
+      <li class="inst"><h3 class="inst__h"><a class="inst__row" href="{% url 'site:inst-fop' %}">
+        <span class="inst__idx mono" aria-hidden="true">004</span>
+        <span class="inst__title" data-s="Институт" data-k="математика · языки · история и философия · физическая культура">Факультет общенаучной подготовки и повышения квалификации<span class="ia" aria-hidden="true"><svg viewBox="0 0 160 60" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="80" cy="30" r="2" fill="currentColor" stroke="none"/><circle cx="80" cy="30" r="16" opacity=".55"/><g transform="rotate(58 80 30)"><circle cx="80" cy="30" r="16" opacity=".55"/><g class="ia-at" style="animation-duration:11s"><circle class="ia-acc" cx="96" cy="30" r="2.4" fill="currentColor" stroke="none"/></g></g><g class="ia-at"><circle class="ia-acc" cx="96" cy="30" r="2.4" fill="currentColor" stroke="none"/></g></svg></span></span>
+        <span class="inst__note mono">математика · языки · история и философия · физическая культура</span>
+        <span class="inst__plus inst__go" aria-hidden="true"></span>
+      </a></h3></li>
+      <li class="inst"><h3 class="inst__h"><a class="inst__row" href="{% url 'site:inst-vuc' %}">
+        <span class="inst__idx mono" aria-hidden="true">005</span>
+        <span class="inst__title" data-s="Институт" data-k="военная подготовка · создан в 2021">Военный учебный центр<span class="ia" aria-hidden="true"><svg viewBox="0 0 160 60" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="0" y1="50.5" x2="160" y2="50.5" opacity=".3"/><path d="M73.5 14.5 a6.5 6.5 0 0 1 13 0 M73.5 14.5 H86.5"/><circle class="ia-acc" cx="80" cy="11.6" r=".9" fill="currentColor" stroke="none"/><circle cx="80" cy="18" r="5.5"/><path d="M80 23.5 V26.5 M73 27 H87 M73 27 L76 38 M87 27 L84 38 M76 38 H84"/><path d="M77.5 38 L76 50 M82.5 38 L84 50 M76 50 H72 M84 50 H88"/><path d="M73 27 L72 33 L72.5 39.5"/><path class="ia-sd" d="M87 27 L88 33 L87.5 39"/><path class="ia-su" d="M87 27 L89.5 31.5 L84 20.5"/></svg></span></span>
+        <span class="inst__note mono">военная подготовка · создан в 2021</span>
+        <span class="inst__plus inst__go" aria-hidden="true"></span>
+      </a></h3></li>
+    </ul>
+  </div>
+</section>
+
+<section class="section" id="other" aria-labelledby="other-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="other-h">02 — Колледж и учебные базы</h2><span class="mono dim">практика и ресурсы</span></header>
+    <div class="cards"><a class="card" href="{% url 'site:college' %}" data-s="Подразделение" data-t="Многопрофильный колледж"><span class="mono">спо</span><h3>Многопрофильный колледж</h3><p>Среднее профессиональное образование · корпус №1, ауд. 208</p><span class="go">Подробнее →</span></a>
+      <a class="card" href="{% url 'site:campus' %}#life" data-s="Подразделение" data-t="Ботанический сад им. Б. В. Гроздова"><span class="mono">практика</span><h3>Ботанический сад им. Б. В. Гроздова</h3><p>Учебная база для лесного и ландшафтного профиля · ул. Горького, 31</p><span class="go">В кампусе →</span></a>
+      <a class="card" href="{% url 'site:campus' %}#life" data-s="Подразделение" data-t="Учебно-опытный лесхоз"><span class="mono">практика</span><h3>Учебно-опытный лесхоз</h3><p>Полевые практики и исследования</p><span class="go">В кампусе →</span></a>
+      <a class="card" href="{% url 'site:index' %}" data-s="Подразделение" data-t="Библиотека"><span class="mono">ресурсы</span><h3>Библиотека и ЭБС</h3><p>Электронные ресурсы и электронно-библиотечные системы</p><span class="go"></span></a></div>
+  </div>
+</section>
+
+<section class="cta" aria-labelledby="cta-h">
+  <div class="container">
+    <p class="mono dim">БГИТУ · Брянск · с 1930 года</p>
+    <h2 id="cta-h">Не знаете, какой институт выбрать? <span class="hl" data-scramble>Позвоните нам</span></h2>
+    <div class="hero__cta"><a class="btn btn--accent btn--lg" href="tel:+74832649912">+7 (4832) 64-99-12</a><a class="btn btn--ghost btn--lg" href="{% url 'site:admission' %}#dirs">Все направления <span aria-hidden="true">→</span></a></div>
+  </div>
+</section>
+{% endblock %}

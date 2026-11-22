@@ -1,0 +1,28 @@
+{% extends "site/base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="page-hero" aria-labelledby="ph">
+  <div class="container">
+    <nav class="crumbs mono" aria-label="Вы здесь"><a href="{% url 'site:index' %}">Главная</a><span aria-hidden="true">/</span><a href="{% url 'site:admission' %}">Поступающим</a><span aria-hidden="true">/</span><span aria-current="page">Платное обучение</span></nav>
+    <p class="tag mono"><i></i>Платное обучение</p>
+    <h1 id="ph">Платное обучение <span class="hl" data-scramble>и оплата</span></h1>
+    <p class="page-hero__lead">Стоимость по направлениям, договоры, образовательный кредит и реквизиты для оплаты.</p>
+  </div>
+</section>
+
+<section class="section section--raised" id="links" aria-labelledby="links-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="links-h">01 — Документы</h2><span class="mono dim">раздел «Абитуриенту» на bgitu.ru</span></header>
+    <ul class="news"><li><a href="{% url 'site:admission' %}" data-s="Ссылка" data-t="Платное обучение: стоимость и договоры"><time class="mono">стоимость</time><h3>Платное обучение: стоимость и договоры</h3><span class="mono dim"></span></a></li><li><a href="{% url 'site:admission' %}" data-s="Ссылка" data-t="Образовательный кредит в СПО"><time class="mono">кредит</time><h3>Образовательный кредит в СПО</h3><span class="mono dim"></span></a></li><li><a href="{% url 'site:admission' %}" data-s="Ссылка" data-t="Банковские реквизиты для оплаты за обучение"><time class="mono">реквизиты</time><h3>Банковские реквизиты для оплаты за обучение</h3><span class="mono dim"></span></a></li><li><a href="{% url 'site:sveden' %}" data-s="Ссылка" data-t="Платные образовательные услуги — сведения об ОО"><time class="mono">сведения</time><h3>Платные образовательные услуги — сведения об ОО</h3><span class="mono dim"></span></a></li></ul>
+  </div>
+</section>
+
+<section class="cta" aria-labelledby="cta-h">
+  <div class="container">
+    <p class="mono dim">БГИТУ · Брянск · с 1930 года</p>
+    <h2 id="cta-h">Вопросы об оплате? <span class="hl" data-scramble>Позвоните</span></h2>
+    <div class="hero__cta"><a class="btn btn--accent btn--lg" href="tel:+74832649912">+7 (4832) 64-99-12</a></div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "site/base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="page-hero" aria-labelledby="ph">
+  <div class="container">
+    <nav class="crumbs mono" aria-label="Вы здесь"><a href="{% url 'site:index' %}">Главная</a><span aria-hidden="true">/</span><a href="{% url 'site:institutes' %}">Институты</a><span aria-hidden="true">/</span><span aria-current="page">Строительный</span></nav>
+    <p class="tag mono"><i></i>Институт</p>
+    <h1 id="ph">Строительный институт</h1>
+    <p class="page-hero__lead">Полный цикл строительной отрасли — от проектирования и геодезии до производства конструкций и строительства дорог.</p><div class="meta-row"><span>Директор института — <b>Курбатская Наталья Александровна</b></span><span>пр-т Станке Димитрова, 3 · учебный корпус №1</span><a href="tel:+74832646354">+7 (4832) 64-63-54</a><a href="mailto:stroy-inst@bgitu.ru">stroy-inst@bgitu.ru</a></div>
+  </div>
+</section>
+
+<section class="section" id="dirs" aria-labelledby="dirs-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="dirs-h">01 — Направления подготовки</h2><span class="mono dim">набор 2026/27 · 6 программ</span></header>
+    <ul class="dirs"><li data-k="stroy" data-l="бакалавриат" data-s="Направление" data-t="08.03.01 Строительство — Промышленное и гражданское строительство"><span class="mono">08.03.01</span><b>Строительство<small>Промышленное и гражданское строительство · Городское строительство и хозяйство · Производство и применение строительных материалов, изделий и конструкций · Автомобильные дороги и аэродромы · Теплогазоснабжение и вентиляция</small></b><span class="mono dim">Строительный</span><span class="mono dim">бакалавриат</span></li><li data-k="stroy" data-l="магистратура" data-s="Направление" data-t="08.04.01 Строительство — Проектирование, строительство и эксплуатация автомобильных дорог"><span class="mono">08.04.01</span><b>Строительство<small>Проектирование, строительство и эксплуатация автомобильных дорог</small></b><span class="mono dim">Строительный</span><span class="mono dim">магистратура</span></li><li data-k="stroy" data-l="магистратура" data-s="Направление" data-t="08.04.01 Строительство — Инновационные технологии возведения, эксплуатации и реконструкции зданий"><span class="mono">08.04.01</span><b>Строительство<small>Инновационные технологии возведения, эксплуатации и реконструкции зданий</small></b><span class="mono dim">Строительный</span><span class="mono dim">магистратура</span></li><li data-k="stroy" data-l="магистратура" data-s="Направление" data-t="08.04.01 Строительство — Технологии строительных материалов, изделий и конструкций"><span class="mono">08.04.01</span><b>Строительство<small>Технологии строительных материалов, изделий и конструкций</small></b><span class="mono dim">Строительный</span><span class="mono dim">магистратура</span></li><li data-k="stroy" data-l="магистратура" data-s="Направление" data-t="08.04.01 Строительство — Теория и проектирование зданий и сооружений"><span class="mono">08.04.01</span><b>Строительство<small>Теория и проектирование зданий и сооружений</small></b><span class="mono dim">Строительный</span><span class="mono dim">магистратура</span></li><li data-k="stroy" data-l="спо" data-s="Направление" data-t="08.02.12 Строительство и эксплуатация автомобильных дорог, аэродромов и городских путей сообщения"><span class="mono">08.02.12</span><b>Строительство и эксплуатация автомобильных дорог, аэродромов и городских путей сообщения</b><span class="mono dim">Строительный</span><span class="mono dim">колледж</span></li></ul><p class="lead-2" style="margin-top:28px">Набор 2026/27 по данным bgitu.ru. Колледж — среднее профессиональное образование на базе института.</p>
+  </div>
+</section>
+
+<section class="section section--raised" id="deps" aria-labelledby="deps-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="deps-h">02 — Кафедры</h2><span class="mono dim">5 кафедр</span></header>
+    <ul class="deps"><li><div><h3 data-s="Кафедра" data-t="Кафедра строительного производства">Кафедра строительного производства</h3><p class="who">Заведующий кафедрой — Плотников Валерий Викторович</p></div><div class="c"><span>пр-т Станке Димитрова, 3, ауд. 376 · учебный корпус №1</span><a href="tel:+74832646931">+7 (4832) 64-69-31</a><a href="mailto:kaf-sp@bgitu.ru">kaf-sp@bgitu.ru</a></div></li><li><div><h3 data-s="Кафедра" data-t="Кафедра строительных конструкций">Кафедра строительных конструкций</h3><p class="who">Заведующий кафедрой — Парфенов Сергей Григорьевич</p></div><div class="c"><span>пр-т Станке Димитрова, 3, ауд. 277 · учебный корпус №1</span><a href="tel:+74832645915">+7 (4832) 64-59-15</a><a href="mailto:kaf-sk@bgitu.ru">kaf-sk@bgitu.ru</a></div></li><li><div><h3 data-s="Кафедра" data-t="Кафедра производства строительных конструкций">Кафедра производства строительных конструкций</h3><p class="who">Заведующий кафедрой — Лукутцова Наталья Петровна</p></div><div class="c"><span>пр-т Ленина, 26, ауд. 244 · учебный корпус №3</span><a href="tel:+74832740513">+7 (4832) 74-05-13</a></div></li><li><div><h3 data-s="Кафедра" data-t="Кафедра автомобильных дорог">Кафедра автомобильных дорог</h3><p class="who">И. о. заведующего — Токар Николай Иванович</p></div><div class="c"><span>пр-т Ленина, 26, ауд. 282а · учебный корпус №2</span><a href="tel:+74832740568">+7 (4832) 74-05-68</a><a href="mailto:kaf-ad@bgitu.ru">kaf-ad@bgitu.ru</a></div></li><li><div><h3 data-s="Кафедра" data-t="Кафедра графики и геодезии">Кафедра графики и геодезии</h3><p class="who">Заведующий кафедрой — Симонов Сергей Александрович</p></div><div class="c"><span>пр-т Ленина, 26, ауд. 493 · учебный корпус №2</span><a href="tel:+74832740393">+7 (4832) 74-03-93</a><a href="mailto:kaf-gg@bgitu.ru">kaf-gg@bgitu.ru</a></div></li></ul>
+  </div>
+</section>
+
+<section class="section" id="contacts-u" aria-labelledby="contacts-u-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="contacts-u-h">03 — Контакты</h2><span class="mono dim">Строительный</span></header>
+    <dl class="contact-card glass" data-reveal><div><dt class="mono">Адрес</dt><dd>пр-т Станке Димитрова, 3 · учебный корпус №1</dd></div><div><dt class="mono">Телефон</dt><dd><a href="tel:+74832646354">+7 (4832) 64-63-54</a></dd></div><div><dt class="mono">Почта</dt><dd><a href="mailto:stroy-inst@bgitu.ru">stroy-inst@bgitu.ru</a></dd></div><div><dt class="mono">Директор института</dt><dd>Курбатская Наталья Александровна</dd></div></dl>
+  </div>
+</section>
+
+<section class="cta" aria-labelledby="cta-h">
+  <div class="container">
+    <p class="mono dim">БГИТУ · Брянск · с 1930 года</p>
+    <h2 id="cta-h">Поступите в институт — <span class="hl" data-scramble>мы поможем</span></h2>
+    <div class="hero__cta"><a class="btn btn--accent btn--lg" href="{% url 'site:admission' %}">Поступающему <span aria-hidden="true">→</span></a><a class="btn btn--ghost btn--lg" href="tel:+74832649912">+7 (4832) 64-99-12</a></div>
+  </div>
+</section>
+{% endblock %}

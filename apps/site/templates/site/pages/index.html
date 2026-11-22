@@ -1,0 +1,219 @@
+{% extends "site/base.html" %}
+{% load static %}
+
+{% block content %}
+<!-- ============ HERO ============ -->
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero__shade" aria-hidden="true"></div>
+  <div class="container hero__grid">
+    <div>
+      <p class="tag mono"><i></i>Брянский государственный инженерно-технологический университет</p>
+      <h1 class="hero__title" id="hero-title">Строим инженеров <span class="hl" data-scramble>с 1930 года</span></h1>
+      <p class="hero__lead">Готовим специалистов для лесного комплекса, строительства, транспорта, цифровой экономики и экологии. Три института, факультет общенаучной подготовки и военный учебный центр.</p>
+      <div class="hero__cta">
+        <a class="btn btn--accent btn--lg" href="#admission">Поступающему <span aria-hidden="true">→</span></a>
+        <a class="btn btn--ghost btn--lg" href="#institutes">Выбрать институт</a>
+      </div>
+      <p class="hero__meta mono">Приёмная комиссия · пн–пт 9:00–17:00 · <a href="tel:+74832649912">+7 (4832) 64-99-12</a> · <span class="week" data-week></span></p>
+    </div>
+
+    <aside class="flow glass" aria-label="Путь абитуриента">
+      <p class="flow__head mono"><span>путь абитуриента</span><span>4 шага</span></p>
+      <ol class="flow__steps">
+        <li style="--i:0"><a href="#step-1"><span class="flow__n mono">01</span><div><b>Выберите направление</b><small>бакалавриат · специалитет · колледж</small></div></a></li>
+        <li style="--i:1"><a href="#step-2"><span class="flow__n mono">02</span><div><b>Подайте документы</b><small>пр-т Станке Димитрова, 3, ауд. 216</small></div></a></li>
+        <li style="--i:2"><a href="#step-3"><span class="flow__n mono">03</span><div><b>Следите за списками</b><small>конкурсные списки — на сайте</small></div></a></li>
+        <li style="--i:3"><a href="#step-4"><span class="flow__n mono">04</span><div><b>Получите зачисление</b><small>приказы публикуются на сайте</small></div></a></li>
+      </ol>
+      <a class="flow__link mono" href="#admission">все шаги и контакты <span aria-hidden="true">→</span></a>
+    </aside>
+  </div>
+  <a class="scroll-cue mono" href="#about">листай <span aria-hidden="true">↓</span></a>
+</section>
+
+<!-- ============ 01 УНИВЕРСИТЕТ ============ -->
+<section class="section" id="about" aria-labelledby="about-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="about-h">01 — Университет</h2><span class="mono dim">основан в 1930 году</span></header>
+    <p class="statement" data-reveal>Инженер начинается там, где идея встречается с материалом: расчёт, проект, запуск. Этому мы учим с <span class="hl" data-scramble>1930 года</span>.</p>
+
+    <dl class="facts">
+      <div class="fact" data-reveal style="--d:0"><dt class="mono">лет с основания</dt><dd class="num" data-since="1930">96</dd><dd>От лесотехнического института до университета</dd></div>
+      <div class="fact" data-reveal style="--d:1"><dt class="mono">подразделений обучения</dt><dd class="num" data-count="5">5</dd><dd>Три института, факультет общенаучной подготовки и военный учебный центр</dd></div>
+      <div class="fact" data-reveal style="--d:2"><dt class="mono">областей подготовки</dt><dd class="num" data-count="6">6</dd><dd>Лес, строительство, дороги, информационные технологии, экономика, экология</dd></div>
+      <div class="fact" data-reveal style="--d:3"><dt class="mono">год награды</dt><dd class="num" data-count="1980" data-plain>1980</dd><dd>Орден Трудового Красного Знамени</dd></div>
+    </dl>
+
+    <ol class="timeline" tabindex="0" aria-label="История университета" data-reveal>
+      <li><time>1930</time><p>Создан лесотехнический институт</p></li>
+      <li><time>1940</time><p>Брянский лесохозяйственный институт</p></li>
+      <li><time>1960</time><p>Технологический институт, строительство студгородка</p></li>
+      <li><time>1980</time><p>Орден Трудового Красного Знамени</p></li>
+      <li><time>1995</time><p>Инженерно-технологическая академия</p></li>
+      <li><time>2015</time><p>Статус университета — БГИТУ</p></li>
+      <li><time>2021</time><p>Создан военный учебный центр</p></li>
+    </ol>
+    <p class="more"><a class="mono" href="{% url 'site:university' %}">история и руководство <span aria-hidden="true">→</span></a></p>
+  </div>
+</section>
+
+<!-- ============ 02 ИНСТИТУТЫ ============ -->
+<section class="section section--raised" id="institutes" aria-labelledby="inst-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="inst-h">02 — Институты</h2><span class="mono dim">нажми на строку</span></header>
+
+    <ul class="inst-list" data-reveal>
+      <li class="inst" id="inst-1">
+        <h3 class="inst__h"><button class="inst__row" type="button" aria-expanded="false" aria-controls="inst-1-body">
+          <span class="inst__idx mono" aria-hidden="true">001</span>
+          <span class="inst__title" id="inst-1-t" data-s="Институт" data-k="илклатиэ лес лесной ландшафт транспорт экология">Институт лесного комплекса, ландшафтной архитектуры, транспорта и экологии<span class="ia" aria-hidden="true"><svg viewBox="0 0 160 60" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="0" y1="50.5" x2="160" y2="50.5" opacity=".3"/><g class="ia-sw"><path d="M16 24 L7 38 H12 L4 50 H28 L20 38 H25 Z"/></g><g class="ia-sw" style="animation-delay:-1.6s"><path d="M34 30 L27 41 H31 L25 50 H43 L37 41 H41 Z"/></g><g class="ia-sw" style="animation-delay:-3.1s"><path d="M52 27 L44 39 H49 L42 50 H62 L55 39 H60 Z"/></g><g class="ia-tr"><rect x="84" y="40" width="26" height="8"/><path d="M96 40 v8 M104 40 v8" opacity=".45"/><path d="M110 43 h6 v5 h-6 z"/><circle cx="90" cy="48" r="2.4"/><circle cx="106" cy="48" r="2.4"/><circle cx="115" cy="48" r="2.4"/></g></svg></span></span>
+          <span class="inst__note mono">лесное дело · ландшафт · транспорт · экология</span>
+          <span class="inst__plus" aria-hidden="true"></span>
+        </button></h3>
+        <div class="inst__panel" id="inst-1-body" role="region" aria-labelledby="inst-1-t"><div><div class="inst__cols">
+          <div><p class="mono dim">Направления бакалавриата · набор 2026/27</p>
+            <ul class="progs"><li data-s="Направление"><span class="mono">18.03.02</span> Энерго- и ресурсосберегающие процессы в химической технологии, нефтехимии и биотехнологии</li><li data-s="Направление"><span class="mono">23.03.03</span> Эксплуатация транспортно-технологических машин и комплексов</li><li data-s="Направление"><span class="mono">35.03.01</span> Лесное дело</li><li data-s="Направление"><span class="mono">35.03.02</span> Технология лесозаготовительных и деревоперерабатывающих производств — Технология деревообработки, проектирование мебели и интерьеров</li><li data-s="Направление"><span class="mono">35.03.02</span> Технология лесозаготовительных и деревоперерабатывающих производств — Машины и технологии лесопромышленных производств и транспортных процессов</li><li data-s="Направление"><span class="mono">35.03.07</span> Технология производства и переработки сельскохозяйственной продукции</li><li data-s="Направление"><span class="mono">35.03.10</span> Ландшафтная архитектура</li></ul></div>
+          <div class="inst__side"><p class="mono dim">Контакты</p><p>Корпус №2, пр-т Ленина, 26</p><a href="tel:+74832741652">+7 (4832) 74-16-52</a><a class="btn btn--accent btn--sm" href="{% url 'site:inst-les' %}">Страница института <span aria-hidden="true">→</span></a></div>
+        </div></div></div>
+      </li>
+
+      <li class="inst" id="inst-2">
+        <h3 class="inst__h"><button class="inst__row" type="button" aria-expanded="false" aria-controls="inst-2-body">
+          <span class="inst__idx mono" aria-hidden="true">002</span>
+          <span class="inst__title" id="inst-2-t" data-s="Институт" data-k="строительство дороги автодороги конструкции геодезия">Строительный институт<span class="ia" aria-hidden="true"><svg viewBox="0 0 160 60" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="0" y1="50.5" x2="160" y2="50.5" opacity=".3"/><path d="M4 50 C10 30 42 30 48 50"/><line x1="0" y1="37" x2="55" y2="37" opacity=".85"/><path d="M14 37 v6 M26 37 v4 M38 37 v6" opacity=".5"/><rect class="ia-car ia-acc" x="6" y="34" width="8" height="3.2"/><rect x="106" y="17" width="44" height="33.5" opacity=".55"/><path d="M128 17 V10" opacity=".55"/><rect class="ia-fl" x="110" y="21" width="36" height="5.4"/><rect class="ia-fl" style="animation-delay:.4s" x="110" y="28" width="36" height="5.4"/><rect class="ia-fl" style="animation-delay:.8s" x="110" y="35" width="36" height="5.4"/><rect class="ia-fl" style="animation-delay:1.2s" x="110" y="42" width="36" height="5.4"/></svg></span></span>
+          <span class="inst__note mono">автодороги · конструкции · геодезия · стройпроизводство</span>
+          <span class="inst__plus" aria-hidden="true"></span>
+        </button></h3>
+        <div class="inst__panel" id="inst-2-body" role="region" aria-labelledby="inst-2-t"><div><div class="inst__cols">
+          <div><p class="mono dim">Направления бакалавриата · набор 2026/27</p>
+            <ul class="progs"><li data-s="Направление"><span class="mono">08.03.01</span> Строительство</li></ul>
+            <p class="inst__text">Институт ведёт подготовку по полному циклу строительной отрасли — от проектирования до стройпроизводства. Магистратура и аспирантура — на странице института.</p></div>
+          <div class="inst__side"><p class="mono dim">Контакты</p><p>Корпус №1, пр-т Станке Димитрова, 3</p><a href="tel:+74832646354">+7 (4832) 64-63-54</a><a class="btn btn--accent btn--sm" href="{% url 'site:inst-stroy' %}">Страница института <span aria-hidden="true">→</span></a></div>
+        </div></div></div>
+      </li>
+
+      <li class="inst" id="inst-3">
+        <h3 class="inst__h"><button class="inst__row" type="button" aria-expanded="false" aria-controls="inst-3-body">
+          <span class="inst__idx mono" aria-hidden="true">003</span>
+          <span class="inst__title" id="inst-3-t" data-s="Институт" data-k="иэи информационные технологии it экономика менеджмент безопасность программирование">Инженерно-экономический институт<span class="ia" aria-hidden="true"><svg viewBox="0 0 160 60" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="8" y1="50.5" x2="152" y2="50.5" opacity=".3"/><rect class="ia-bar" x="20" y="38" width="11" height="12.5" fill="currentColor" fill-opacity=".16"/><rect class="ia-bar" style="animation-delay:.35s" x="40" y="30" width="11" height="20.5" fill="currentColor" fill-opacity=".16"/><rect class="ia-bar" style="animation-delay:.7s" x="60" y="21" width="11" height="29.5" fill="currentColor" fill-opacity=".16"/><rect class="ia-bar" style="animation-delay:1.05s" x="80" y="12" width="11" height="38.5" fill="currentColor" fill-opacity=".16"/><path class="ia-arrow ia-acc" d="M24 33 L46 25 L66 17 L88 8 L112 2 M106 4 L112 2 L110 8" stroke-width="1.6"/></svg></span></span>
+          <span class="inst__note mono">информационные технологии · экономика · менеджмент · безопасность</span>
+          <span class="inst__plus" aria-hidden="true"></span>
+        </button></h3>
+        <div class="inst__panel" id="inst-3-body" role="region" aria-labelledby="inst-3-t"><div><div class="inst__cols">
+          <div><p class="mono dim">Бакалавриат и специалитет · набор 2026/27</p>
+            <ul class="progs"><li data-s="Направление"><span class="mono">09.03.01</span> Информатика и вычислительная техника</li><li data-s="Направление"><span class="mono">09.03.02</span> Информационные системы и технологии</li><li data-s="Направление"><span class="mono">09.03.04</span> Программная инженерия</li><li data-s="Направление"><span class="mono">38.03.01</span> Экономика</li><li data-s="Направление"><span class="mono">38.03.04</span> Государственное и муниципальное управление</li><li data-s="Направление"><span class="mono">38.05.01</span> Экономическая безопасность</li></ul></div>
+          <div class="inst__side"><p class="mono dim">Контакты</p><p>Корпус №2, пр-т Ленина, 26</p><a href="tel:+74832740533">+7 (4832) 74-05-33</a><a class="btn btn--accent btn--sm" href="{% url 'site:inst-econ' %}">Страница института <span aria-hidden="true">→</span></a></div>
+        </div></div></div>
+      </li>
+
+      <li class="inst" id="inst-4">
+        <h3 class="inst__h"><button class="inst__row" type="button" aria-expanded="false" aria-controls="inst-4-body">
+          <span class="inst__idx mono" aria-hidden="true">004</span>
+          <span class="inst__title" id="inst-4-t" data-s="Институт" data-k="фопипк общенаучная математика языки история философия физкультура повышение квалификации">Факультет общенаучной подготовки и повышения квалификации<span class="ia" aria-hidden="true"><svg viewBox="0 0 160 60" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="80" cy="30" r="2" fill="currentColor" stroke="none"/><circle cx="80" cy="30" r="16" opacity=".55"/><g transform="rotate(58 80 30)"><circle cx="80" cy="30" r="16" opacity=".55"/><g class="ia-at" style="animation-duration:11s"><circle class="ia-acc" cx="96" cy="30" r="2.4" fill="currentColor" stroke="none"/></g></g><g class="ia-at"><circle class="ia-acc" cx="96" cy="30" r="2.4" fill="currentColor" stroke="none"/></g></svg></span></span>
+          <span class="inst__note mono">математика · языки · история и философия · физическая культура</span>
+          <span class="inst__plus" aria-hidden="true"></span>
+        </button></h3>
+        <div class="inst__panel" id="inst-4-body" role="region" aria-labelledby="inst-4-t"><div><div class="inst__cols">
+          <div><p class="mono dim">Общенаучные кафедры</p>
+            <ul class="progs"><li data-s="Кафедра"><span class="mono">01</span> Математики</li><li data-s="Кафедра"><span class="mono">02</span> Философии, истории и социологии</li><li data-s="Кафедра"><span class="mono">03</span> Русского и иностранных языков</li><li data-s="Кафедра"><span class="mono">04</span> Физвоспитания</li></ul></div>
+          <div class="inst__side"><p class="mono dim">О факультете</p><p>Общенаучная подготовка студентов всех институтов и программы повышения квалификации.</p><a class="btn btn--accent btn--sm" href="{% url 'site:inst-fop' %}">Страница факультета <span aria-hidden="true">→</span></a></div>
+        </div></div></div>
+      </li>
+
+      <li class="inst" id="inst-5">
+        <h3 class="inst__h"><button class="inst__row" type="button" aria-expanded="false" aria-controls="inst-5-body">
+          <span class="inst__idx mono" aria-hidden="true">005</span>
+          <span class="inst__title" id="inst-5-t" data-s="Институт" data-k="вуц военная подготовка военная кафедра армия">Военный учебный центр<span class="ia" aria-hidden="true"><svg viewBox="0 0 160 60" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="0" y1="50.5" x2="160" y2="50.5" opacity=".3"/><path d="M73.5 14.5 a6.5 6.5 0 0 1 13 0 M73.5 14.5 H86.5"/><circle class="ia-acc" cx="80" cy="11.6" r=".9" fill="currentColor" stroke="none"/><circle cx="80" cy="18" r="5.5"/><path d="M80 23.5 V26.5 M73 27 H87 M73 27 L76 38 M87 27 L84 38 M76 38 H84"/><path d="M77.5 38 L76 50 M82.5 38 L84 50 M76 50 H72 M84 50 H88"/><path d="M73 27 L72 33 L72.5 39.5"/><path class="ia-sd" d="M87 27 L88 33 L87.5 39"/><path class="ia-su" d="M87 27 L89.5 31.5 L84 20.5"/></svg></span></span>
+          <span class="inst__note mono">военная подготовка · создан в 2021</span>
+          <span class="inst__plus" aria-hidden="true"></span>
+        </button></h3>
+        <div class="inst__panel" id="inst-5-body" role="region" aria-labelledby="inst-5-t"><div><div class="inst__cols">
+          <div><p class="mono dim">О центре</p><p class="inst__text">Военный учебный центр создан в 2021 году. Военная подготовка студентов университета проходит параллельно с основной программой обучения.</p></div>
+          <div class="inst__side"><p class="mono dim">Подробнее</p><p>Отбор, направления и контакты — на странице центра.</p><a class="btn btn--accent btn--sm" href="{% url 'site:inst-vuc' %}">Страница ВУЦ <span aria-hidden="true">→</span></a></div>
+        </div></div></div>
+      </li>
+    </ul>
+    <p class="more"><a class="mono" href="{% url 'site:institutes' %}">все институты и кафедры <span aria-hidden="true">→</span></a></p>
+  </div>
+</section>
+
+<!-- ============ 03 ПОСТУПЛЕНИЕ ============ -->
+<section class="section" id="admission" aria-labelledby="adm-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="adm-h">03 — Поступление</h2><span class="mono dim">приёмная комиссия</span></header>
+    <div class="adm">
+      <div class="adm__intro" data-reveal>
+        <h3>Как поступить в БГИТУ</h3>
+        <p>Четыре шага от выбора направления до приказа о зачислении. Приёмная комиссия поможет на каждом.</p>
+        <div class="hero__cta">
+          <a class="btn btn--accent btn--lg" href="{% url 'site:admission' %}">Направления на  <span aria-hidden="true">↗</span></a>
+          <a class="btn btn--ghost btn--lg" href="tel:+74832649912">Позвонить</a>
+        </div>
+      </div>
+
+      <div>
+        <ol class="steps">
+          <li data-reveal id="step-1" data-s="Поступление" data-t="Выбрать направление подготовки" data-k="специальность бакалавриат специалитет колледж"><span class="step-n">01</span><div><h4>Выберите направление</h4><p>Бакалавриат и специалитет: информационные системы, строительство, лесное дело, транспорт, экономика, экология и безопасность.</p></div></li>
+          <li data-reveal id="step-2" data-s="Поступление" data-t="Подать документы" data-k="подача заявление аудитория 216 приёмная адрес"><span class="step-n">02</span><div><h4>Подайте документы</h4><p>Приёмная комиссия: г. Брянск, пр-т Станке Димитрова, 3, ауд. 216. Пн–пт 9:00–17:00, сб 9:00–13:00.</p></div></li>
+          <li data-reveal id="step-3" data-s="Поступление" data-t="Конкурсные списки" data-k="рейтинг списки баллы"><span class="step-n">03</span><div><h4>Следите за списками</h4><p>Конкурсные списки публикуются на сайте — оставайтесь на связи с приёмной комиссией.</p></div></li>
+          <li data-reveal id="step-4" data-s="Поступление" data-t="Приказ о зачислении" data-k="зачисление приказ"><span class="step-n">04</span><div><h4>Получите зачисление</h4><p>Приказы о зачислении публикуются на сайте университета.</p></div></li>
+        </ol>
+        <ul class="levels mono" aria-label="Уровни подготовки" data-reveal>
+          <li>Колледж (СПО)</li><li>Бакалавриат</li><li>Специалитет</li><li>Магистратура</li><li>Аспирантура</li>
+        </ul>
+        <dl class="contact-card glass" data-reveal>
+          <div><dt class="mono">Адрес</dt><dd><a href="#contacts" data-s="Контакты" data-t="Приёмная комиссия — адрес" data-k="ауд 216 пр-т Станке Димитрова 3">г. Брянск, пр-т Станке Димитрова, 3, ауд. 216</a></dd></div>
+          <div><dt class="mono">Часы приёма</dt><dd>Пн–пт 9:00–17:00<br>Сб 9:00–13:00</dd></div>
+          <div><dt class="mono">Телефон</dt><dd><a href="tel:+74832649912" data-s="Контакты" data-t="Приёмная комиссия — +7 (4832) 64-99-12" data-k="телефон позвонить">+7 (4832) 64-99-12</a></dd></div>
+          <div><dt class="mono">Почта</dt><dd><a href="mailto:priem@bgitu.ru" data-s="Контакты" data-t="Приёмная комиссия — priem@bgitu.ru" data-k="email почта написать">priem@bgitu.ru</a></dd></div>
+        </dl>
+      </div>
+    </div>
+    <p class="more"><a class="mono" href="{% url 'site:admission' %}">направления, документы, вопросы <span aria-hidden="true">→</span></a></p>
+  </div>
+</section>
+
+<!-- ============ 04 КАМПУС ============ -->
+<section class="section section--raised" id="campus" aria-labelledby="campus-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="campus-h">04 — Кампус</h2><span class="mono dim">два адреса · один университет</span></header>
+    <!-- Плитки с градиентом-заглушкой: замените на фото, положив <img> первым ребёнком .tile -->
+    <div class="bento">
+      <a href="{% url 'site:campus' %}" class="tile tile--a" id="campus-main" data-reveal data-s="Кампус" data-t="Главный корпус" data-k="корпус 1 станке димитрова"><span class="mono">к.01</span><h3>Главный корпус</h3><p>Корпус №1 · пр-т Станке Димитрова, 3. Приёмная комиссия, Строительный институт, администрация.</p></a>
+      <a href="{% url 'site:campus' %}" class="tile tile--b" id="campus-dorm" data-reveal style="--d:1" data-s="Кампус" data-t="Студенческий городок" data-k="общежитие столовая жильё"><span class="mono">к.02</span><h3>Студенческий городок</h3><p>Общежитие · столовая · стадион</p></a>
+      <a href="{% url 'site:campus' %}" class="tile tile--c" id="campus-study" data-reveal style="--d:2" data-s="Кампус" data-t="Учебные корпуса" data-k="корпус 2 ленина"><span class="mono">к.03</span><h3>Учебные корпуса</h3><p>Корпус №2 · пр-т Ленина, 26</p></a>
+      <a href="{% url 'site:campus' %}" class="tile tile--d" id="campus-labs" data-reveal data-s="Кампус" data-t="Лаборатории" data-k="практика проекты оборудование"><span class="mono">к.04</span><h3>Лаборатории</h3><p>Практика и проекты</p></a>
+      <a href="{% url 'site:campus' %}" class="tile tile--e" id="campus-garden" data-reveal style="--d:1" data-s="Кампус" data-t="Ботанический сад им. Б. В. Гроздова" data-k="лесхоз практика горького"><span class="mono">к.05</span><h3>Ботанический сад им. Б. В. Гроздова</h3><p>ул. Горького, 31</p></a>
+      <a href="{% url 'site:campus' %}" class="tile tile--f" id="campus-sport" data-reveal style="--d:2" data-s="Кампус" data-t="Стадион" data-k="спорт команды физкультура"><span class="mono">к.06</span><h3>Стадион</h3><p>Спорт и студенческие команды</p></a>
+    </div>
+    <p class="more"><a class="mono" href="{% url 'site:campus' %}">всё о кампусе <span aria-hidden="true">→</span></a></p>
+  </div>
+</section>
+
+
+<section class="section" id="news" aria-labelledby="news-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="news-h">05 — Новости</h2><a class="mono dim" href="{% url 'site:news' %}">все новости и объявления →</a></header>
+    <ul class="news">
+      <li data-k="n"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Тренинг предпринимательских компетенций"><time class="mono">05.11.2026</time><h3>Тренинг предпринимательских компетенций</h3><span class="mono dim">студенты</span></a></li>
+      <li data-k="n"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Научно-образовательный проект «IT-предпринимательство»"><time class="mono">29.10.2026</time><h3>Научно-образовательный проект «IT-предпринимательство»</h3><span class="mono dim">IT · проекты</span></a></li>
+      <li data-k="n"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Научно-практическая конференция «120 лет практической лесной науке на Брянщине»"><time class="mono">27.10.2026</time><h3>Научно-практическая конференция «120 лет практической лесной науке на Брянщине»</h3><span class="mono dim">наука · лес</span></a></li>
+      <li data-k="n"><a href="{% url 'site:article' %}" data-s="Новости" data-t="Победа на первенстве России по спортивному программированию"><time class="mono">23.10.2026</time><h3>Победа на первенстве России по спортивному программированию</h3><span class="mono dim">студенты · IT</span></a></li>
+      <li data-k="n"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Учредительное заседание Комитета по инновациям"><time class="mono">21.10.2026</time><h3>Учредительное заседание Комитета по инновациям</h3><span class="mono dim">университет</span></a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ ПРИЗЫВ ============ -->
+<section class="cta" aria-labelledby="cta-h">
+  <div class="cta__shade" aria-hidden="true"></div>
+  <div class="container">
+    <p class="mono dim" data-reveal>БГИТУ · Брянск · с 1930 года</p>
+    <h2 id="cta-h" data-reveal>Выберите профессию, на которой держится <span class="hl" data-scramble>реальная отрасль</span></h2>
+    <div class="hero__cta" data-reveal>
+      <a class="btn btn--accent btn--lg" href="#institutes">Выбрать институт <span aria-hidden="true">→</span></a>
+      <a class="btn btn--ghost btn--lg" href="tel:+74832649912">+7 (4832) 64-99-12</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

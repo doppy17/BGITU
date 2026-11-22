@@ -1,0 +1,20 @@
+{% extends "site/base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="page-hero" aria-labelledby="ph">
+  <div class="container">
+    <nav class="crumbs mono" aria-label="Вы здесь"><a href="{% url 'site:index' %}">Главная</a><span aria-hidden="true">/</span><a href="{% url 'site:university' %}">Университет</a><span aria-hidden="true">/</span><span aria-current="page">Сведения об ОО</span></nav>
+    <p class="tag mono"><i></i>Сведения об образовательной организации</p>
+    <h1 id="ph">Сведения <span class="hl" data-scramble>об образовательной организации</span></h1>
+    <p class="page-hero__lead">Обязательный раздел по приказу Рособрнадзора № 1493. Дата создания университета — 3 июля 1930 года, учредитель — Министерство науки и высшего образования РФ.</p>
+  </div>
+</section>
+
+<section class="section section--raised" id="list" aria-labelledby="list-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="list-h">01 — Подразделы</h2><span class="mono dim">14 разделов</span></header>
+    <ul class="news"><li><a href="{% url 'site:sveden' %}" data-s="Ссылка" data-t="Основные сведения"><time class="mono">01</time><h3>Основные сведения</h3><span class="mono dim"></span></a></li><li><a href="{% url 'site:sveden' %}" data-s="Ссылка" data-t="Структура и органы управления"><time class="mono">02</time><h3>Структура и органы управления</h3><span class="mono dim"></span></a></li><li><a href="{% url 'site:sveden' %}" data-s="Ссылка" data-t="Документы"><time class="mono">03</time><h3>Документы</h3><span class="mono dim"></span></a></li><li><a href="{% url 'site:sveden' %}" data-s="Ссылка" data-t="Образование"><time class="mono">04</time><h3>Образование</h3><span class="mono dim"></span></a></li><li><a href="{% url 'site:sveden' %}" data-s="Ссылка" data-t="Образовательные стандарты и требования"><time class="mono">05</time><h3>Образовательные стандарты и требования</h3><span class="mono dim"></span></a></li><li><a href="{% url 'site:sveden' %}" data-s="Ссылка" data-t="Руководство"><time class="mono">06</time><h3>Руководство</h3><span class="mono dim"></span></a></li><li><a href="{% url 'site:sveden' %}" data-s="Ссылка" data-t="Педагогический состав"><time class="mono">07</time><h3>Педагогический состав</h3><span class="mono dim"></span></a></li><li><a href="{% url 'site:sveden' %}" data-s="Ссылка" data-t="Материально-техническое обеспечение и оснащённость"><time class="mono">08</time><h3>Материально-техническое обеспечение и оснащённость</h3><span class="mono dim"></span></a></li><li><a href="{% url 'site:sveden' %}" data-s="Ссылка" data-t="Стипендии и меры поддержки обучающихся"><time class="mono">09</time><h3>Стипендии и меры поддержки обучающихся</h3><span class="mono dim"></span></a></li><li><a href="{% url 'site:sveden' %}" data-s="Ссылка" data-t="Платные образовательные услуги"><time class="mono">10</time><h3>Платные образовательные услуги</h3><span class="mono dim"></span></a></li><li><a href="{% url 'site:sveden' %}" data-s="Ссылка" data-t="Финансово-хозяйственная деятельность"><time class="mono">11</time><h3>Финансово-хозяйственная деятельность</h3><span class="mono dim"></span></a></li><li><a href="{% url 'site:sveden' %}" data-s="Ссылка" data-t="Вакантные места для приёма (перевода)"><time class="mono">12</time><h3>Вакантные места для приёма (перевода)</h3><span class="mono dim"></span></a></li><li><a href="{% url 'site:sveden' %}" data-s="Ссылка" data-t="Международное сотрудничество"><time class="mono">13</time><h3>Международное сотрудничество</h3><span class="mono dim"></span></a></li><li><a href="{% url 'site:sveden' %}" data-s="Ссылка" data-t="Организация питания в образовательной организации"><time class="mono">14</time><h3>Организация питания в образовательной организации</h3><span class="mono dim"></span></a></li></ul>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,71 @@
+/* Общие размеры и положение элементов шапки — одни для сайта и кабинета */
+.head-pill .btn--sm,
+.head-pill .head-cta {
+  min-height: 44px;
+  padding: 0 1.15em;
+  border-radius: var(--radius-pill);
+  font: 600 0.875rem/1 var(--font-text);
+}
+.head-search-form {
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+.head-search-form .head-search {
+  height: 44px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+  color: var(--text);
+  font: 400 0.875rem/1 var(--font-text);
+  width: 200px;
+  transition: border-color var(--dur-fast) var(--ease), width var(--dur-fast) var(--ease);
+}
+.head-search-form .head-search:focus {
+  outline: none;
+  border-color: var(--line-strong);
+  width: 240px;
+}
+.head-search-form .head-search::placeholder { color: var(--text-faint); }
+
+/* Страница результатов поиска */
+.search-page-form {
+  display: flex;
+  gap: 10px;
+  margin: 0 0 clamp(20px, 3vw, 32px);
+}
+.search-page-form .head-search {
+  flex: 1 1 auto;
+  width: auto;
+  height: 48px;
+}
+.search-page-form .btn { min-height: 48px; border-radius: var(--radius-pill); padding: 0 1.4em; }
+
+.search-results { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.search-result__link {
+  display: grid;
+  gap: 4px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-l);
+  background: var(--bg-raised);
+  text-decoration: none;
+  transition: border-color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.search-result__link:hover { border-color: var(--line-strong); transform: translateY(-1px); }
+.search-result__section { font-size: 0.6875rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.search-result__title { font: 700 1.0625rem/1.25 var(--font-display); color: var(--text); }
+.search-result__snippet { color: var(--text-muted); font-size: 0.875rem; line-height: 1.45; }
+.search-empty { margin-top: 8px; }
+.search-hints .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.search-hints .chip {
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  text-decoration: none;
+}
+.search-hints .chip:hover { border-color: var(--line-strong); color: var(--text); }

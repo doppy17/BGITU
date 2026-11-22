@@ -1,0 +1,46 @@
+{% extends "site/base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="page-hero" aria-labelledby="ph">
+  <div class="container">
+    <nav class="crumbs mono" aria-label="Вы здесь"><a href="{% url 'site:index' %}">Главная</a><span aria-hidden="true">/</span><span aria-current="page">Наука</span></nav>
+    <p class="tag mono"><i></i>Наука и инновации</p>
+    <h1 id="ph">Наука, <span class="hl" data-scramble>которая работает на отрасль</span></h1>
+    <p class="page-hero__lead">Научные центры, гранты, конференции и подготовка кадров высшей квалификации.</p><div class="meta-row"><span>Проректор по научной и инновационной деятельности — <b>Тихомиров П. В.</b></span></div>
+  </div>
+</section>
+
+<section class="section section--raised" id="centers" aria-labelledby="centers-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="centers-h">01 — Подразделения</h2><span class="mono dim">по структуре БГИТУ</span></header>
+    <div class="cards"><div class="card" data-s="Сервис" data-t="Управление научно-образовательных инноваций"><span class="mono">унои</span><h3>Управление научно-образовательных инноваций</h3><p>Организация научной работы и инновационных проектов.</p></div><div class="card" data-s="Сервис" data-t="ЦКП научным оборудованием"><span class="mono">цкп</span><h3>ЦКП научным оборудованием</h3><p>Центр коллективного пользования для исследований.</p></div><div class="card" data-s="Сервис" data-t="Инжиниринговый центр"><span class="mono">инжиниринг</span><h3>Инжиниринговый центр</h3><p>Проекты для промышленных партнёров.</p></div><div class="card" data-s="Сервис" data-t="Центр цифровых компетенций"><span class="mono">цифра</span><h3>Центр цифровых компетенций</h3><p>IT-проекты и цифровые навыки.</p></div><a class="card" href="{% url 'site:aspirantura' %}" data-s="Сервис" data-t="Аспирантура"><span class="mono">кадры</span><h3>Аспирантура</h3><p>14 научных специальностей, очная форма.</p><span class=go>Подробнее →</span></a></div>
+  </div>
+</section>
+
+<section class="section" id="grants" aria-labelledby="grants-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="grants-h">02 — Гранты и проекты</h2><span class="mono dim">с главной bgitu.ru</span></header>
+    <ul class="news"><li><a href="{% url 'site:index' %}" data-s="Ссылка" data-t="Грант РНФ № 23-28-00180"><time class="mono">рнф</time><h3>Грант РНФ № 23-28-00180</h3><span class="mono dim"></span></a></li><li><a href="{% url 'site:index' %}" data-s="Ссылка" data-t="Грант РФФИ № 18-41-320003"><time class="mono">рффи</time><h3>Грант РФФИ № 18-41-320003</h3><span class="mono dim"></span></a></li><li><a href="{% url 'site:index' %}" data-s="Ссылка" data-t="Грант РФФИ № 18-08-00567"><time class="mono">рффи</time><h3>Грант РФФИ № 18-08-00567</h3><span class="mono dim"></span></a></li><li><a href="{% url 'site:index' %}" data-s="Ссылка" data-t="Грант РФФИ № 16-38-00041"><time class="mono">рффи</time><h3>Грант РФФИ № 16-38-00041</h3><span class="mono dim"></span></a></li></ul>
+  </div>
+</section>
+
+<section class="section section--raised" id="events" aria-labelledby="events-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="events-h">03 — Конференции и проекты</h2><span class="mono dim">октябрь 2026</span></header>
+    <ul class="news">
+      <li data-k="n"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Научно-образовательный проект «IT-предпринимательство»"><time class="mono">29.10.2026</time><h3>Научно-образовательный проект «IT-предпринимательство»</h3><span class="mono dim">IT · проекты</span></a></li>
+      <li data-k="n"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Научно-практическая конференция «120 лет практической лесной науке на Брянщине»"><time class="mono">27.10.2026</time><h3>Научно-практическая конференция «120 лет практической лесной науке на Брянщине»</h3><span class="mono dim">наука · лес</span></a></li>
+      <li data-k="n"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Научно-образовательный проект «IT предпринимательство»"><time class="mono">27.10.2026</time><h3>Научно-образовательный проект «IT предпринимательство»</h3><span class="mono dim">IT · проекты</span></a></li>
+    </ul>
+  </div>
+</section>
+
+<section class="cta" aria-labelledby="cta-h">
+  <div class="container">
+    <p class="mono dim">БГИТУ · Брянск · с 1930 года</p>
+    <h2 id="cta-h">Хотите в науку? <span class="hl" data-scramble>Начните с аспирантуры</span></h2>
+    <div class="hero__cta"><a class="btn btn--accent btn--lg" href="{% url 'site:aspirantura' %}">Аспирантура <span aria-hidden="true">→</span></a><a class="btn btn--ghost btn--lg" href="{% url 'site:contacts' %}">Контакты</a></div>
+  </div>
+</section>
+{% endblock %}

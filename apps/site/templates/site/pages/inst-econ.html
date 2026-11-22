@@ -1,0 +1,42 @@
+{% extends "site/base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="page-hero" aria-labelledby="ph">
+  <div class="container">
+    <nav class="crumbs mono" aria-label="Вы здесь"><a href="{% url 'site:index' %}">Главная</a><span aria-hidden="true">/</span><a href="{% url 'site:institutes' %}">Институты</a><span aria-hidden="true">/</span><span aria-current="page">ИЭИ</span></nav>
+    <p class="tag mono"><i></i>Институт</p>
+    <h1 id="ph">Инженерно-экономический институт</h1>
+    <p class="page-hero__lead">Информационные технологии, экономика и управление — для цифровой экономики региона и инженерных компаний.</p><div class="meta-row"><span>Директор института — <b>Жиленкова Елена Петровна</b></span><span>пр-т Ленина, 26 · учебный корпус №2</span><a href="tel:+74832740533">+7 (4832) 74-05-33</a><a href="mailto:ie-institut@bgitu.ru">ie-institut@bgitu.ru</a></div>
+  </div>
+</section>
+
+<section class="section" id="dirs" aria-labelledby="dirs-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="dirs-h">01 — Направления подготовки</h2><span class="mono dim">набор 2026/27 · 13 программ</span></header>
+    <ul class="dirs"><li data-k="econ" data-l="бакалавриат" data-s="Направление" data-t="09.03.01 Информатика и вычислительная техника — Автоматизированные системы обработки информации и управления"><span class="mono">09.03.01</span><b>Информатика и вычислительная техника<small>Автоматизированные системы обработки информации и управления</small></b><span class="mono dim">ИЭИ</span><span class="mono dim">бакалавриат</span></li><li data-k="econ" data-l="бакалавриат" data-s="Направление" data-t="09.03.02 Информационные системы и технологии"><span class="mono">09.03.02</span><b>Информационные системы и технологии</b><span class="mono dim">ИЭИ</span><span class="mono dim">бакалавриат</span></li><li data-k="econ" data-l="бакалавриат" data-s="Направление" data-t="09.03.04 Программная инженерия"><span class="mono">09.03.04</span><b>Программная инженерия</b><span class="mono dim">ИЭИ</span><span class="mono dim">бакалавриат</span></li><li data-k="econ" data-l="бакалавриат" data-s="Направление" data-t="38.03.01 Экономика"><span class="mono">38.03.01</span><b>Экономика</b><span class="mono dim">ИЭИ</span><span class="mono dim">бакалавриат</span></li><li data-k="econ" data-l="бакалавриат" data-s="Направление" data-t="38.03.04 Государственное и муниципальное управление — Управление государственными и муниципальными финансами"><span class="mono">38.03.04</span><b>Государственное и муниципальное управление<small>Управление государственными и муниципальными финансами</small></b><span class="mono dim">ИЭИ</span><span class="mono dim">бакалавриат</span></li><li data-k="econ" data-l="специалитет" data-s="Направление" data-t="38.05.01 Экономическая безопасность — Экономико-правовое обеспечение экономической безопасности"><span class="mono">38.05.01</span><b>Экономическая безопасность<small>Экономико-правовое обеспечение экономической безопасности · Экономическая безопасность государственных структур и бизнеса</small></b><span class="mono dim">ИЭИ</span><span class="mono dim">специалитет</span></li><li data-k="econ" data-l="магистратура" data-s="Направление" data-t="09.04.02 Информационные системы и технологии — Интеллектуальные информационные системы и технологии"><span class="mono">09.04.02</span><b>Информационные системы и технологии<small>Интеллектуальные информационные системы и технологии</small></b><span class="mono dim">ИЭИ</span><span class="mono dim">магистратура</span></li><li data-k="econ" data-l="магистратура" data-s="Направление" data-t="38.04.01 Экономика — Экономика строительства и ЖКХ"><span class="mono">38.04.01</span><b>Экономика<small>Экономика строительства и ЖКХ</small></b><span class="mono dim">ИЭИ</span><span class="mono dim">магистратура</span></li><li data-k="econ" data-l="магистратура" data-s="Направление" data-t="38.04.01 Экономика — Финансовый контроль и оценка бизнеса"><span class="mono">38.04.01</span><b>Экономика<small>Финансовый контроль и оценка бизнеса</small></b><span class="mono dim">ИЭИ</span><span class="mono dim">магистратура</span></li><li data-k="econ" data-l="магистратура" data-s="Направление" data-t="38.04.01 Экономика — Сметное дело"><span class="mono">38.04.01</span><b>Экономика<small>Сметное дело</small></b><span class="mono dim">ИЭИ</span><span class="mono dim">магистратура</span></li><li data-k="econ" data-l="магистратура" data-s="Направление" data-t="38.04.01 Экономика — Цифровая экономика"><span class="mono">38.04.01</span><b>Экономика<small>Цифровая экономика</small></b><span class="mono dim">ИЭИ</span><span class="mono dim">магистратура</span></li><li data-k="econ" data-l="спо" data-s="Направление" data-t="38.02.07 Банковское дело"><span class="mono">38.02.07</span><b>Банковское дело</b><span class="mono dim">ИЭИ</span><span class="mono dim">колледж</span></li><li data-k="econ" data-l="спо" data-s="Направление" data-t="— Техническая эксплуатация и сопровождение информационных систем"><span class="mono">—</span><b>Техническая эксплуатация и сопровождение информационных систем</b><span class="mono dim">ИЭИ</span><span class="mono dim">колледж</span></li></ul><p class="lead-2" style="margin-top:28px">Набор 2026/27 по данным bgitu.ru. Колледж — среднее профессиональное образование на базе института.</p>
+  </div>
+</section>
+
+<section class="section section--raised" id="deps" aria-labelledby="deps-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="deps-h">02 — Кафедры</h2><span class="mono dim">2 кафедр</span></header>
+    <ul class="deps"><li><div><h3 data-s="Кафедра" data-t="Кафедра экономики и экономической безопасности">Кафедра экономики и экономической безопасности</h3><p class="who">Заведующий кафедрой — Буданова Марина Викторовна</p></div><div class="c"><span>пр-т Ленина, 26, ауд. 364 · учебный корпус №2</span><a href="tel:+74832740393">+7 (4832) 74-03-93</a><a href="mailto:kaf-ebob@bgitu.ru">kaf-ebob@bgitu.ru</a></div></li><li><div><h3 data-s="Кафедра" data-t="Кафедра информационных технологий">Кафедра информационных технологий</h3><p class="who">Заведующий кафедрой — Казаков Олег Дмитриевич</p></div><div class="c"><span>пр-т Ленина, 26, ауд. 480в · учебный корпус №2</span><a href="tel:+74832645989">+7 (4832) 64-59-89</a><a href="mailto:kaf-it@bgitu.ru">kaf-it@bgitu.ru</a></div></li></ul>
+  </div>
+</section>
+
+<section class="section" id="contacts-u" aria-labelledby="contacts-u-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="contacts-u-h">03 — Контакты</h2><span class="mono dim">ИЭИ</span></header>
+    <dl class="contact-card glass" data-reveal><div><dt class="mono">Адрес</dt><dd>пр-т Ленина, 26 · учебный корпус №2</dd></div><div><dt class="mono">Телефон</dt><dd><a href="tel:+74832740533">+7 (4832) 74-05-33</a></dd></div><div><dt class="mono">Почта</dt><dd><a href="mailto:ie-institut@bgitu.ru">ie-institut@bgitu.ru</a></dd></div><div><dt class="mono">Директор института</dt><dd>Жиленкова Елена Петровна</dd></div></dl>
+  </div>
+</section>
+
+<section class="cta" aria-labelledby="cta-h">
+  <div class="container">
+    <p class="mono dim">БГИТУ · Брянск · с 1930 года</p>
+    <h2 id="cta-h">Поступите в институт — <span class="hl" data-scramble>мы поможем</span></h2>
+    <div class="hero__cta"><a class="btn btn--accent btn--lg" href="{% url 'site:admission' %}">Поступающему <span aria-hidden="true">→</span></a><a class="btn btn--ghost btn--lg" href="tel:+74832649912">+7 (4832) 64-99-12</a></div>
+  </div>
+</section>
+{% endblock %}

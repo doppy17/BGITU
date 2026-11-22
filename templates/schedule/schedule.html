@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% block title %}Расписание{% endblock %}
+{% block content %}
+
+<header class="page-head page-head--row">
+  <div>
+    <p class="mono dim">учебный процесс · семестр 2026/27</p>
+    <h1>Расписание</h1>
+    <p>{% if group %}Группа {{ group.code }}{% if group.course %} · {{ group.course }} курс{% endif %}{% else %}Группа не выбрана{% endif %}</p>
+  </div>
+  {% if can_choose_group %}
+  <form method="get" class="group-switch">
+    <select class="input" name="group" aria-label="Группа" onchange="this.form.submit()">
+      {% for g in groups %}
+        <option value="{{ g.code }}" {% if group and g.id == group.id %}selected{% endif %}>{{ g.code }}</option>
+      {% endfor %}
+    </select>
+  </form>
+  {% endif %}
+</header>
+
+{% if group %}
+<!-- Переключатель недель -->
+<section class="week-nav" aria-label="Неделя">
+  {% if week > 1 %}
+  <a class="week-nav__arrow" href="?week={{ week|add:'-1' }}{% if can_choose_group and group %}&group={{ group.code }}{% endif %}&dir=prev" aria-label="Предыдущая неделя">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+  </a>
+  {% else %}
+  <span class="week-nav__arrow is-disabled" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+  </span>
+  {% endif %}
+
+  <div class="week-nav__info">
+    <p class="mono dim">неделя № {{ week }} · {{ week_label }}{% if is_current %} · текущая{% endif %}</p>
+    <p class="week-nav__dates">
+      {{ monday|date:"d.m" }} — {{ sunday|date:"d.m.Y" }}
+      <span class="mono">{{ monday|date:"d" }}–{{ sunday|date:"d" }} числа</span>
+    </p>
+  </div>
+
+  {% if week < 18 %}
+  <a class="week-nav__arrow" href="?week={{ week|add:'1' }}{% if can_choose_group and group %}&group={{ group.code }}{% endif %}&dir=next" aria-label="Следующая неделя">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+  </a>
+  {% else %}
+  <span class="week-nav__arrow is-disabled" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+  </span>
+  {% endif %}
+</section>
+
+{% if subgroups|length > 1 %}
+<div class="sub-line">
+  <span class="sub-pills__lbl mono">подгруппа</span>
+  <div class="sub-pills">
+    <a class="sub-pill{% if not sub %} is-active{% endif %}" href="?week={{ week }}{% if can_choose_group and group %}&group={{ group.code }}{% endif %}">все</a>
+    {% for item in subgroups %}
+    <a class="sub-pill{% if sub == item %} is-active{% endif %}" href="?week={{ week }}&sub={{ item }}{% if can_choose_group and group %}&group={{ group.code }}{% endif %}">{{ item }}</a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- Таблица расписания -->
+<section class="panel sched-panel{% if direction == 'next' %} sched-in-next{% elif direction == 'prev' %} sched-in-prev{% endif %}">
+  <div class="sched-scroll">
+    <div class="sched-table">
+      <div class="sched-head">
+        <div class="sched-cell sched-cell--time mono dim">пара</div>
+        {% for day in days_header %}
+        <div class="sched-cell sched-cell--head{% if day.is_today %} is-today{% endif %}">
+          <span class="sched-day">{{ day.short }}</span>
+          <span class="sched-date mono">{{ day.date|date:"d.m" }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% for row in grid %}
+      <div class="sched-row" style="--i: {{ forloop.counter }}">
+        <div class="sched-cell sched-cell--time mono dim">
+          <b>{{ row.pair }}</b>
+          {% if row.time %}<small>{{ row.time }}</small>{% endif %}
+        </div>
+        {% for cell in row.days %}
+        <div class="sched-cell sched-cell--body">
+          {% for lesson in cell %}
+          <article class="sched-lesson{% if lesson.kind == 'лаб' or lesson.kind == 'лаб.' or lesson.kind == 'практ' %} sched-lesson--lab{% endif %}">
+            {% if lesson.kind %}<span class="sched-kind mono">{{ lesson.kind }}</span>{% endif %}
+            <b>{{ lesson.subject }}</b>
+            <small class="sched-meta">
+              {% if lesson.room %}ауд. {{ lesson.room }}{% endif %}
+              {% if lesson.room and lesson.teacher_name %} · {% endif %}
+              {% if lesson.teacher_name %}{{ lesson.teacher_name }}{% endif %}
+            </small>
+            {% if lesson.subgroup %}<span class="sched-sub mono">{{ lesson.subgroup }}</span>{% endif %}
+          </article>
+          {% empty %}
+          <span class="sched-empty" aria-hidden="true"></span>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% if can_import %}
+<!-- Импорт файла с сайта БГИТУ -->
+<section class="panel">
+  <header class="panel__head">
+    <div class="panel__title"><span class="panel__num mono">02</span><h2>Импорт из файла БГИТУ</h2></div>
+    <span class="mono dim">.xls / .xlsx</span>
+  </header>
+  <p class="muted panel-note">Скачайте файл на bgitu.ru → «Расписание → Очное обучение» и загрузите сюда — занятия, группы и звонки обновятся сразу, без перезапуска.</p>
+  <form method="post" action="{% url 'schedule:import' %}" enctype="multipart/form-data" class="import-form">
+    {% csrf_token %}
+    {% if group %}<input type="hidden" name="group" value="{{ group.code }}">{% endif %}
+    <input class="file-input" name="file" type="file" accept=".xls,.xlsx" required>
+    <button class="btn btn--accent" type="submit">Обновить расписание</button>
+  </form>
+  {% if latest_import %}
+  <p class="muted panel-note">Последний импорт: {{ latest_import.original_name }} · {{ latest_import.imported_at|date:"d.m.Y H:i" }} · занятий {{ latest_import.lessons_count }} · групп {{ latest_import.groups_count }}</p>
+  {% endif %}
+</section>
+{% endif %}
+
+<!-- Учебный план: вся программа по семестрам -->
+<section class="panel semester-panel">
+  <header class="panel__head">
+    <div class="panel__title">
+      <span class="panel__num mono">01</span>
+      <h2>Учебный план · вся программа обучения</h2>
+    </div>
+  </header>
+  <p class="muted semester-panel__lead">Ось — семестры программы ({{ program_semesters|length }}). Цветные отрезки показывают, в каких семестрах читается дисциплина{% if program_semester %}; текущий семестр — {{ program_semester }}-й{% endif %}.</p>
+
+  <div class="tl-scroll">
+    <div class="tl-grid tl-grid--semesters" style="--weeks: {{ program_semesters|length }}">
+      <div class="tl-axis">
+        <span class="tl-subject mono dim">семестры →</span>
+        <div class="tl-ticks">
+          {% for sem in program_semesters %}
+          <span class="tl-tick{% if sem == program_semester %} is-now{% endif %}" style="--w: {{ sem }}">
+            <i></i><b class="mono">{{ sem }}</b><em>сем.</em>
+          </span>
+          {% endfor %}
+        </div>
+      </div>
+      {% for item in curriculum %}
+      <div class="tl-row" style="--i: {{ forloop.counter }}">
+        <span class="tl-subject">{{ item.subject }}</span>
+        <div class="tl-track">
+          <span class="tl-gridline" aria-hidden="true"></span>
+          {% for start, end in item.segments %}
+          <span class="tl-seg tl-seg--{{ item.color }}"
+                style="--from: {{ start }}; --to: {{ end }}"
+                title="{{ item.subject }}: {% if end == start %}{{ start }}-й семестр{% else %}{{ start }}–{{ end }} семестры{% endif %}">
+            {% if end != start %}{{ start }}–{{ end }}{% else %}{{ start }}{% endif %}
+          </span>
+          {% endfor %}
+        </div>
+      </div>
+      {% empty %}
+      <div class="empty"><b>Учебный план не загружен</b><p>Для этого направления план появится позже.</p></div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% else %}
+<section class="panel">
+  <div class="empty">
+    <b>Группа не назначена</b>
+    <p>Деканат назначит вашу группу — и здесь появится расписание.</p>
+  </div>
+</section>
+{% endif %}
+
+{% if latest_import %}
+<p class="mono dim schedule-source">Источник — файл с bgitu.ru от {{ latest_import.imported_at|date:"d.m.Y H:i" }}.</p>
+{% endif %}
+
+{% endblock %}

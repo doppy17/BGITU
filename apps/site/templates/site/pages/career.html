@@ -1,0 +1,30 @@
+{% extends "site/base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="page-hero" aria-labelledby="ph">
+  <div class="container">
+    <nav class="crumbs mono" aria-label="Вы здесь"><a href="{% url 'site:index' %}">Главная</a><span aria-hidden="true">/</span><a href="{% url 'site:student' %}">Студенту</a><span aria-hidden="true">/</span><span aria-current="page">Карьера</span></nav>
+    <p class="tag mono"><i></i>Трудоустройство</p>
+    <h1 id="ph">Карьера <span class="hl" data-scramble>и практика</span></h1>
+    <p class="page-hero__lead">Центр содействия трудоустройству, стажировки у партнёров и целевое обучение с гарантией работы.</p>
+  </div>
+</section>
+
+<section class="section section--raised" id="how" aria-labelledby="how-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="how-h">01 — С чего начать</h2><span class="mono dim">3 шага</span></header>
+    <ol class="steps">
+      <li data-reveal><span class="step-n">01</span><div><h4>Соберите резюме</h4><p>Добавьте практики, курсовые проекты и достижения из портфолио.</p></div></li>
+      <li data-reveal><span class="step-n">02</span><div><h4>Выберите стажировку</h4><p>Партнёры университета приглашают студентов на практику и экскурсии на производство.</p></div></li>
+      <li data-reveal><span class="step-n">03</span><div><h4>Обратитесь в центр</h4><p>Центр содействия трудоустройству поможет с резюме и подбором вакансий.</p></div></li></ol>
+  </div>
+</section>
+
+<section class="section" id="links" aria-labelledby="links-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="links-h">02 — Ресурсы</h2><span class="mono dim">вакансии и программы</span></header>
+    <ul class="news"><li><a href="{% url 'site:student' %}" data-s="Ссылка" data-t="Центр содействия трудоустройству"><time class="mono">цст</time><h3>Центр содействия трудоустройству</h3><span class="mono dim"></span></a></li><li><a href="https://trudvsem.ru/" target="_blank" rel="noopener" data-s="Ссылка" data-t="Работа в России — вакансии и целевое обучение"><time class="mono">вакансии</time><h3>Работа в России — вакансии и целевое обучение</h3><span class="mono dim">trudvsem.ru ↗</span></a></li><li><a href="{% url 'site:target' %}" data-s="Ссылка" data-t="Целевое обучение в БГИТУ"><time class="mono">целевое</time><h3>Целевое обучение в БГИТУ</h3><span class="mono dim">→</span></a></li><li><a href="{% url 'site:news' %}" data-s="Ссылка" data-t="Экскурсии на производство и стажировки — в ленте новостей"><time class="mono">практика</time><h3>Экскурсии на производство и стажировки — в ленте новостей</h3><span class="mono dim">→</span></a></li></ul>
+  </div>
+</section>
+{% endblock %}

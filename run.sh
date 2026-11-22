@@ -1,74 +1,41 @@
-#!/usr/bin/env bash
-# Запуск ЛК БГИТУ одной командой: ./run.sh [--port 8010] [--no-seed]
-# Сам создаёт окружение, ставит зависимости, применяет миграции и поднимает сервер.
+#!/bin/bash
+# Запуск ЛК БГИТУ одной командой: ./run.sh
+#   - берёт следующий свободный порт (начиная с .run-port или 8030), +1 при каждом старте
+#   - поднимает Django из проекта, без autoreload
+#   - открывает браузер
+# Аргументы: run.sh [порт] [--no-open]
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-APP="$ROOT/ЛК-портал"
-PORT="${PORT:-8010}"
-SEED=1
-SETUP_ONLY=0
+cd "$(dirname "$0")"
 
-while [ $# -gt 0 ]; do
-  case "$1" in
-    --port) PORT="$2"; shift 2 ;;
-    --no-seed) SEED=0; shift ;;
-    --setup-only) SETUP_ONLY=1; shift ;;
-    -h|--help) echo "usage: ./run.sh [--port N] [--no-seed] [--setup-only]"; exit 0 ;;
-    *) echo "неизвестный аргумент: $1"; exit 2 ;;
+VENV="${LK_VENV:-$HOME/.hermes/cache/scratch/lk-run/.venv}"
+PY="$VENV/bin/python"
+if [ ! -x "$PY" ]; then
+  echo "Не найден python в $VENV — задайте LK_VENV=/путь/к/.venv" >&2
+  exit 1
+fi
+
+PORT_FILE=".run-port"
+LAST=$(cat "$PORT_FILE" 2>/dev/null || echo 8029)
+case "$LAST" in ''|*[!0-9]*) LAST=8029;; esac
+PORT=$((LAST + 1))
+OPEN=1
+for a in "$@"; do
+  case "$a" in
+    --no-open) OPEN=0 ;;
+    ''|*[!0-9]*) : ;;
+    *) PORT="$a" ;;
   esac
 done
 
-PY="$APP/.venv/bin/python"
-UV="$(command -v uv 2>/dev/null || true)"
-[ -z "$UV" ] && [ -x "$HOME/.hermes/bin/uv" ] && UV="$HOME/.hermes/bin/uv"
+# если порт занят — идём дальше
+while lsof -nP -iTCP:"$PORT" -sTCP:LISTEN >/dev/null 2>&1; do
+  PORT=$((PORT + 1))
+done
 
-# порт занят прошлым запуском — берём следующий свободный
-if lsof -nP -iTCP:"$PORT" -sTCP:LISTEN >/dev/null 2>&1; then
-  for p in $(seq $((PORT + 1)) $((PORT + 9))); do
-    if ! lsof -nP -iTCP:"$p" -sTCP:LISTEN >/dev/null 2>&1; then
-      echo "→ порт $PORT занят, беру $p"
-      PORT="$p"; break
-    fi
-  done
-fi
+echo "$PORT" > "$PORT_FILE"
+echo "ЛК БГИТУ → http://127.0.0.1:$PORT  (Ctrl+C — остановить)"
+[ "$OPEN" = "1" ] && (sleep 1.2; open "http://127.0.0.1:$PORT" >/dev/null 2>&1 &)
 
-# 1. окружение
-if [ ! -x "$PY" ]; then
-  echo "→ создаю .venv (Python 3.11)…"
-  if [ -n "$UV" ]; then
-    "$UV" venv --python 3.11 "$APP/.venv"
-  else
-    python3.11 -m venv "$APP/.venv"
-  fi
-fi
-
-# 2. зависимости
-if ! "$PY" -c "import django" >/dev/null 2>&1; then
-  echo "→ ставлю зависимости из requirements.txt…"
-  if [ -n "$UV" ]; then
-    "$UV" pip install --python "$PY" -r "$APP/requirements.txt"
-  else
-    "$PY" -m ensurepip --upgrade >/dev/null 2>&1 || true
-    "$PY" -m pip install -r "$APP/requirements.txt"
-  fi
-fi
-
-cd "$APP"
-
-# 3. база
-FRESH=0
-[ -f db.sqlite3 ] || FRESH=1
-"$PY" manage.py migrate --noinput >/dev/null
-if [ "$SEED" -eq 1 ] && [ "$FRESH" -eq 1 ]; then
-  echo "→ заполняю демо-данными (роли, пользователи, курсы, расписание)…"
-  "$PY" manage.py seed_demo
-fi
-
-if [ "$SETUP_ONLY" -eq 1 ]; then
-  echo "→ окружение готово (запуск: ./run.sh)"
-  exit 0
-fi
-
-echo "→ портал: http://127.0.0.1:$PORT/   (демо-пароль: demo12345)"
-exec "$PY" manage.py runserver "127.0.0.1:$PORT"
+export PYTHONDONTWRITEBYTECODE=1
+exec "$PY" manage.py runserver "127.0.0.1:$PORT" --noreload

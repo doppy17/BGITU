@@ -1,0 +1,41 @@
+{% extends "site/base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="page-hero" aria-labelledby="ph">
+  <div class="container">
+    <nav class="crumbs mono" aria-label="Вы здесь"><a href="{% url 'site:index' %}">Главная</a><span aria-hidden="true">/</span><a href="{% url 'site:student' %}">Студенту</a><span aria-hidden="true">/</span><span aria-current="page">Студенческая жизнь</span></nav>
+    <p class="tag mono"><i></i>Молодёжная политика</p>
+    <h1 id="ph">Студенческая <span class="hl" data-scramble>жизнь</span></h1>
+    <p class="page-hero__lead">Советы обучающихся, клубы, спорт, волонтёрство и профком — и единая афиша событий университета.</p>
+  </div>
+</section>
+
+<section class="section section--raised" id="orgs" aria-labelledby="orgs-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="orgs-h">01 — Объединения</h2><span class="mono dim">по структуре БГИТУ</span></header>
+    <div class="cards"><div class="card" data-s="Сервис" data-t="Объединённый совет обучающихся"><span class="mono">осо</span><h3>Объединённый совет обучающихся</h3><p>Студенческое самоуправление университета.</p></div><div class="card" data-s="Сервис" data-t="Студенческий клуб «Тонус»"><span class="mono">клуб</span><h3>Студенческий клуб «Тонус»</h3><p>Творческие коллективы и мероприятия.</p></div><a class="card" href="{% url 'site:campus' %}#life" data-s="Сервис" data-t="Спортивный клуб БГИТУ"><span class="mono">спорт</span><h3>Спортивный клуб БГИТУ</h3><p>Секции и сборные; стадион на 400 мест и спортзал.</p><span class=go>Кампус →</span></a><div class="card" data-s="Сервис" data-t="Центр поддержки добровольческих инициатив"><span class="mono">добро</span><h3>Центр поддержки добровольческих инициатив</h3><p>Волонтёрские проекты и «Обучение служением».</p></div><a class="card" href="https://profkombgitu.ru/" target="_blank" rel="noopener" data-s="Сервис" data-t="Профком студентов"><span class="mono">профком</span><h3>Профком студентов</h3><p>Защита прав студентов, материальная помощь.</p><span class=go>profkombgitu.ru ↗</span></a></div>
+  </div>
+</section>
+
+<section class="section" id="afisha" aria-labelledby="afisha-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="afisha-h">02 — Афиша</h2><span class="mono dim">ближайшие события — с bgitu.ru</span></header>
+    <ul class="news">
+      <li data-k="n"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Тренинг предпринимательских компетенций"><time class="mono">05.11.2026</time><h3>Тренинг предпринимательских компетенций</h3><span class="mono dim">студенты</span></a></li>
+      <li data-k="n"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Научно-образовательный проект «IT-предпринимательство»"><time class="mono">29.10.2026</time><h3>Научно-образовательный проект «IT-предпринимательство»</h3><span class="mono dim">IT · проекты</span></a></li>
+      <li data-k="n"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Научно-практическая конференция «120 лет практической лесной науке на Брянщине»"><time class="mono">27.10.2026</time><h3>Научно-практическая конференция «120 лет практической лесной науке на Брянщине»</h3><span class="mono dim">наука · лес</span></a></li>
+      <li data-k="a"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Всероссийская программа по развитию молодёжного предпринимательства"><time class="mono">05.11.2026</time><h3>Всероссийская программа по развитию молодёжного предпринимательства</h3><span class="mono dim">объявление</span></a></li>
+      <li data-k="a"><a href="{% url 'site:news' %}" data-s="Новости" data-t="Всероссийский конкурс-премия «Безграничные возможности»"><time class="mono">22.10.2026</time><h3>Всероссийский конкурс-премия «Безграничные возможности»</h3><span class="mono dim">объявление</span></a></li>
+    </ul>
+  </div>
+</section>
+
+<section class="cta" aria-labelledby="cta-h">
+  <div class="container">
+    <p class="mono dim">БГИТУ · Брянск · с 1930 года</p>
+    <h2 id="cta-h">Хотите в команду? <span class="hl" data-scramble>Напишите нам</span></h2>
+    <div class="hero__cta"><a class="btn btn--accent btn--lg" href="https://vk.com/bgitu_ru" target="_blank" rel="noopener">ВКонтакте <span aria-hidden="true">↗</span></a><a class="btn btn--ghost btn--lg" href="https://t.me/bgituofficial" target="_blank" rel="noopener">Telegram <span aria-hidden="true">↗</span></a></div>
+  </div>
+</section>
+{% endblock %}
