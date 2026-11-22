@@ -1,4 +1,4 @@
-{% extends 'main/base_site.html' %}
+{% extends 'main/archive_base.html' %}
 {% load static %}
 
 {% block content %}
@@ -156,8 +156,8 @@
 </section>
 {% endblock %}
 
-{% block scripts %}
-<script src="{% static 'js/vendor/three.min.js' %}"></script>
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="{% static 'js/reveal.js' %}"></script>
 <script src="{% static 'js/hero3d.js' %}"></script>
 {% endblock %}

@@ -229,14 +229,14 @@ class ThemePreferenceTests(TestCase):
         self.client.post(reverse('accounts:theme_set'), {'theme': 'surik'})
         self.client.logout()
         self.client.force_login(self.user)
-        response = self.client.get(reverse('main:index'))
+        response = self.client.get(reverse('portal:dashboard'))
         self.assertContains(response, 'data-theme="surik"')
 
     def test_anonymous_uses_cookie(self):
         self.client.cookies['bgitu-theme'] = 'latun'
-        response = self.client.get(reverse('main:index'))
+        response = self.client.get(reverse('accounts:login'))
         self.assertContains(response, 'data-theme="latun"')
 
     def test_anonymous_default_is_paper(self):
-        response = self.client.get(reverse('main:index'))
+        response = self.client.get(reverse('accounts:login'))
         self.assertContains(response, 'data-theme="paper"')

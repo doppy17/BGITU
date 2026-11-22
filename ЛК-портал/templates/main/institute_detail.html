@@ -1,4 +1,4 @@
-{% extends 'main/base_site.html' %}
+{% extends 'main/archive_base.html' %}
 {% block title %}{{ institute.name }} — БГИТУ{% endblock %}
 
 {% block content %}
@@ -15,21 +15,6 @@
 <div class="institute-page__body">
     <p class="institute-page__desc">{{ institute.description }}</p>
 
-    {% if institute.groups.all %}
-    <h2 style="font-family: var(--font-head); font-size: 20px; font-weight: 800; margin-bottom: 16px;">Учебные группы</h2>
-    <table class="schedule__table">
-        <thead>
-            <tr><th>Группа</th><th>Курс</th></tr>
-        </thead>
-        <tbody>
-            {% for group in institute.groups.all %}
-            <tr>
-                <td><a href="{% url 'main:schedule' %}?group={{ group.id }}" style="color: var(--accent); font-family: var(--font-ui);">{{ group.name }}</a></td>
-                <td style="font-family: var(--font-ui); color: var(--fg-muted);">{{ group.course }} курс</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% endif %}
+    {% comment %}группы живут в ЛК (apps.education.Group){% endcomment %}
 </div>
 {% endblock %}

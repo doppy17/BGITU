@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>{% block title %}БГИТУ — Брянский государственный инженерно-технологический университет{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('bgitu-theme')||'dark')}catch(e){}</script>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Перейти к содержимому</a>
+
+    <header class="site-header">
+        <div class="site-header__inner">
+            <a href="{% url 'main:index' %}" class="site-header__logo">БГИТУ</a>
+
+            <nav class="site-nav" aria-label="Основная навигация">
+                <a href="{% url 'main:news_list' %}" class="site-nav__link">Новости</a>
+                <a href="{% url 'main:admission' %}" class="site-nav__link">Абитуриенту</a>
+                <a href="{% url 'main:schedule' %}" class="site-nav__link">Расписание</a>
+                <a href="{% url 'portal:dashboard' %}" class="site-nav__link">Личный кабинет</a>
+
+                <div class="site-nav__dropdown" role="navigation" aria-label="Институты">
+                    <button type="button" class="site-nav__link site-nav__dropdown-trigger"
+                            aria-haspopup="true" aria-expanded="false">Институты</button>
+                    <div class="site-nav__dropdown-menu" role="menu">
+                        <a href="{% url 'main:institute_detail' 'iei' %}" class="site-nav__dropdown-item" role="menuitem">ИЭИ — Инженерно-экономический</a>
+                        <a href="{% url 'main:institute_detail' 'li' %}" class="site-nav__dropdown-item" role="menuitem">ЛИ — Лесной институт</a>
+                        <a href="{% url 'main:institute_detail' 'si' %}" class="site-nav__dropdown-item" role="menuitem">СИ — Строительный институт</a>
+                    </div>
+                </div>
+            </nav>
+
+            <button type="button" class="theme-toggle" id="themeToggle" aria-label="Переключить тему">
+                <span class="theme-toggle__icon theme-toggle__icon--dark">☽</span>
+                <span class="theme-toggle__icon theme-toggle__icon--light">☀</span>
+            </button>
+
+            <button type="button" class="burger" id="burgerBtn" aria-label="Меню" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+
+        <div class="site-nav--mobile" id="mobileMenu" aria-hidden="true">
+            <a href="{% url 'main:news_list' %}" class="site-nav__link">Новости</a>
+            <a href="{% url 'main:admission' %}" class="site-nav__link">Абитуриенту</a>
+            <a href="{% url 'main:schedule' %}" class="site-nav__link">Расписание</a>
+            <a href="{% url 'portal:dashboard' %}" class="site-nav__link">Личный кабинет</a>
+            <a href="{% url 'main:institute_detail' 'iei' %}" class="site-nav__link">ИЭИ</a>
+            <a href="{% url 'main:institute_detail' 'li' %}" class="site-nav__link">ЛИ</a>
+            <a href="{% url 'main:institute_detail' 'si' %}" class="site-nav__link">СИ</a>
+        </div>
+    </header>
+
+    <main class="page-main" id="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="site-footer__inner">
+            <div>
+                <p class="site-footer__logo">БГИТУ</p>
+                <p class="site-footer__text">241037, г. Брянск, пр-т Станке Димитрова, 3</p>
+                <p class="site-footer__text">Приёмная комиссия: <a href="tel:+74832746008">(4832) 74-60-08</a></p>
+            </div>
+            <div>
+                <p class="site-footer__col-title">Разделы</p>
+                <a href="{% url 'main:schedule' %}" class="site-footer__link">Расписание</a>
+                <a href="{% url 'main:admission' %}" class="site-footer__link">Абитуриентам</a>
+                <a href="#" class="site-footer__link">Документы</a>
+            </div>
+            <div>
+                <p class="site-footer__col-title">Институты</p>
+                <a href="{% url 'main:institute_detail' 'iei' %}" class="site-footer__link">ИЭИ</a>
+                <a href="{% url 'main:institute_detail' 'li' %}" class="site-footer__link">ЛИ</a>
+                <a href="{% url 'main:institute_detail' 'si' %}" class="site-footer__link">СИ</a>
+            </div>
+        </div>
+        <div class="site-footer__bottom">
+            <span>© {% now 'Y' %} БГИТУ</span>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/site-theme.js' %}"></script>
+    <script src="{% static 'js/nav.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -31,9 +31,10 @@ class PublicSiteTests(TestCase):
         self.assertEqual(self.client.get(reverse('main:institute_detail', args=['iei'])).status_code, 200)
         self.assertEqual(self.client.get(reverse('main:admission')).status_code, 200)
 
-    def test_shared_header_and_footer(self):
+    def test_archive_shell_and_cabinet_link(self):
+        """Публичные страницы — оболочка архива из Загрузок, плюс раздел «Личный кабинет»."""
         response = self.client.get(reverse('main:index'))
-        self.assertContains(response, 'site-head')       # общий верхний навбар
-        self.assertContains(response, 'head-search')     # поиск в навбаре
-        self.assertContains(response, 'footer__word')    # общий подвал с «БГИТУ»
-        self.assertContains(response, 'trail.js')        # фон-след
+        self.assertContains(response, 'site-header')          # их шапка
+        self.assertContains(response, 'site-footer')          # их подвал
+        self.assertContains(response, 'css/styles.css')       # их оформление
+        self.assertContains(response, reverse('portal:dashboard'))  # раздел ЛК
