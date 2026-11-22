@@ -62,98 +62,17 @@
     onScroll();
   }
 
-  // Док-эффект левого меню (как в macOS): пункт под курсором увеличивается,
-  // соседние разъезжаются наружу с сохранением зазора.
+  // Раскрытие/сворачивание рельса — только кнопкой-стрелкой.
+  // Док-магнификация убрана (требование юзера): пункты стоят на местах.
   (function () {
     var dockNav = document.getElementById('cabNav');
-    if (!dockNav || !window.matchMedia('(hover: hover)').matches) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    var dockItems = Array.prototype.slice.call(dockNav.querySelectorAll('.cab-nav__item'));
-    if (dockItems.length < 2) return;
-
-    var AMP = 0.13;      // максимум увеличения
-    var SIGMA = 95;      // радиус влияния, px
-    var base = null;     // базовые позиции пунктов (без трансформаций)
-    var dockExpandTimer = 0;
-
-    function measure() {
-      base = dockItems.map(function (el) {
-        el.style.transform = '';
-        var r = el.getBoundingClientRect();
-        return { center: r.top + r.height / 2, h: r.height, w: r.width };
-      });
-    }
-
-    function apply(clientY) {
-      var dists = base.map(function (b) { return Math.abs(b.center - clientY); });
-      var h = dists.indexOf(Math.min.apply(Math, dists));
-      var scales = dists.map(function (d) {
-        return 1 + AMP * Math.exp(-(d * d) / (2 * SIGMA * SIGMA));
-      });
-      // раздвижка: якорь — пункт под курсором, соседи едут наружу от него
-      var ty = new Array(dockItems.length).fill(0);
-      for (var j = h + 1; j < dockItems.length; j++) {
-        ty[j] = ty[j - 1] + (base[j - 1].h * (scales[j - 1] - 1) + base[j].h * (scales[j] - 1)) / 2;
-      }
-      for (var k = h - 1; k >= 0; k--) {
-        ty[k] = ty[k + 1] - (base[k].h * (scales[k] - 1) + base[k + 1].h * (scales[k + 1] - 1)) / 2;
-      }
-      dockItems.forEach(function (el, i) {
-        // увеличение + выдвижение вправо (tx) + раздвижка по вертикали (ty)
-        var tx = (scales[i] - 1) * base[i].w * 0.5;
-        el.style.transform = 'translate(' + tx.toFixed(2) + 'px, ' + ty[i].toFixed(2) + 'px) scale(' + scales[i].toFixed(3) + ')';
-      });
-    }
-
-    // Один расчёт на кадр (rAF), с фолбэком для фоновых вкладок и headless,
-    // где rAF не тикает — иначе на каждый mousemove идут лишние записи стилей и лог.
-    var rafId = 0, pendingY = null;
-    function flush() {
-      if (pendingY === null) return;
-      var y = pendingY;
-      pendingY = null;
-      apply(y);
-    }
-    function schedule(y) {
-      pendingY = y;
-      if (rafId) return;
-      var fired = false;
-      rafId = requestAnimationFrame(function () { rafId = 0; fired = true; flush(); });
-      setTimeout(function () {
-        if (!fired && rafId) { cancelAnimationFrame(rafId); rafId = 0; flush(); }
-      }, 50);
-    }
-
-    // Док-магнификация работает при наведении; раскрытие рельса — ТОЛЬКО
-    // по кнопке-стрелке (см. cabToggle ниже).
-    dockNav.addEventListener('mouseenter', function () {
-      if (window.innerWidth <= 1000) return;
-      measure();
-    });
-    dockNav.addEventListener('mousemove', function (event) {
-      if (!base) return;
-      schedule(event.clientY);
-    });
-    dockNav.addEventListener('mouseleave', function () {
-      base = null;
-      pendingY = null;
-      if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
-      dockItems.forEach(function (el) { el.style.transform = ''; });
-    });
-
-    // Перемер позиций после раскрытия/сворачивания рельса.
     var toggle = document.getElementById('cabToggle');
-    if (toggle && dockNav) {
-      toggle.addEventListener('click', function () {
-        var open = !dockNav.classList.contains('is-expanded');
-        dockNav.classList.toggle('is-expanded', open);
-        toggle.setAttribute('aria-expanded', String(open));
-        window.setTimeout(function () {
-          measure();
-          if (pendingY !== null) flush();
-        }, 340);
-      });
-    }
+    if (!dockNav || !toggle) return;
+    toggle.addEventListener('click', function () {
+      var open = !dockNav.classList.contains('is-expanded');
+      dockNav.classList.toggle('is-expanded', open);
+      toggle.setAttribute('aria-expanded', String(open));
+    });
   })();
 
   // Поле поиска в шапке: ⌘K/Ctrl+K — фокус; Enter — пока честный ответ.
