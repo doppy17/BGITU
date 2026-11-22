@@ -1,0 +1,110 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru" data-theme="paper">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{% block title %}{{ page.title }}{% endblock %} — БГИТУ</title>
+  <meta name="description" content="{{ page.description }}">
+  <meta name="theme-color" content="#f2eee6">
+  <link rel="icon" href="{% static 'site/icon-192.png' %}">
+  <link rel="manifest" href="{% static 'site/manifest.webmanifest' %}">
+  <link rel="apple-touch-icon" href="{% static 'site/icon-180.png' %}">
+  <script src="{% static 'site/js/mode.js' %}"></script>
+  <script src="{% static 'site/js/theme.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'site/css/site.css' %}">
+</head>
+<body id="top">
+
+<a class="skip" href="#main">К содержимому</a>
+<canvas class="trail" aria-hidden="true"></canvas>
+<div class="theme-pop a11y-pop" id="a11y-pop" popover aria-label="Версия для слабовидящих"><p class="mono dim">версия для слабовидящих</p><div class="a11y-row"><p class="mono dim">Размер шрифта</p><div class="chips" role="group" aria-label="Размер шрифта"><button type="button" data-a11y="fs" data-v="0" aria-pressed="false">А</button><button type="button" data-a11y="fs" data-v="1" aria-pressed="false">А+</button><button type="button" data-a11y="fs" data-v="2" aria-pressed="false">А++</button></div></div><div class="a11y-row"><p class="mono dim">Интервалы</p><div class="chips" role="group" aria-label="Интервалы"><button type="button" data-a11y="sp" data-v="0" aria-pressed="false">Обычные</button><button type="button" data-a11y="sp" data-v="1" aria-pressed="false">Увеличенные</button></div></div><div class="a11y-row"><p class="mono dim">Цвет</p><div class="chips" role="group" aria-label="Цвет"><button type="button" data-a11y="cl" data-v="0" aria-pressed="false">Обычный</button><button type="button" data-a11y="cl" data-v="gray" aria-pressed="false">Ч/б</button><button type="button" data-a11y="cl" data-v="hc" aria-pressed="false">Контраст</button></div></div><div class="a11y-row"><p class="mono dim">Изображения и анимация</p><div class="chips" role="group" aria-label="Изображения и анимация"><button type="button" data-a11y="im" data-v="0" aria-pressed="false">Показывать</button><button type="button" data-a11y="im" data-v="1" aria-pressed="false">Скрыть</button></div></div><button type="button" class="btn btn--ghost btn--sm a11y-reset" data-a11y-reset>Сбросить настройки</button><p class="theme-pop__note">По ГОСТ Р 52872-2019 и ПП РФ № 102</p></div>
+<div class="secbar" aria-hidden="true" hidden><div class="container secbar__slot"></div></div>
+<div class="theme-pop" id="theme-pop" popover aria-label="Оформление сайта"><p class="mono dim">оформление</p><div role="radiogroup" aria-label="Тема"><button type="button" role="radio" aria-checked="false" data-theme-set="paper"><i style="--a:#b8322a;--b:#f2eee6" aria-hidden="true"></i><span><b>Бумага</b><small>светлая · киноварь</small></span></button><button type="button" role="radio" aria-checked="false" data-theme-set="surik"><i style="--a:#ff5a2e;--b:#0d0d0d" aria-hidden="true"></i><span><b>Сурик</b><small>тёмная · красно-оранжевый</small></span></button><button type="button" role="radio" aria-checked="false" data-theme-set="latun"><i style="--a:#d6b072;--b:#0d0d0d" aria-hidden="true"></i><span><b>Латунь</b><small>тёмная · золото</small></span></button></div><p class="theme-pop__note">Выбор сохранится в этом браузере</p></div>
+
+<!-- ============ ШАПКА ============ -->
+<header class="site-head" id="head">
+  <div class="head-pill">
+    <a class="brand" href="{% url 'site:index' %}" aria-label="БГИТУ — наверх">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="7" fill="currentColor"/><path d="M16 6H8v12h5a3.5 3.5 0 000-7H8" fill="none" stroke="var(--accent-ink)" stroke-width="2.2" stroke-linejoin="round"/></svg>
+      БГИТУ
+    </a>
+    <nav class="nav" aria-label="Основное">
+      <ul><li><a href="{% url 'site:university' %}"{% if page.section == 'university' %} aria-current="page"{% endif %} data-s="Раздел" data-k="о вузе история руководство структура институты кампус">Университет</a></li><li><a href="{% url 'site:admission' %}"{% if page.section == 'admission' %} aria-current="page"{% endif %} data-s="Раздел" data-k="абитуриенту приёмная комиссия направления калькулятор егэ">Поступающим</a></li><li><a href="{% url 'site:student' %}"{% if page.section == 'student' %} aria-current="page"{% endif %} data-s="Раздел" data-k="расписание стипендия эос библиотека общежитие справки">Студенту</a></li><li><a href="{% url 'site:science' %}"{% if page.section == 'science' %} aria-current="page"{% endif %} data-s="Раздел" data-k="исследования гранты аспирантура конференции">Наука</a></li><li><a href="{% url 'site:news' %}"{% if page.section == 'news' %} aria-current="page"{% endif %} data-s="Раздел" data-k="события объявления">Новости</a></li><li><a href="{% url 'site:contacts' %}"{% if page.section == 'contacts' %} aria-current="page"{% endif %} data-s="Раздел" data-k="адрес телефон почта справочник">Контакты</a></li></ul>
+    </nav>
+    <div class="head-actions">
+      <button class="theme-btn a11y-btn" type="button" popovertarget="a11y-pop" aria-label="Версия для слабовидящих"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span>Доступность</span></button>
+      <button class="theme-btn" type="button" popovertarget="theme-pop" aria-label="Оформление сайта"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg><span>Тема</span></button>
+      <button class="search-btn" type="button" data-search-open aria-haspopup="dialog" aria-label="Поиск по сайту">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7.5"/><path d="m21 21-4.5-4.5"/></svg>
+        <span>Поиск</span><kbd data-kbd>Ctrl K</kbd>
+      </button>
+      <a class="btn btn--accent btn--sm" href="{% url 'portal:dashboard' %}" data-s="Раздел" data-t="Личный кабинет" data-k="лк расписание стипендия студент">Личный кабинет</a>
+      <button class="burger" type="button" aria-expanded="false" aria-controls="menu" aria-label="Открыть меню"></button>
+    </div>
+  </div>
+</header>
+
+<div class="menu" id="menu" hidden>
+  <a href="{% url 'site:university' %}"{% if page.section == 'university' %} aria-current="page"{% endif %}>Университет</a>
+  <a href="{% url 'site:admission' %}"{% if page.section == 'admission' %} aria-current="page"{% endif %}>Поступающим</a>
+  <a href="{% url 'site:student' %}"{% if page.section == 'student' %} aria-current="page"{% endif %}>Студенту</a>
+  <a href="{% url 'site:science' %}"{% if page.section == 'science' %} aria-current="page"{% endif %}>Наука</a>
+  <a href="{% url 'site:news' %}"{% if page.section == 'news' %} aria-current="page"{% endif %}>Новости</a>
+  <a href="{% url 'site:contacts' %}"{% if page.section == 'contacts' %} aria-current="page"{% endif %}>Контакты</a>
+  <a class="btn btn--accent btn--lg" href="{% url 'portal:dashboard' %}">Личный кабинет</a>
+  <button class="btn btn--ghost btn--lg" type="button" popovertarget="a11y-pop" style="margin-top:12px">Версия для слабовидящих</button>
+  <div class="menu-theme" role="radiogroup" aria-label="Тема"><p class="mono">оформление</p><button type="button" role="radio" aria-checked="false" data-theme-set="paper"><i style="--a:#b8322a;--b:#f2eee6" aria-hidden="true"></i><span><b>Бумага</b><small>светлая · киноварь</small></span></button><button type="button" role="radio" aria-checked="false" data-theme-set="surik"><i style="--a:#ff5a2e;--b:#0d0d0d" aria-hidden="true"></i><span><b>Сурик</b><small>тёмная · красно-оранжевый</small></span></button><button type="button" role="radio" aria-checked="false" data-theme-set="latun"><i style="--a:#d6b072;--b:#0d0d0d" aria-hidden="true"></i><span><b>Латунь</b><small>тёмная · золото</small></span></button></div>
+</div>
+
+
+
+<main id="main">
+  {% block content %}{% endblock %}
+</main>
+
+<!-- ============ ФУТЕР ============ -->
+<footer class="footer" id="contacts">
+  <div class="container">
+    <div class="footer__cols">
+      <div><h2 class="mono">Адрес</h2><p>241037, г. Брянск,<br>пр-т Станке Димитрова, 3</p><p class="mono dim">режим работы 8:30–18:00</p><p class="mono dim week" data-week></p></div>
+      <div><h2 class="mono">Разделы</h2><a href="{% url 'site:index' %}">Главная</a><a href="{% url 'site:university' %}">Университет</a><a href="{% url 'site:institutes' %}">Институты</a><a href="{% url 'site:admission' %}">Поступающим</a><a href="{% url 'site:student' %}">Студенту</a><a href="{% url 'site:schedule' %}">Расписание</a><a href="{% url 'site:science' %}">Наука</a><a href="{% url 'site:news' %}">Новости</a><a href="{% url 'site:sveden' %}">Сведения об ОО</a><a href="{% url 'site:sitemap' %}">Карта сайта</a><a href="{% url 'portal:dashboard' %}">Личный кабинет</a></div>
+      <div><h2 class="mono">Контакты</h2>
+        <a href="tel:+74832649912" data-s="Контакты" data-t="Приёмная комиссия — +7 (4832) 64-99-12" data-k="телефон абитуриент"><small>Приёмная комиссия</small>+7 (4832) 64-99-12</a>
+        <a href="tel:+74832746008" data-s="Контакты" data-t="Приёмная ректора — +7 (4832) 74-60-08" data-k="телефон ректор"><small>Приёмная ректора</small>+7 (4832) 74-60-08</a>
+        <a href="mailto:mail@bgitu.ru" data-s="Контакты" data-t="mail@bgitu.ru" data-k="email почта университет">mail@bgitu.ru</a></div>
+      <div><h2 class="mono">Сервисы и соцсети</h2><a href="{% url 'portal:dashboard' %}" data-s="Сервис" data-t="Личный кабинет">Личный кабинет</a><a href="{% url 'site:eos' %}" data-s="Сервис" data-t="ЭОС и Moodle">ЭОС и Moodle</a><a href="{% url 'site:schedule' %}" data-s="Сервис" data-t="Расписание">Расписание</a><a href="{% url 'site:programs' %}" data-s="Сервис" data-t="Направления подготовки">Направления подготовки</a><a href="{% url 'site:library' %}" data-s="Сервис" data-t="Библиотека">Библиотека</a><div class="soc"><a href="https://vk.com/bgitu_ru" target="_blank" rel="noopener">ВКонтакте ↗</a><a href="https://t.me/bgituofficial" target="_blank" rel="noopener">Telegram ↗</a><a href="https://max.ru/id3234017534_gos" target="_blank" rel="noopener">MAX ↗</a><a href="https://ok.ru/bgituoffic" target="_blank" rel="noopener">Одноклассники ↗</a><a href="https://rutube.ru/channel/25386572/" target="_blank" rel="noopener">Rutube ↗</a></div></div>
+    </div>
+    <p class="footer__word" aria-hidden="true" data-text="БГИТУ">БГИТУ</p>
+    <div class="footer__bottom mono"><span>© <span id="year">2026</span> ФГБОУ ВО «Брянский государственный инженерно-технологический университет»</span><span><a href="{% url 'site:privacy' %}">Политика ПДн</a> · <a href="{% url 'site:sveden' %}">Сведения об ОО</a> · <a href="{% url 'site:sitemap' %}">Карта сайта</a></span></div>
+  </div>
+</footer>
+
+<!-- ============ ПОИСК (Ctrl/⌘ + K) ============ -->
+<dialog class="search" id="search" aria-label="Поиск по сайту">
+  <div class="search__bar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7.5"/><path d="m21 21-4.5-4.5"/></svg>
+    <input id="q" type="search" role="combobox" aria-expanded="true" aria-controls="results" aria-autocomplete="list" aria-label="Запрос" placeholder="Направление, институт, телефон…" autocomplete="off" spellcheck="false">
+    <kbd>Esc</kbd>
+  </div>
+  <ul class="search__list" id="results" role="listbox" aria-label="Результаты поиска"></ul>
+  <p class="search__hint mono"><span>↑↓ выбрать</span><span>↵ перейти</span><span>esc закрыть</span></p>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+
+
+
+<nav hidden aria-hidden="true"><a href="{% url 'site:index' %}" data-s="Страница" data-t="Главная" data-k="главная бгиту">Главная</a><a href="{% url 'site:university' %}" data-s="Страница" data-t="Об университете" data-k="история ректор руководство учёный совет">Об университете</a><a href="{% url 'site:institutes' %}" data-s="Страница" data-t="Институты и подразделения" data-k="институты факультет колледж вуц">Институты и подразделения</a><a href="{% url 'site:campus' %}" data-s="Страница" data-t="Кампус" data-k="корпуса общежития столовая стадион">Кампус</a><a href="{% url 'site:garden' %}" data-s="Страница" data-t="Ботанический сад и лесхоз" data-k="ботсад гроздова лесхоз">Ботанический сад и лесхоз</a><a href="{% url 'site:sveden' %}" data-s="Страница" data-t="Сведения об образовательной организации" data-k="сведения 1493 структура документы">Сведения об образовательной организации</a><a href="{% url 'site:docs' %}" data-s="Страница" data-t="Документы и бланки" data-k="устав лицензия аккредитация заявления">Документы и бланки</a><a href="{% url 'site:press' %}" data-s="Страница" data-t="Пресс-центр" data-k="соцсети вк телеграм rutube логотип">Пресс-центр</a><a href="{% url 'site:staff' %}" data-s="Страница" data-t="Сотрудникам и преподавателям" data-k="сотрудник преподаватель ведомости нагрузка кадры">Сотрудникам и преподавателям</a><a href="{% url 'site:admission' %}" data-s="Страница" data-t="Приёмная комиссия" data-k="абитуриент поступление документы шаги">Приёмная комиссия</a><a href="{% url 'site:programs' %}" data-s="Страница" data-t="Направления подготовки и калькулятор ЕГЭ" data-k="каталог программ баллы егэ калькулятор">Направления подготовки и калькулятор ЕГЭ</a><a href="{% url 'site:program' %}" data-s="Страница" data-t="Карточка направления (пример)" data-k="учебный план программная инженерия">Карточка направления (пример)</a><a href="{% url 'site:target' %}" data-s="Страница" data-t="Целевое обучение" data-k="целевое квота работа в россии">Целевое обучение</a><a href="{% url 'site:school' %}" data-s="Страница" data-t="Школьникам" data-k="цто олимпиада малая инженерная академия код будущего курсы егэ">Школьникам</a><a href="{% url 'site:transfer' %}" data-s="Страница" data-t="Перевод и восстановление" data-k="перевод восстановление бюджет вакантные места">Перевод и восстановление</a><a href="{% url 'site:paid' %}" data-s="Страница" data-t="Платное обучение" data-k="стоимость оплата договор кредит">Платное обучение</a><a href="{% url 'site:international' %}" data-s="Страница" data-t="Иностранным гражданам" data-k="study in russia international">Иностранным гражданам</a><a href="{% url 'site:student' %}" data-s="Страница" data-t="Студенту" data-k="хаб сервисы студента">Студенту</a><a href="{% url 'site:schedule' %}" data-s="Страница" data-t="Расписание и звонки" data-k="расписание пары звонки неделя ics">Расписание и звонки</a><a href="{% url 'site:eos' %}" data-s="Страница" data-t="ЭОС и электронное обучение" data-k="эос moodle сдо курсы оценки">ЭОС и электронное обучение</a><a href="{% url 'site:scholarships' %}" data-s="Страница" data-t="Стипендии и поддержка" data-k="стипендия пгас гас социальная калькулятор">Стипендии и поддержка</a><a href="{% url 'site:library' %}" data-s="Страница" data-t="Библиотека" data-k="эбс ipr smart каталог читальный зал">Библиотека</a><a href="{% url 'site:life' %}" data-s="Страница" data-t="Студенческая жизнь" data-k="тонус спортклуб профком волонтёры">Студенческая жизнь</a><a href="{% url 'site:career' %}" data-s="Страница" data-t="Карьера и трудоустройство" data-k="вакансии стажировки трудоустройство">Карьера и трудоустройство</a><a href="{% url 'site:dpo' %}" data-s="Страница" data-t="Дополнительное образование" data-k="дпо переподготовка повышение квалификации">Дополнительное образование</a><a href="{% url 'site:help' %}" data-s="Страница" data-t="Помощь: FAQ, отчёт по ГОСТ, чат" data-k="инструкции faq титульный лист гост чат">Помощь: FAQ, отчёт по ГОСТ, чат</a><a href="{% url 'portal:dashboard' %}" data-s="Страница" data-t="Личный кабинет" data-k="лк вход эос">Личный кабинет</a><a href="{% url 'site:science' %}" data-s="Страница" data-t="Наука и инновации" data-k="наука гранты рнф конференции">Наука и инновации</a><a href="{% url 'site:aspirantura' %}" data-s="Страница" data-t="Аспирантура" data-k="аспирантура научные специальности">Аспирантура</a><a href="{% url 'site:news' %}" data-s="Страница" data-t="Новости и объявления" data-k="новости объявления">Новости и объявления</a><a href="{% url 'site:contacts' %}" data-s="Страница" data-t="Контакты" data-k="телефоны адреса почта">Контакты</a><a href="{% url 'site:sitemap' %}" data-s="Страница" data-t="Карта сайта" data-k="карта сайта все страницы">Карта сайта</a><a href="{% url 'site:privacy' %}" data-s="Страница" data-t="Политика обработки персональных данных" data-k="пдн 152-фз cookies">Политика обработки персональных данных</a></nav>
+<div class="cookie" role="region" aria-label="Уведомление о cookies" hidden><p>Сайт сохраняет в браузере только выбранную тему и настройки доступности. Подробнее — в <a href="{% url 'site:privacy' %}">политике обработки персональных данных</a>.</p><button class="btn btn--accent btn--sm" type="button">Понятно</button></div>
+
+<script src="{% static 'site/js/reveal.js' %}"></script>
+<script src="{% static 'site/js/core.js' %}"></script>
+<script src="{% static 'site/js/fallback.js' %}"></script>
+<script src="{% static 'site/js/trail.js' %}"></script>
+<script src="{% static 'site/js/secbar.js' %}"></script>
+<script src="{% static 'site/js/week.js' %}"></script>
+<script src="{% static 'site/js/extras.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+{% extends "site/base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="page-hero" aria-labelledby="ph">
+  <div class="container">
+    <nav class="crumbs mono" aria-label="Вы здесь"><a href="{% url 'site:index' %}">Главная</a><span aria-hidden="true">/</span><span aria-current="page">Университет</span></nav>
+    <p class="tag mono"><i></i>Об университете</p>
+    <h1 id="ph">Инженерная школа Брянска <span class="hl" data-scramble>с 1930 года</span></h1>
+    <p class="page-hero__lead">БГИТУ вырос из лесотехнического института в многопрофильный университет: три института, факультет общенаучной подготовки, колледж и военный учебный центр.</p><div class="meta-row"><span>Ректор — <b>Егорушкин В. А.</b></span><span>г. Брянск, пр-т Станке Димитрова, 3</span><a href="#history">История ↓</a></div>
+  </div>
+</section>
+
+<section class="section" id="numbers" aria-labelledby="numbers-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="numbers-h">01 — В цифрах</h2><span class="mono dim">по данным bgitu.ru</span></header>
+    <dl class="facts" style="margin-top:0">
+      <div class="fact" data-reveal style="--d:0"><dt class="mono">лет с основания</dt><dd class="num" data-since="1930">96</dd><dd>От лесотехнического института до университета</dd></div>
+      <div class="fact" data-reveal style="--d:1"><dt class="mono">учебных корпусов</dt><dd class="num" data-count="5">5</dd><dd>Основных учебно-лабораторных, плюс учебно-производственные</dd></div>
+      <div class="fact" data-reveal style="--d:2"><dt class="mono">общежития</dt><dd class="num" data-count="4">4</dd><dd>Для иногородних студентов</dd></div>
+      <div class="fact" data-reveal style="--d:3"><dt class="mono">лекционных аудиторий</dt><dd class="num" data-count="32">32</dd><dd>Вместимостью от 50 до 150 мест</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="section section--raised" id="history" aria-labelledby="history-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="history-h">02 — История</h2><span class="mono dim">девять десятилетий</span></header>
+    <div class="split-layout"><div class="sticky"><h3 class="big">От лесного института к <span class="hl" data-scramble>инженерному университету</span></h3><p class="lead-2">Профиль менялся вместе с регионом: лес, затем строительство и транспорт, сегодня — цифровая экономика и экология.</p></div><ol class="vtl"><li><time>1930</time><div><b>Лесотехнический институт</b><p>Дата создания — 3 июля 1930 года (сведения bgitu.ru); занятия начались 25 января 1931-го.</p></div></li><li><time>1933</time><div><b>Брянский лесной институт</b><p>Первое переименование — институт закрепляет лесной профиль.</p></div></li><li><time>1940</time><div><b>Брянский лесохозяйственный институт</b><p>Подготовка специалистов лесного хозяйства для всей страны.</p></div></li><li><time>1941–1944</time><div><b>Эвакуация</b><p>Институт работает в г. Советске Кировской области; 19 июня 1944 года занятия возобновляются в Брянске.</p></div></li><li><time>1960</time><div><b>Брянский технологический институт</b><p>Институт становится многопрофильным политехническим вузом.</p></div></li><li><time>1980</time><div><b>Орден Трудового Красного Знамени</b><p>Награда вручена 5 августа 1980 года.</p></div></li><li><time>1995</time><div><b>Инженерно-технологическая академия</b><p>Брянская государственная инженерно-технологическая академия.</p></div></li><li><time>2015</time><div><b>Университет — БГИТУ</b><p>С 16 июля 2015 года — Брянский государственный инженерно-технологический университет.</p></div></li><li><time>2016</time><div><b>Новая структура</b><p>Сформированы три института и факультет общенаучной подготовки.</p></div></li><li><time>2021</time><div><b>Военный учебный центр</b><p>Создан распоряжением Правительства РФ № 3551-р от 11 декабря 2021 года.</p></div></li></ol></div>
+  </div>
+</section>
+
+<section class="section" id="lead" aria-labelledby="lead-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="lead-h">03 — Руководство</h2><span class="mono dim">ректорат</span></header>
+    <div class="people"><div class="person person--lead"><span class="ava" aria-hidden="true">ВА</span><div><b>Егорушкин Валерий Алексеевич</b><small>Ректор</small></div></div><div class="person"><span class="ava" aria-hidden="true">НЕ</span><div><b>Захаров Никита Евгеньевич</b><small>Проректор по образовательной деятельности и молодёжной политике</small></div></div><div class="person"><span class="ava" aria-hidden="true">СГ</span><div><b>Кузнецов Сергей Григорьевич</b><small>Проректор по проектной и экономической деятельности</small></div></div><div class="person"><span class="ava" aria-hidden="true">ПВ</span><div><b>Тихомиров Петр Викторович</b><small>Проректор по научной и инновационной деятельности</small></div></div><div class="person"><span class="ava" aria-hidden="true">ОД</span><div><b>Казаков Олег Дмитриевич</b><small>Проректор по цифровизации</small></div></div></div>
+  </div>
+</section>
+
+<section class="section section--raised" id="structure" aria-labelledby="structure-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="structure-h">04 — Структура</h2><span class="mono dim">институты · факультет · колледж · центр</span></header>
+    <div class="cards"><a class="card" href="{% url 'site:inst-les' %}" data-s="Институт" data-t="Институт лесного комплекса, ландшафтной архитектуры, транспорта и экологии"><span class="mono">Институт</span><h3>Институт лесного комплекса, ландшафтной архитектуры, транспорта и экологии</h3><p>лесное дело · ландшафт · транспорт · экология</p><span class="go">Подробнее →</span></a><a class="card" href="{% url 'site:inst-stroy' %}" data-s="Институт" data-t="Строительный институт"><span class="mono">Институт</span><h3>Строительный институт</h3><p>автодороги · конструкции · геодезия · стройпроизводство</p><span class="go">Подробнее →</span></a><a class="card" href="{% url 'site:inst-econ' %}" data-s="Институт" data-t="Инженерно-экономический институт"><span class="mono">Институт</span><h3>Инженерно-экономический институт</h3><p>информационные технологии · экономика · менеджмент · безопасность</p><span class="go">Подробнее →</span></a><a class="card" href="{% url 'site:inst-fop' %}" data-s="Институт" data-t="Факультет общенаучной подготовки и повышения квалификации"><span class="mono">Факультет</span><h3>Факультет общенаучной подготовки и повышения квалификации</h3><p>математика · языки · история и философия · физическая культура</p><span class="go">Подробнее →</span></a><a class="card" href="{% url 'site:inst-vuc' %}" data-s="Институт" data-t="Военный учебный центр"><span class="mono">Центр</span><h3>Военный учебный центр</h3><p>военная подготовка · создан в 2021</p><span class="go">Подробнее →</span></a><a class="card" href="{% url 'site:college' %}" data-s="Институт" data-t="Многопрофильный колледж"><span class="mono">Колледж</span><h3>Многопрофильный колледж</h3><p>среднее профессиональное образование</p><span class="go">Подробнее →</span></a></div>
+  </div>
+</section>
+
+<section class="section" id="docs" aria-labelledby="docs-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="docs-h">05 — Сведения об организации</h2><a class="mono dim" href="https://bgitu.ru/sveden/" target="_blank" rel="noopener">все сведения ↗</a></header>
+    <ul class="news"><li><a href="https://bgitu.ru/sveden/common/" target="_blank" rel="noopener" data-s="Документы" data-t="Основные сведения"><time class="mono">sveden</time><h3>Основные сведения</h3><span class="mono dim">bgitu.ru ↗</span></a></li><li><a href="https://bgitu.ru/sveden/struct/" target="_blank" rel="noopener" data-s="Документы" data-t="Структура и органы управления"><time class="mono">sveden</time><h3>Структура и органы управления</h3><span class="mono dim">bgitu.ru ↗</span></a></li><li><a href="https://bgitu.ru/sveden/document/" target="_blank" rel="noopener" data-s="Документы" data-t="Документы"><time class="mono">sveden</time><h3>Документы</h3><span class="mono dim">bgitu.ru ↗</span></a></li><li><a href="https://bgitu.ru/sveden/education/" target="_blank" rel="noopener" data-s="Документы" data-t="Образование"><time class="mono">sveden</time><h3>Образование</h3><span class="mono dim">bgitu.ru ↗</span></a></li><li><a href="https://bgitu.ru/sveden/managers/" target="_blank" rel="noopener" data-s="Документы" data-t="Руководство"><time class="mono">sveden</time><h3>Руководство</h3><span class="mono dim">bgitu.ru ↗</span></a></li><li><a href="https://bgitu.ru/sveden/objects/" target="_blank" rel="noopener" data-s="Документы" data-t="Материально-техническое обеспечение"><time class="mono">sveden</time><h3>Материально-техническое обеспечение</h3><span class="mono dim">bgitu.ru ↗</span></a></li></ul>
+  </div>
+</section>
+
+<section class="cta" aria-labelledby="cta-h">
+  <div class="container">
+    <p class="mono dim">БГИТУ · Брянск · с 1930 года</p>
+    <h2 id="cta-h">Выберите профессию, на которой держится <span class="hl" data-scramble>реальная отрасль</span></h2>
+    <div class="hero__cta"><a class="btn btn--accent btn--lg" href="{% url 'site:admission' %}">Поступающему <span aria-hidden="true">→</span></a><a class="btn btn--ghost btn--lg" href="{% url 'site:institutes' %}">Институты</a></div>
+  </div>
+</section>
+{% endblock %}

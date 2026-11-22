@@ -1,0 +1,28 @@
+{% extends "site/base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="page-hero" aria-labelledby="ph">
+  <div class="container">
+    <nav class="crumbs mono" aria-label="Вы здесь"><a href="{% url 'site:index' %}">Главная</a><span aria-hidden="true">/</span><a href="{% url 'site:university' %}">Университет</a><span aria-hidden="true">/</span><span aria-current="page">Ботанический сад</span></nav>
+    <p class="tag mono"><i></i>Природно-производственные объекты</p>
+    <h1 id="ph">Ботанический сад <span class="hl" data-scramble>и лесхоз</span></h1>
+    <p class="page-hero__lead">Ботанический сад им. Б. В. Гроздова на ул. Горького, 31 и Учебно-опытный лесхоз — учебные и научные базы лесного профиля университета.</p>
+  </div>
+</section>
+
+<section class="section section--raised" id="obj" aria-labelledby="obj-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="obj-h">01 — Объекты</h2><span class="mono dim">учебные базы</span></header>
+    <div class="cards"><a class="card" href="https://yandex.ru/maps/?text=Брянск%2C%20улица%20Горького%2C%2031" target="_blank" rel="noopener" data-s="Сервис" data-t="Ботанический сад им. Б. В. Гроздова"><span class="mono">ул. Горького, 31</span><h3>Ботанический сад им. Б. В. Гроздова</h3><p>Коллекции растений, практики студентов, экскурсии.</p><span class=go>На карте ↗</span></a><div class="card" data-s="Сервис" data-t="Учебно-опытный лесхоз"><span class="mono">практика</span><h3>Учебно-опытный лесхоз</h3><p>Полевые практики и научные исследования по лесному хозяйству.</p></div></div>
+  </div>
+</section>
+
+<section class="cta" aria-labelledby="cta-h">
+  <div class="container">
+    <p class="mono dim">БГИТУ · Брянск · с 1930 года</p>
+    <h2 id="cta-h">Хотите на экскурсию? <span class="hl" data-scramble>Позвоните</span></h2>
+    <div class="hero__cta"><a class="btn btn--accent btn--lg" href="tel:+74832746008">Приёмная ректора</a></div>
+  </div>
+</section>
+{% endblock %}

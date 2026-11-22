@@ -1,0 +1,35 @@
+{% extends "site/base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="page-hero" aria-labelledby="ph">
+  <div class="container">
+    <nav class="crumbs mono" aria-label="Вы здесь"><a href="{% url 'site:index' %}">Главная</a><span aria-hidden="true">/</span><a href="{% url 'site:institutes' %}">Институты</a><span aria-hidden="true">/</span><span aria-current="page">ФОПиПК</span></nav>
+    <p class="tag mono"><i></i>Факультет</p>
+    <h1 id="ph" class="long">Факультет общенаучной подготовки и повышения квалификации</h1>
+    <p class="page-hero__lead">Общенаучная подготовка студентов всех институтов и программы дополнительного профессионального образования.</p><div class="meta-row"><span>Декан факультета — <b>Коньшакова Светлана Александровна</b></span><span>пр-т Станке Димитрова, 3, ауд. 231 · учебный корпус №1</span><a href="tel:+74832649562">+7 (4832) 64-95-62</a><a href="mailto:international@bgitu.ru">international@bgitu.ru</a></div>
+  </div>
+</section>
+
+<section class="section" id="deps" aria-labelledby="deps-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="deps-h">01 — Кафедры и отдел ДПО</h2><span class="mono dim">5 подразделений</span></header>
+    <ul class="deps"><li><div><h3 data-s="Кафедра" data-t="Кафедра математики">Кафедра математики</h3><p class="who">Заведующий кафедрой — Баранова Ирина Михайловна</p></div><div class="c"><span>пр-т Станке Димитрова, 3, ауд. 333 · учебный корпус №1</span><a href="tel:+74832645931">+7 (4832) 64-59-31</a><a href="mailto:kaf-matem@bgitu.ru">kaf-matem@bgitu.ru</a></div></li><li><div><h3 data-s="Кафедра" data-t="Кафедра философии, истории и социологии">Кафедра философии, истории и социологии</h3><p class="who">Заведующий кафедрой — Рябова Татьяна Ивановна</p></div><div class="c"><span>пр-т Ленина, 26, ауд. 298 · учебный корпус №2</span><a href="tel:+74832741178">+7 (4832) 74-11-78</a><a href="mailto:kaf-fis@bgitu.ru">kaf-fis@bgitu.ru</a></div></li><li><div><h3 data-s="Кафедра" data-t="Кафедра русского и иностранных языков">Кафедра русского и иностранных языков</h3><p class="who">Заведующий кафедрой — Артемова Вера Степановна</p></div><div class="c"><span>пр-т Ленина, 26, ауд. 294 · учебный корпус №2</span><a href="tel:+74832741178">+7 (4832) 74-11-78</a><a href="mailto:kaf-rin@bgitu.ru">kaf-rin@bgitu.ru</a></div></li><li><div><h3 data-s="Кафедра" data-t="Кафедра физвоспитания">Кафедра физвоспитания</h3><p class="who">Заведующий кафедрой — Сбитный Сергей Николаевич</p></div><div class="c"><span>пр-т Станке Димитрова, 3, ауд. 5 · учебный корпус №1</span><a href="tel:+74832645991">+7 (4832) 64-59-91</a><a href="mailto:kaf-fv@bgitu.ru">kaf-fv@bgitu.ru</a></div></li><li><div><h3 data-s="Кафедра" data-t="Отдел дополнительного профессионального образования">Отдел дополнительного профессионального образования</h3><p class="who">Руководитель — Ерохина Юлия Сергеевна</p></div><div class="c"><span>пр-т Станке Димитрова, 3, ауд. 241 · учебный корпус №1</span><a href="tel:+74832649562">+7 (4832) 64-95-62</a><a href="mailto:dpo@bgitu.ru">dpo@bgitu.ru</a></div></li></ul>
+  </div>
+</section>
+
+<section class="section section--raised" id="contacts-u" aria-labelledby="contacts-u-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="contacts-u-h">02 — Контакты</h2><span class="mono dim">ФОПиПК</span></header>
+    <dl class="contact-card glass" data-reveal><div><dt class="mono">Адрес</dt><dd>пр-т Станке Димитрова, 3, ауд. 231 · учебный корпус №1</dd></div><div><dt class="mono">Телефон</dt><dd><a href="tel:+74832649562">+7 (4832) 64-95-62</a></dd></div><div><dt class="mono">Почта</dt><dd><a href="mailto:international@bgitu.ru">international@bgitu.ru</a></dd></div><div><dt class="mono">Декан факультета</dt><dd>Коньшакова Светлана Александровна</dd></div></dl>
+  </div>
+</section>
+
+<section class="cta" aria-labelledby="cta-h">
+  <div class="container">
+    <p class="mono dim">БГИТУ · Брянск · с 1930 года</p>
+    <h2 id="cta-h">Поступите в БГИТУ — <span class="hl" data-scramble>мы поможем</span></h2>
+    <div class="hero__cta"><a class="btn btn--accent btn--lg" href="{% url 'site:admission' %}">Поступающему <span aria-hidden="true">→</span></a><a class="btn btn--ghost btn--lg" href="tel:+74832649912">+7 (4832) 64-99-12</a></div>
+  </div>
+</section>
+{% endblock %}

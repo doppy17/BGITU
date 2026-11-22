@@ -1,0 +1,42 @@
+{% extends "site/base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="page-hero" aria-labelledby="ph">
+  <div class="container">
+    <nav class="crumbs mono" aria-label="Вы здесь"><a href="{% url 'site:index' %}">Главная</a><span aria-hidden="true">/</span><a href="{% url 'site:news' %}">Новости</a><span aria-hidden="true">/</span><span aria-current="page">Статья</span></nav>
+    <p class="tag mono"><i></i>23.10.2026 · студенты · IT</p>
+    <h1 id="ph" class="long">Победа на первенстве России по спортивному программированию</h1>
+    <p class="page-hero__lead">Студенты БГИТУ в составе молодёжной сборной Брянской области заняли первое место в финале первенства России по спортивному программированию.</p>
+  </div>
+</section>
+
+<section class="section" id="text" aria-labelledby="text-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="text-h">01 — Материал</h2><a class="mono dim" href="https://bgitu.ru/news/index.php?news=4928" target="_blank" rel="noopener">оригинал на bgitu.ru ↗</a></header>
+    <div class="split-layout"><div class="sticky"><p class="note">Пересказ новости с bgitu.ru. Полный текст и фотографии — в оригинале по ссылке выше.</p></div>
+      <div class="prose">
+        <p class="lead-p">Финал первенства России среди молодёжи прошёл с 18 по 23 октября в Красноярске, в дни форума «Россия — спортивная держава». Лучшими стали студенты БГИТУ Максим Исакович и Иван Матвеев в составе сборной Брянской области.</p>
+        <p>Команда решала кейс о развитии Красноярского края. Всего в финале работали 29 команд — больше 130 спортсменов, которые три дня решали прикладные задачи.</p>
+        <p>В финал вышли две команды Брянской области: обе заняли первые места в Центральном федеральном округе.</p>
+        <h2>Четвёртое место в чемпионате России</h2>
+        <p>Мужская команда — проректор БГИТУ по цифровизации Олег Казаков, представитель IT-отрасли Андрей Сериков и студент университета Михаил Хромов — заняла четвёртое место в чемпионате России и выполнила норматив кандидата в мастера спорта. Задачей команды была разработка социально полезного продукта для любительского спорта.</p>
+        <blockquote>Университет поздравляет победителей и всю команду.</blockquote>
+        <div class="share"><a class="btn btn--accent btn--sm" href="https://bgitu.ru/news/index.php?news=4928" target="_blank" rel="noopener">Читать на bgitu.ru ↗</a><button class="btn btn--ghost btn--sm" type="button" onclick="navigator.clipboard && navigator.clipboard.writeText(location.href)">Скопировать ссылку</button><a class="btn btn--ghost btn--sm" href="{% url 'site:news' %}">Все новости</a></div>
+      </div></div>
+  </div>
+</section>
+
+<section class="section section--raised" id="more-news" aria-labelledby="more-news-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="more-news-h">02 — Другие материалы</h2><a class="mono dim" href="{% url 'site:news' %}">вся лента →</a></header>
+    <ul class="news">
+      <li data-k="n"><a href="https://bgitu.ru/news/index.php?news=4933" target="_blank" rel="noopener" data-s="Новости" data-t="Тренинг предпринимательских компетенций"><time class="mono">05.11.2026</time><h3>Тренинг предпринимательских компетенций</h3><span class="mono dim">студенты ↗</span></a></li>
+      <li data-k="n"><a href="https://bgitu.ru/news/index.php?news=4931" target="_blank" rel="noopener" data-s="Новости" data-t="Научно-образовательный проект «IT-предпринимательство»"><time class="mono">29.10.2026</time><h3>Научно-образовательный проект «IT-предпринимательство»</h3><span class="mono dim">IT · проекты ↗</span></a></li>
+      <li data-k="n"><a href="https://bgitu.ru/news/index.php?news=4927" target="_blank" rel="noopener" data-s="Новости" data-t="Научно-практическая конференция «120 лет практической лесной науке на Брянщине»"><time class="mono">27.10.2026</time><h3>Научно-практическая конференция «120 лет практической лесной науке на Брянщине»</h3><span class="mono dim">наука · лес ↗</span></a></li>
+      <li data-k="a"><a href="https://bgitu.ru/obyavl/index.php?news=4932" target="_blank" rel="noopener" data-s="Новости" data-t="Всероссийская программа по развитию молодёжного предпринимательства"><time class="mono">05.11.2026</time><h3>Всероссийская программа по развитию молодёжного предпринимательства</h3><span class="mono dim">объявление ↗</span></a></li>
+      <li data-k="a"><a href="https://bgitu.ru/obyavl/index.php?news=4924" target="_blank" rel="noopener" data-s="Новости" data-t="Всероссийский конкурс-премия «Безграничные возможности»"><time class="mono">22.10.2026</time><h3>Всероссийский конкурс-премия «Безграничные возможности»</h3><span class="mono dim">объявление ↗</span></a></li>
+    </ul>
+  </div>
+</section>
+{% endblock %}

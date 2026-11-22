@@ -1,0 +1,66 @@
+{% extends "site/base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="page-hero" aria-labelledby="ph">
+  <div class="container">
+    <nav class="crumbs mono" aria-label="Вы здесь"><a href="{% url 'site:index' %}">Главная</a><span aria-hidden="true">/</span><span aria-current="page">Кампус</span></nav>
+    <p class="tag mono"><i></i>Два адреса · один университет</p>
+    <h1 id="ph">Кампус <span class="hl" data-scramble>в центре Брянска</span></h1>
+    <p class="page-hero__lead">Учебные корпуса на проспекте Станке Димитрова и проспекте Ленина, общежития, стадион, ботанический сад и учебно-опытный лесхоз.</p>
+  </div>
+</section>
+
+<section class="section" id="numbers" aria-labelledby="numbers-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="numbers-h">01 — В цифрах</h2><span class="mono dim">материально-техническая база</span></header>
+    <dl class="facts" style="margin-top:0">
+      <div class="fact" data-reveal style="--d:0"><dt class="mono">учебно-лабораторных корпусов</dt><dd class="num" data-count="5">5</dd><dd>И несколько учебно-производственных</dd></div>
+      <div class="fact" data-reveal style="--d:1"><dt class="mono">общежития</dt><dd class="num" data-count="4">4</dd><dd>Для иногородних студентов</dd></div>
+      <div class="fact" data-reveal style="--d:2"><dt class="mono">мест в столовых</dt><dd class="num" data-count="448">448</dd><dd>Плюс буфеты в корпусах</dd></div>
+      <div class="fact" data-reveal style="--d:3"><dt class="mono">мест на трибунах</dt><dd class="num" data-count="400">400</dd><dd>Стадион 13 014,7 м²</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="section section--raised" id="buildings" aria-labelledby="buildings-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="buildings-h">02 — Учебные корпуса</h2><span class="mono dim">5 основных корпусов</span></header>
+    <div class="cards"><div class="card"><span class="mono">к.01</span><h3>Учебный корпус №1</h3><p>пр-т Станке Димитрова, 3. Приёмная комиссия, Строительный институт, колледж, факультет общенаучной подготовки, стадион и спортзал.</p></div><div class="card"><span class="mono">к.02</span><h3>Учебный корпус №2</h3><p>пр-т Ленина, 26. Институт лесного комплекса, ландшафтной архитектуры, транспорта и экологии; Инженерно-экономический институт.</p></div><div class="card"><span class="mono">к.03</span><h3>Учебный корпус №3</h3><p>пр-т Ленина, 26. Кафедра производства строительных конструкций, военный учебный центр.</p></div><div class="card"><span class="mono">к.2А</span><h3>Учебный корпус №2А</h3><p>пр-т Ленина, 26А — место образовательной деятельности по сведениям bgitu.ru.</p></div><div class="card"><span class="mono">здоровье</span><h3>Здравпункт</h3><p>Филиал поликлиники № 4 в общежитии № 1.</p></div></div>
+  </div>
+</section>
+
+<section class="section" id="life" aria-labelledby="life-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="life-h">03 — Жизнь в кампусе</h2><span class="mono dim">спорт · еда · практика</span></header>
+    <div class="bento">
+      <a href="#map" class="tile tile--a" data-reveal data-s="Кампус" data-t="Общежития"><span class="mono">к.04</span><h3>Четыре общежития</h3><p>Для иногородних студентов. Порядок заселения — в приёмной комиссии.</p></a>
+      <a href="#map" class="tile tile--b" data-reveal style="--d:1" data-s="Кампус" data-t="Стадион"><span class="mono">к.05</span><h3>Стадион и спортзал</h3><p>Стадион 13 014,7 м² · спортзал 907,9 м² · пр-т Станке Димитрова, 3</p></a>
+      <a href="#map" class="tile tile--c" data-reveal style="--d:2" data-s="Кампус" data-t="Столовые"><span class="mono">к.06</span><h3>Столовые и буфеты</h3><p>Комбинат общественного питания · 448 посадочных мест</p></a>
+      <a href="#map" class="tile tile--d" data-reveal data-s="Кампус" data-t="Ботанический сад"><span class="mono">к.07</span><h3>Ботанический сад им. Б. В. Гроздова</h3><p>ул. Горького, 31</p></a>
+      <a href="#map" class="tile tile--e" data-reveal style="--d:1" data-s="Кампус" data-t="Лесхоз"><span class="mono">к.08</span><h3>Учебно-опытный лесхоз</h3><p>Полевые практики и исследования</p></a>
+      <a href="https://bgitu.ru/" target="_blank" rel="noopener" class="tile tile--f" data-reveal style="--d:2" data-s="Кампус" data-t="Библиотека"><span class="mono">к.09</span><h3>Библиотека и ЭБС</h3><p>Электронные ресурсы · bgitu.ru ↗</p></a>
+    </div>
+  </div>
+</section>
+
+<section class="section section--raised" id="map" aria-labelledby="map-h">
+  <div class="container">
+    <header class="sec-head" data-reveal><h2 class="mono" id="map-h">04 — Как добраться</h2><span class="mono dim">схема</span></header>
+    <div class="map" role="img" aria-label="Схема: учебные корпуса на проспекте Станке Димитрова и проспекте Ленина">
+      <svg class="roads" viewBox="0 0 1000 380" preserveAspectRatio="none" aria-hidden="true"><path d="M-10 250 C 220 230 360 120 560 140 S 880 90 1010 60" fill="none" stroke="currentColor" stroke-width="10" opacity=".5"/><path d="M120 -10 C 160 120 260 260 300 390" fill="none" stroke="currentColor" stroke-width="6" opacity=".35"/><path d="M700 -10 C 690 120 740 260 760 390" fill="none" stroke="currentColor" stroke-width="6" opacity=".35"/></svg>
+      <span class="pin" style="left:27%;top:62%"><i></i><span>Корпус №1 · Станке Димитрова, 3</span></span>
+      <span class="pin" style="left:66%;top:34%"><i></i><span>Корпуса №2, №3 · Ленина, 26</span></span>
+      <div class="map__links"><a class="btn btn--ghost btn--sm" href="https://yandex.ru/maps/?text=Брянск%2C%20проспект%20Станке%20Димитрова%2C%203" target="_blank" rel="noopener">Корпус №1 на карте <span aria-hidden="true">↗</span></a><a class="btn btn--ghost btn--sm" href="https://yandex.ru/maps/?text=Брянск%2C%20проспект%20Ленина%2C%2026" target="_blank" rel="noopener">Корпус №2 на карте <span aria-hidden="true">↗</span></a></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta" aria-labelledby="cta-h">
+  <div class="container">
+    <p class="mono dim">БГИТУ · Брянск · с 1930 года</p>
+    <h2 id="cta-h">Приходите на <span class="hl" data-scramble>день открытых дверей</span></h2>
+    <div class="hero__cta"><a class="btn btn--accent btn--lg" href="tel:+74832649912">Узнать дату <span aria-hidden="true">→</span></a><a class="btn btn--ghost btn--lg" href="{% url 'site:contacts' %}">Все контакты</a></div>
+  </div>
+</section>
+{% endblock %}
