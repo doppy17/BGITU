@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="{% static 'css/portal.css' %}">
   <link rel="stylesheet" href="{% static 'site/css/header.css' %}">
   <link rel="stylesheet" href="{% static 'site/css/search.css' %}">
+  <link rel="stylesheet" href="{% static 'site/css/a11y.css' %}">
 </head>
 <body id="top">
 <canvas class="bg-canvas" aria-hidden="true"></canvas>
@@ -101,21 +102,12 @@
   </div>
 </footer>
 
-<div class="theme-pop" id="theme-pop" popover aria-label="Оформление сайта">
-  <p class="mono dim">оформление</p>
-  <div role="radiogroup" aria-label="Тема">
-    <button type="button" role="radio" aria-checked="false" data-theme-set="paper"><i style="--a:#b8322a;--b:#f2eee6" aria-hidden="true"></i><span><b>Бумага</b><small>светлая · киноварь</small></span></button>
-    <button type="button" role="radio" aria-checked="false" data-theme-set="surik"><i style="--a:#ff5a2e;--b:#0d0d0d" aria-hidden="true"></i><span><b>Сурик</b><small>тёмная · красно-оранжевый</small></span></button>
-    <button type="button" role="radio" aria-checked="false" data-theme-set="latun"><i style="--a:#d6b072;--b:#0d0d0d" aria-hidden="true"></i><span><b>Латунь</b><small>тёмная · золото</small></span></button>
-  </div>
-  <p class="theme-pop__note">Выбор сохранится в этом браузере</p>
-</div>
 
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="{% static 'js/bg.js' %}"></script>
 <script src="{% static 'js/trail.js' %}"></script>
 <script src="{% static 'js/app.js' %}"></script>
 <script src="{% static 'js/search.js' %}"></script>
+<script src="{% static 'site/js/extras.js' %}"></script>
 <script src="{% static 'js/select.js' %}"></script>
 </body>
 </html>

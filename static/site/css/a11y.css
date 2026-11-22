@@ -1,0 +1,32 @@
+/* Версия для слабовидящих — общий файл для сайта и кабинета */
+
+
+/* ================= Панель для слабовидящих ================= */
+.a11y-pop { width: 330px; }
+
+.a11y-row { padding: 6px 6px 10px; }
+
+.a11y-row .mono { margin-bottom: 8px; }
+
+.a11y-row .chips button { min-height: 38px; }
+
+.a11y-reset { width: calc(100% - 12px); margin: 6px; }
+
+html.a11y-fs1 { font-size: 118%; }
+
+html.a11y-fs2 { font-size: 136%; }
+
+html.a11y-sp body { letter-spacing: 0.04em; word-spacing: 0.16em; }
+
+html.a11y-sp :is(p, li, dd) { line-height: 1.9 !important; }
+
+html.a11y-gray { filter: grayscale(1); }
+
+html.a11y-hc { --brand-base: #000 !important; --brand-ink: #fff !important; --brand-accent: #ffe14d !important; --brand-on-accent: #000 !important; --brand-aux: #ffe14d !important; }
+
+html.a11y-im .trail, html.a11y-im img, html.a11y-im .ia, html.a11y-im :is(.tile, .card, .feature)::before, html.a11y-im .tile::after { display: none !important; }
+
+html.a11y-im *, html.a11y-im *::before, html.a11y-im *::after { animation: none !important; transition: none !important; }
+ .a11y-btn span { display: none; }
+ .a11y-btn { width: 44px; justify-content: center; padding: 0; }
+ .a11y-btn { display: none; }

@@ -10,21 +10,6 @@
     return (msg) => { el.textContent = msg; el.classList.add('is-on'); clearTimeout(t); t = setTimeout(() => el.classList.remove('is-on'), 2600); };
   })();
 
-  /* ---------- Шапка и мобильное меню ---------- */
-  const head = $('#head'), burger = $('.burger'), menu = $('#menu');
-  addEventListener('scroll', () => head.classList.toggle('is-stuck', scrollY > 24), { passive: true });
-  const setMenu = (open) => {
-    menu.hidden = !open;
-    burger.setAttribute('aria-expanded', open);
-    burger.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
-    document.documentElement.classList.toggle('menu-open', open);
-    $('#main').inert = $('.footer').inert = open;
-  };
-  burger.addEventListener('click', () => setMenu(menu.hidden));
-  menu.addEventListener('click', (e) => e.target.closest('a') && setMenu(false));
-  addEventListener('keydown', (e) => e.key === 'Escape' && !menu.hidden && setMenu(false));
-  addEventListener('resize', () => innerWidth > 1180 && !menu.hidden && setMenu(false));
-
   // Страницы, которых ещё нет в макете, не должны вести в 404
   document.addEventListener('click', (e) => {
     if (!e.target.closest('[data-soon]')) return;

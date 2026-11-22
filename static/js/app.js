@@ -6,19 +6,33 @@
   var nav = document.getElementById('cabNav');
   var backdrop = document.getElementById('navBackdrop');
 
-  // Мобильное меню публичных страниц
-  var mobileNav = document.getElementById('siteNavMobile');
+  // Мобильное меню (общее для сайта и кабинета: <nav class="menu" id="menu">)
+  var mobileNav = document.getElementById('menu') || document.getElementById('siteNavMobile');
   if (burger && mobileNav) {
     burger.addEventListener('click', function () {
-      var open = mobileNav.classList.toggle('is-open');
-      burger.setAttribute('aria-expanded', String(open));
-      document.body.classList.toggle('is-nav-open', open);
+      var open = mobileNav.hasAttribute('hidden');
+      if (mobileNav.id === 'menu') {
+        mobileNav.hidden = !open;
+        burger.setAttribute('aria-expanded', String(open));
+        burger.setAttribute('aria-label', open ? 'Закрыть меню' : 'Меню');
+        document.documentElement.classList.toggle('menu-open', open);
+      } else {
+        mobileNav.classList.toggle('is-open', open);
+        burger.setAttribute('aria-expanded', String(open));
+        document.body.classList.toggle('is-nav-open', open);
+      }
     });
     mobileNav.addEventListener('click', function (event) {
       if (event.target.tagName === 'A') {
-        mobileNav.classList.remove('is-open');
-        burger.setAttribute('aria-expanded', 'false');
-        document.body.classList.remove('is-nav-open');
+        if (mobileNav.id === 'menu') {
+          mobileNav.hidden = true;
+          burger.setAttribute('aria-expanded', 'false');
+          document.documentElement.classList.remove('menu-open');
+        } else {
+          mobileNav.classList.remove('is-open');
+          burger.setAttribute('aria-expanded', 'false');
+          document.body.classList.remove('is-nav-open');
+        }
       }
     });
   }

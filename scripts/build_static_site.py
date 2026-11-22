@@ -21,7 +21,17 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[1]
+
+# Мобильная шапка — общая для сайта и кабинета: бургер вместо меню разделов.
+# На сайте бургер открывает меню разделов, в кабинете — рельс (app.js).
+MOBILE_HEAD_CSS = """
+@media (max-width: 1180px) {
+  .nav, .head-actions .btn { display: none; }
+  .burger { display: block; }
+  .head-actions { margin-left: auto; }
+}
+"""
 SOURCE = Path(sys.argv[1]) if len(sys.argv) > 1 else Path.home() / 'Downloads' / 'bgitu-site-main'
 
 # slug в URL отличается от имени файла там, где путь занят ЛК
@@ -244,7 +254,9 @@ def main() -> None:
             kept.append(line)
     (css_dir / 'header.css').write_text(
         '/* Шапка сайта и кабинета: один компонент на обе части. */\n'
-        + '\n'.join(header_lines) + '\n',
+        '.site-head { padding: 0; }\n'
+        + '\n'.join(header_lines) + '\n'
+        + MOBILE_HEAD_CSS,
         encoding='utf-8',
     )
     (css_dir / 'site.css').write_text('\n'.join(kept) + '\n', encoding='utf-8')
@@ -258,6 +270,13 @@ def main() -> None:
     if start != -1 and end != -1:
         # поиск живёт в отдельном общем модуле static/js/search.js
         core_js = core_js[:start] + core_js[end:]
+    # шапку и мобильное меню обслуживает app.js (общий для сайта и кабинета)
+    start_m = core_js.find('/* ---------- Шапка и мобильное меню ---------- */')
+    end_m = core_js.find('// Страницы, которых ещё нет в макете')
+    if start_m != -1 and end_m != -1:
+        core_js = core_js[:start_m] + core_js[end_m:]
+    # подсказку клавиши ставит search.js — убираем дубль из макета
+    core_js = re.sub(r"\$\('\[data-kbd\]'\)\.textContent\s*=\s*[^;]+;\n?", '', core_js)
     (js_dir / 'core.js').write_text(core_js + '\n', encoding='utf-8')
     (js_dir / 'trail.js').write_text(scripts[4] + '\n', encoding='utf-8')
     (js_dir / 'secbar.js').write_text(scripts[5] + '\n', encoding='utf-8')
@@ -304,6 +323,7 @@ def main() -> None:
   <link rel="stylesheet" href="{{% static 'site/css/site.css' %}}">
   <link rel="stylesheet" href="{{% static 'site/css/header.css' %}}">
   <link rel="stylesheet" href="{{% static 'site/css/search.css' %}}">
+  <link rel="stylesheet" href="{{% static 'site/css/a11y.css' %}}">
 </head>
 <body id="top">
 {{% include 'partials/site_head.html' with nav_section=page.section nav_mode='site' %}}
@@ -321,6 +341,8 @@ def main() -> None:
 <script src="{{% static 'site/js/secbar.js' %}}"></script>
 <script src="{{% static 'site/js/week.js' %}}"></script>
 <script src="{{% static 'site/js/extras.js' %}}"></script>
+<script src="{{% static 'js/app.js' %}}"></script>
+<script src="{{% static 'js/search.js' %}}"></script>
 </body>
 </html>
 """
