@@ -1,12 +1,16 @@
-VENV ?= .venv
-PY ?= $(VENV)/bin/python
+# ЛК БГИТУ — типовые команды.
+# Интерпретатор: сначала LK_VENV (рабочая копия вне iCloud), затем .venv, затем python3 —
+# берётся первый, в котором есть Django. .venv в ~/Documents под iCloud ломается (Resource deadlock).
+LK_VENV ?= $(HOME)/.hermes/cache/scratch/lk-run/.venv
+PY ?= $(shell for p in "$(LK_VENV)/bin/python" .venv/bin/python python3 python; do \
+        $$p -c 'import django' >/dev/null 2>&1 && { echo $$p; break; }; done)
 PORT ?= 8010
 UV ?= $(shell command -v uv 2>/dev/null || echo $(HOME)/.hermes/bin/uv)
 
 .PHONY: venv install migrate seed run test check clean
 
 venv:
-	$(UV) venv --python 3.11 $(VENV) || python3.11 -m venv $(VENV)
+	$(UV) venv --python 3.11 $(LK_VENV) || python3.11 -m venv $(LK_VENV)
 
 install: venv
 	$(UV) pip install --python $(PY) -r requirements.txt
@@ -18,7 +22,7 @@ seed:
 	$(PY) manage.py seed_demo
 
 run:
-	$(PY) manage.py runserver 127.0.0.1:$(PORT)
+	./run.sh
 
 test:
 	$(PY) manage.py test
