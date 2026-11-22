@@ -1,6 +1,7 @@
 """Просмотр расписания и импорт файла с сайта БГИТУ."""
 import os
-from datetime import date
+from collections import defaultdict
+from datetime import date, timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -11,16 +12,47 @@ from django.views.decorators.http import require_POST
 from apps.accounts.permissions import role_can, role_required
 from apps.education.models import Group
 
-from .import_service import WEEKDAYS
 from .models import Bell, Lesson, ScheduleImport
 from .services import run_import
 
 BGITU_SOURCE = 'https://bgitu.ru/studentu/raspisanie/ochnoe-obuchenie/'
 DAY_SHORT = ['', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб']
+DAY_FULL = ['', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота']
+
+# Понедельник первой недели осеннего семестра 2026/27.
+# Позже начало семестра стоит брать из импорта/настроек, а не константой.
+SEMESTER_START = date(2026, 8, 31)
+SEMESTER_WEEKS = 18
 
 
-def current_parity():
-    return 'odd' if date.today().isocalendar()[1] % 2 else 'even'
+def semester_week_of(day):
+    return (day - SEMESTER_START).days // 7 + 1
+
+
+def semester_monday(week):
+    return SEMESTER_START + timedelta(weeks=week - 1)
+
+
+def parity_of_monday(monday):
+    """Календарная чётность недели (по ISO-номеру) — как в файле БГИТУ."""
+    return 'odd' if monday.isocalendar()[1] % 2 else 'even'
+
+
+def run_segments(weeks):
+    """Сливает набор номеров недель в непрерывные отрезки [(start, end), ...]."""
+    weeks = sorted(set(weeks))
+    if not weeks:
+        return []
+    segments = []
+    start = prev = weeks[0]
+    for w in weeks[1:]:
+        if w == prev + 1:
+            prev = w
+            continue
+        segments.append((start, prev))
+        start = prev = w
+    segments.append((start, prev))
+    return segments
 
 
 @login_required
@@ -34,52 +66,93 @@ def schedule_view(request):
     if group is None and can_choose:
         group = groups.first()
 
-    # Чётность недели показываем только если в расписании группы есть занятия,
-    # привязанные к конкретной неделе. Иначе одно расписание на обе недели.
-    has_parity = bool(group) and Lesson.objects.filter(group=group).exclude(week='all').exists()
-    week = request.GET.get('week')
-    if not has_parity or week not in ('odd', 'even'):
-        week = current_parity() if has_parity else 'all'
-    week_label = {'odd': 'нечётная', 'even': 'чётная'}.get(week, '')
+    # Номер семестровой недели: ?week=N, зажатый в границы семестра.
+    current_week = semester_week_of(date.today())
+    try:
+        week = int(request.GET.get('week', current_week))
+    except (TypeError, ValueError):
+        week = current_week
+    week = max(1, min(SEMESTER_WEEKS, week))
+    direction = request.GET.get('dir')
+    if direction not in ('next', 'prev'):
+        direction = ''
+
+    monday = semester_monday(week)
+    sunday = monday + timedelta(days=6)
+    parity = parity_of_monday(monday)
+    week_label = 'нечётная' if parity == 'odd' else 'чётная'
+    is_current = week == current_week
 
     lessons = []
     if group:
-        week_filter = ['all', week] if has_parity else ['all']
         lessons = list(
-            Lesson.objects.filter(group=group, week__in=week_filter)
-            .select_related('source')
+            Lesson.objects.filter(group=group, week__in=['all', parity])
             .order_by('weekday', 'pair', 'subgroup')
         )
     bells = {b.pair: b for b in Bell.objects.filter(building='2')}
 
-    days = []
-    today = date.today()
-    for weekday in range(1, 7):
-        day_lessons = [lesson for lesson in lessons if lesson.weekday == weekday]
-        days.append({
-            'n': weekday,
-            'name': DAY_SHORT[weekday],
-            'full': list(WEEKDAYS.keys())[weekday - 1],
-            'is_today': today.weekday() + 1 == weekday and week == current_parity(),
-            'lessons': [
-                {
-                    'lesson': lesson,
-                    'time': (bells.get(lesson.pair).start if bells.get(lesson.pair) else ''),
-                }
-                for lesson in day_lessons
+    # Таблица: строки — пары, колонки — дни недели.
+    max_pair = max((lesson.pair for lesson in lessons), default=0)
+    grid = []
+    for pair in range(1, max(max_pair, 6) + 1):
+        bell = bells.get(pair)
+        grid.append({
+            'pair': pair,
+            'time': f'{bell.start}–{bell.end}' if bell else '',
+            'days': [
+                [lesson for lesson in lessons if lesson.pair == pair and lesson.weekday == weekday]
+                for weekday in range(1, 7)
             ],
         })
+
+    days_header = []
+    for weekday in range(1, 7):
+        day = monday + timedelta(days=weekday - 1)
+        days_header.append({
+            'short': DAY_SHORT[weekday],
+            'full': DAY_FULL[weekday],
+            'date': day,
+            'is_today': day == date.today(),
+        })
+
+    # Ось семестра: предметы и недели, на которых они есть.
+    subject_weeks = defaultdict(set)
+    subject_order = []
+    if group:
+        for lesson in Lesson.objects.filter(group=group).order_by('weekday', 'pair', 'subgroup'):
+            if lesson.subject not in subject_weeks:
+                subject_order.append(lesson.subject)
+            if lesson.week == 'all':
+                subject_weeks[lesson.subject].update(range(1, SEMESTER_WEEKS + 1))
+            else:
+                subject_weeks[lesson.subject].update(
+                    w for w in range(1, SEMESTER_WEEKS + 1)
+                    if parity_of_monday(semester_monday(w)) == lesson.week
+                )
+    timeline = []
+    for index, subject in enumerate(subject_order):
+        timeline.append({
+            'subject': subject,
+            'segments': run_segments(subject_weeks[subject]),
+            'color': index % 6,
+        })
+
     latest = ScheduleImport.objects.order_by('-imported_at').first()
     return render(request, 'schedule/schedule.html', {
         'group': group,
         'groups': groups,
         'can_choose_group': can_choose,
         'week': week,
-        'has_parity': has_parity,
         'week_label': week_label,
-        'week_number': today.isocalendar()[1],
-        'days': days,
-        'bells': [bells[p] for p in sorted(bells)],
+        'monday': monday,
+        'sunday': sunday,
+        'is_current': is_current,
+        'direction': direction,
+        'semester_weeks': range(1, SEMESTER_WEEKS + 1),
+        'current_week': current_week,
+        'days_header': days_header,
+        'grid': grid,
+        'timeline': timeline,
         'latest_import': latest,
     })
 

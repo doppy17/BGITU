@@ -116,7 +116,7 @@ class NavCompositionTests(TestCase):
     def test_all_sections_are_wip(self):
         """Все разделы в режиме «в разработке»."""
         self.client.force_login(self.dev)
-        for url in ('/cabinet/', '/cabinet/grades/', '/schedule/', '/courses/', '/works/',
+        for url in ('/cabinet/', '/cabinet/grades/', '/courses/', '/works/',
                     '/roles/', '/cabinet/stipendia/', '/cabinet/profile/', '/manage/students/'):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200, url)

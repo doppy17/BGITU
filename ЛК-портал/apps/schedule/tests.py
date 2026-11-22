@@ -1,4 +1,5 @@
 """Тесты импорта и показа расписания."""
+from datetime import date, timedelta
 from pathlib import Path
 
 from django.conf import settings
@@ -49,21 +50,49 @@ class ScheduleImportTests(TestCase):
         self.assertIn(lesson.weekday, range(1, 7))
         self.assertIn(lesson.pair, range(1, 7))
 
-    def test_schedule_page_is_wip(self):
-        """Раздел «Расписание» в разработке — страница открывается, но без данных."""
+    def test_schedule_shows_table_and_dates(self):
+        """Таблица с днями и диапазоном дат текущей недели семестра."""
+        from .views import semester_monday, semester_week_of
+
         self.student.profile.group = Group.objects.get(code='ИСТ-201')
         self.student.profile.save()
         self.client.force_login(self.student)
         response = self.client.get(reverse('schedule:schedule'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Раздел в разработке')
-        self.assertNotContains(response, 'Базы данных')
+        self.assertNotContains(response, 'Раздел в разработке')
+        week = semester_week_of(date.today())
+        monday = semester_monday(week)
+        sunday = monday + timedelta(days=6)
+        self.assertContains(response, f'неделя № {week}')
+        self.assertContains(response, f'{monday.strftime("%d.%m")} — {sunday.strftime("%d.%m.%Y")}')
+        self.assertContains(response, 'Базы данных')
+        self.assertContains(response, 'Семестр · предметы по неделям')
 
-    def test_schedule_page_wip_for_staff(self):
+    def test_week_arrows_and_limits(self):
+        """Стрелки листают недели; на границах семестра — выключены."""
+        self.client.force_login(self.dean)
+        first = self.client.get(reverse('schedule:schedule'), {'group': 'ИСТ-201', 'week': '1'})
+        self.assertContains(first, 'week=2')
+        self.assertContains(first, 'dir=next')
+        self.assertContains(first, 'is-disabled')  # стрелка «назад» неактивна
+        last = self.client.get(reverse('schedule:schedule'), {'group': 'ИСТ-201', 'week': '18'})
+        self.assertContains(last, 'is-disabled')  # стрелка «вперёд» неактивна
+        self.assertNotContains(last, 'week=19')
+
+    def test_week_switch_changes_dates(self):
+        self.client.force_login(self.dean)
+        w12 = self.client.get(reverse('schedule:schedule'), {'group': 'ИСТ-201', 'week': '12'})
+        w13 = self.client.get(reverse('schedule:schedule'), {'group': 'ИСТ-201', 'week': '13', 'dir': 'next'})
+        self.assertContains(w12, '16.11 — 22.11.2026')
+        self.assertContains(w13, '23.11 — 29.11.2026')
+        self.assertContains(w13, 'sched-in-next')
+
+    def test_staff_can_switch_group(self):
         self.client.force_login(self.dean)
         response = self.client.get(reverse('schedule:schedule'), {'group': 'ИСТ-101'})
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Раздел в разработке')
+        self.assertContains(response, 'ИСТ-101')
+        self.assertContains(response, 'class="group-switch"')
 
     def test_student_cannot_open_import(self):
         self.client.force_login(self.student)
@@ -93,16 +122,30 @@ class WeekParityTests(TestCase):
         self.assertEqual(parse_cell('Математика чётн.')['week'], 'even')
         self.assertEqual(parse_cell('Базы данных\n482 (Козлова И.Р.)')['week'], 'all')
 
-    def test_schedule_wip_with_parity_lessons(self):
-        """Раздел WIP даже при наличии недельных занятий."""
+    def test_parity_follows_selected_week(self):
+        """Занятия чёт/нечёт показываются по чётности ВЫБРАННОЙ недели."""
         from .models import Lesson
 
         Lesson.objects.create(group=self.group, weekday=2, pair=1, week='odd', subject='Только нечёт')
+        Lesson.objects.create(group=self.group, weekday=2, pair=2, week='even', subject='Только чёт')
         self.client.force_login(self.student)
-        response = self.client.get(reverse('schedule:schedule'), {'week': 'odd'})
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Раздел в разработке')
-        self.assertNotContains(response, 'Только нечёт')
+        # неделя 12 семестра: 16–22.11.2026, ISO 47 → нечётная
+        odd = self.client.get(reverse('schedule:schedule'), {'week': '12'})
+        self.assertContains(odd, '<b>Только нечёт</b>')
+        self.assertNotContains(odd, '<b>Только чёт</b>')
+        # неделя 13: 23–29.11.2026, ISO 48 → чётная
+        even = self.client.get(reverse('schedule:schedule'), {'week': '13'})
+        self.assertContains(even, '<b>Только чёт</b>')
+        self.assertNotContains(even, '<b>Только нечёт</b>')
+        # предмет «каждую неделю» виден в таблице в обеих
+        self.assertContains(odd, '<b>Философия</b>')
+        self.assertContains(even, '<b>Философия</b>')
+
+    def test_timeline_segments_for_all_weeks(self):
+        """Предмет «каждую неделю» занимает на оси весь семестр (1–18)."""
+        self.client.force_login(self.student)
+        response = self.client.get(reverse('schedule:schedule'))
+        self.assertContains(response, 'Философия: недели 1–18')
 
 
 class ServerImportPathTests(TestCase):
