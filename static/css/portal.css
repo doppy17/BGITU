@@ -254,6 +254,7 @@ code { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--text-mu
   background: var(--bg);
 }
 .auth-shell {
+  padding-top: calc(var(--head-h) + 36px);
   min-height: 100dvh;
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);

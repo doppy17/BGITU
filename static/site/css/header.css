@@ -46,6 +46,14 @@ kbd { font: 500 0.6875rem/1 var(--font-mono); padding: 0.3em 0.55em; border: 1px
 .nav a[aria-current="page"] { color: var(--accent); background: var(--accent-soft); }
 .nav a[aria-current="page"]:hover { color: var(--accent); background: color-mix(in oklab, var(--brand-accent) 22%, transparent); }
 
+/* Выравнивание шапки: кабинет не должен отличаться от сайта */
+.site-head a, .site-head .brand, .site-head .nav a { text-decoration: none; }
+.site-head .search-btn { background: transparent; }
+.site-head .search-btn:hover { background: var(--line); }
+.site-head a.btn { border: 0; }
+.site-head .burger { padding: 0; }
+.site-head .burger span { display: none; }
+
 @media (max-width: 1180px) {
   .nav, .head-actions .btn { display: none; }
   .burger { display: block; }

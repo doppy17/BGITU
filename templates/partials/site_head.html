@@ -37,9 +37,7 @@
       <a class="btn btn--accent btn--sm" href="{% if user.is_authenticated %}{% url 'portal:dashboard' %}{% else %}{% url 'accounts:login' %}{% endif %}">Личный кабинет</a>
 
       <button class="burger" id="burger" type="button" aria-label="Меню" aria-expanded="false"
-              aria-controls="{% if nav_mode == 'cabinet' %}cabNav{% else %}siteMenu{% endif %}">
-        <span></span><span></span><span></span>
-      </button>
+              aria-controls="{% if nav_mode == 'cabinet' %}cabNav{% else %}siteMenu{% endif %}"></button>
     </div>
   </div>
 </header>

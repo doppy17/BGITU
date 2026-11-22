@@ -23,6 +23,19 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
+# Шапка в кабинете и на сайте должна считаться одинаково: кабинетные
+# глобальные стили (a{underline}, button{background}, .btn{border}) иначе
+# перекрашивают те же элементы. Эти правила идут последними в header.css.
+UNIFY_HEAD_CSS = """
+/* Выравнивание шапки: кабинет не должен отличаться от сайта */
+.site-head a, .site-head .brand, .site-head .nav a { text-decoration: none; }
+.site-head .search-btn { background: transparent; }
+.site-head .search-btn:hover { background: var(--line); }
+.site-head a.btn { border: 0; }
+.site-head .burger { padding: 0; }
+.site-head .burger span { display: none; }
+"""
+
 # Мобильная шапка — общая для сайта и кабинета: бургер вместо меню разделов.
 # На сайте бургер открывает меню разделов, в кабинете — рельс (app.js).
 MOBILE_HEAD_CSS = """
@@ -256,6 +269,7 @@ def main() -> None:
         '/* Шапка сайта и кабинета: один компонент на обе части. */\n'
         '.site-head { padding: 0; }\n'
         + '\n'.join(header_lines) + '\n'
+        + UNIFY_HEAD_CSS
         + MOBILE_HEAD_CSS,
         encoding='utf-8',
     )
