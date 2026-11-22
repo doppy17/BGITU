@@ -1,4 +1,4 @@
-Версия для слабовидящих: настройки хранятся в браузере */
+/* Версия для слабовидящих: настройки хранятся в браузере */
 (() => {
   const root = document.documentElement;
   let st = {}; try { st = JSON.parse(localStorage.getItem('bgitu-a11y') || '{}'); } catch (e) {}

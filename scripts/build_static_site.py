@@ -285,6 +285,9 @@ def main() -> None:
     extras = '\n\n'.join(
         tail_blocks[key] for key in ('a11y', 'cookies', 'pwa') if key in tail_blocks
     )
+    # первый блок начинается с хвоста комментария («…браузере */»), без открывающего /*
+    if extras and not extras.lstrip().startswith('/*'):
+        extras = '/* ' + extras
     (js_dir / 'extras.js').write_text(extras + '\n', encoding='utf-8')
 
     for asset in ('manifest.webmanifest', 'sw.js', 'icon-180.png', 'icon-192.png',

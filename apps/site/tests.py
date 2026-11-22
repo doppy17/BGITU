@@ -66,6 +66,28 @@ class SearchTests(TestCase):
                 self.assertContains(response, 'data-search-open')
                 self.assertContains(response, 'id="bgitu-index"')
 
+    def test_accessibility_panel_present_everywhere(self):
+        """Панель «Версия для слабовидящих» есть на сайте и в кабинете."""
+        from django.contrib.auth import get_user_model
+
+        user = get_user_model().objects.create_user('a11y-user', password='demo12345')
+        self.client.force_login(user)
+        for url in ('/', '/news/', reverse('portal:dashboard')):
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                self.assertContains(response, 'id="a11y-pop"')
+                self.assertContains(response, 'data-a11y="fs"')
+                self.assertContains(response, 'data-a11y-reset')
+
+    def test_a11y_script_is_valid_javascript(self):
+        """extras.js не должен начинаться с обрывка комментария без «/*»."""
+        from pathlib import Path
+
+        code = (Path(__file__).resolve().parents[2] / 'static' / 'site' / 'js' / 'extras.js').read_text()
+        head = code.lstrip()
+        self.assertTrue(head.startswith('/*') or head.startswith('('), head[:40])
+        self.assertIn('bgitu-a11y', code)
+
     def test_search_index_includes_cabinet(self):
         import json
         import re
