@@ -88,6 +88,19 @@ class SearchTests(TestCase):
         self.assertTrue(head.startswith('/*') or head.startswith('('), head[:40])
         self.assertIn('bgitu-a11y', code)
 
+    def test_background_layers_present(self):
+        """Фон «след» и полоса разделов есть на всех страницах сайта."""
+        for url in ('/', '/news/', '/timetable/', '/student/'):
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                self.assertContains(response, 'canvas class="trail"')
+                self.assertContains(response, 'class="secbar"')
+
+    def test_search_dialog_not_duplicated(self):
+        html = self.client.get('/news/').content.decode()
+        self.assertEqual(html.count('id="search"'), 1)
+        self.assertEqual(html.count('id="toast"'), 1)
+
     def test_search_index_includes_cabinet(self):
         import json
         import re

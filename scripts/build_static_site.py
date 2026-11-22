@@ -38,6 +38,15 @@ UNIFY_HEAD_CSS = """
 
 # Мобильная шапка — общая для сайта и кабинета: бургер вместо меню разделов.
 # На сайте бургер открывает меню разделов, в кабинете — рельс (app.js).
+TRAIL_LOOP_GUARD_UNUSED = """  // предохранитель: если кадры стабильно медленные (слабое железо, software-рендер),
+  // оставляем статичный первый кадр и перестаём нагружать процессор
+  let __last = 0, __slow = 0;
+  const loop = () => {
+    const __now = performance.now();
+    if (__last) { const dt = __now - __last; __slow = dt > 120 ? __slow + 1 : Math.max(0, __slow - 1); }
+    __last = __now;
+    if (__slow < 8) {"""
+
 MOBILE_HEAD_CSS = """
 @media (max-width: 1180px) {
   .nav, .head-actions .btn { display: none; }
@@ -292,7 +301,27 @@ def main() -> None:
     # подсказку клавиши ставит search.js — убираем дубль из макета
     core_js = re.sub(r"\$\('\[data-kbd\]'\)\.textContent\s*=\s*[^;]+;\n?", '', core_js)
     (js_dir / 'core.js').write_text(core_js + '\n', encoding='utf-8')
-    (js_dir / 'trail.js').write_text(scripts[4] + '\n', encoding='utf-8')
+    trail_js = scripts[4]
+    # первый кадр фона рисуем всегда: иначе в фоновой вкладке/headless канвас пуст,
+    # а до первого тика rAF виден голый фон
+    trail_js = trail_js.replace('if (!document.hidden) {', 'if (!document.hidden || frame === 0) {', 1)
+    # в скрытой вкладке/headless rAF не тикает — рисуем один кадр сразу
+    trail_js = trail_js.replace('  requestAnimationFrame(loop);\n})();',
+                                '  if (document.hidden) loop();\n  requestAnimationFrame(loop);\n})();', 1)
+    # предохранитель: на слабом железе/software-рендере останавливаемся на статичном кадре
+    trail_js = trail_js.replace(
+        '  const loop = () => {\n    if (!document.hidden || frame === 0) {',
+        '  let __last = 0, __slow = 0;\n'
+        '  const loop = () => {\n'
+        '    const __now = performance.now();\n'
+        '    if (__last) { const dt = __now - __last; __slow = dt > 120 ? __slow + 1 : Math.max(0, __slow - 1); }\n'
+        '    __last = __now;\n'
+        '    if (__slow < 8 && (!document.hidden || frame === 0)) {',
+        1,
+    )
+    # кадр рисуется и при document.hidden (фоновые вкладки, headless):
+    # условие ниже пускает первый кадр, дальше цикл идёт по rAF как в макете
+    (js_dir / 'trail.js').write_text(trail_js + '\n', encoding='utf-8')
     (js_dir / 'secbar.js').write_text(scripts[5] + '\n', encoding='utf-8')
     tail_blocks = split_tail_script(scripts[6])
     (js_dir / 'week.js').write_text(tail_blocks.get('week', '') + '\n', encoding='utf-8')
@@ -321,6 +350,10 @@ def main() -> None:
             f'{{% if page.section == \'{section}\' %}} aria-current="page"{{% endif %}}',
         )
     tail = re.sub(r'<script(?![^>]*src)[^>]*>.*?</script>', '', tail, flags=re.S).strip()
+    # диалог поиска и тост уже приходят из partials/site_head.html — убираем дубли из макета
+    tail = re.sub(r'<dialog class="search"[\s\S]*?</dialog>', '', tail, count=1)
+    tail = re.sub(r'<div class="toast" id="toast"[^>]*></div>', '', tail, count=1)
+    tail = tail.strip()
     tail = rewrite_links(tail, pages)
 
     base = f"""{{% load static %}}
@@ -343,6 +376,9 @@ def main() -> None:
   <link rel="stylesheet" href="{{% static 'site/css/a11y.css' %}}">
 </head>
 <body id="top">
+<a class="skip" href="#main">К содержимому</a>
+<canvas class="trail" aria-hidden="true"></canvas>
+<div class="secbar" aria-hidden="true" hidden><div class="container secbar__slot"></div></div>
 {{% include 'partials/site_head.html' with nav_section=page.section nav_mode='site' %}}
 
 <main id="main">

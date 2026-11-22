@@ -306,8 +306,12 @@
     SMS = reduce || Math.abs(d) < 0.05 ? scrollY : SMS + d * (1 - Math.exp(-dt * 9));
   };
   const t0 = performance.now(); let frame = 0;
+  let __last = 0, __slow = 0;
   const loop = () => {
-    if (!document.hidden) {
+    const __now = performance.now();
+    if (__last) { const dt = __now - __last; __slow = dt > 120 ? __slow + 1 : Math.max(0, __slow - 1); }
+    __last = __now;
+    if (__slow < 8 && (!document.hidden || frame === 0)) {
       ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.clearRect(0, 0, W, H);
       ctx.lineJoin = 'round'; ctx.lineCap = 'round';
       const now = performance.now(); smoothScroll(now);
@@ -320,5 +324,6 @@
     }
     requestAnimationFrame(loop);
   };
+  if (document.hidden) loop();
   requestAnimationFrame(loop);
 })();

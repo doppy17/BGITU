@@ -312,7 +312,8 @@
   };
   const t0 = performance.now(); let frame = 0, painted = 0;
   const paint = () => {
-    if (document.hidden) return;
+    // первый кадр рисуем даже в скрытой вкладке (headless), дальше — только когда видно
+    if (document.hidden && painted > 0) return;
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.clearRect(0, 0, W, H);
     ctx.lineJoin = 'round'; ctx.lineCap = 'round';
     const now = performance.now(); smoothScroll(now);
@@ -325,7 +326,15 @@
     painted++;
   };
   let rafPaints = 0;
-  const loop = () => { rafPaints++; paint(); requestAnimationFrame(loop); };
+  let __last = 0, __slow = 0;
+  const loop = () => {
+    rafPaints++;
+    const __now = performance.now();
+    if (__last) { const dt = __now - __last; __slow = dt > 120 ? __slow + 1 : Math.max(0, __slow - 1); }
+    __last = __now;
+    if (__slow < 8) paint();
+    requestAnimationFrame(loop);
+  };
   requestAnimationFrame(loop);
   // страховка: если requestAnimationFrame не тикает (headless/скрытая вкладка),
   // рисуем по таймеру — и останавливаемся, как только кадры снова пошли через rAF
