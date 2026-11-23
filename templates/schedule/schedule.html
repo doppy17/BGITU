@@ -287,7 +287,8 @@
   <p class="muted semester-panel__lead">Ось — семестры программы ({{ program_semesters|length }}). Цветные отрезки показывают, в каких семестрах читается дисциплина{% if program_semester %}; текущий семестр — {{ program_semester }}-й{% endif %}.</p>
 
   <div class="tl-scroll">
-    <div class="tl-grid tl-grid--semesters" style="--weeks: {{ program_semesters|length }}">
+    <div class="tl-grid tl-grid--semesters{% if program_semester %} has-now{% endif %}" style="--weeks: {{ program_semesters|length }}{% if program_semester %}; --now: {{ program_semester }}{% endif %}">
+      <span class="tl-guides" aria-hidden="true"></span>
       <div class="tl-axis">
         <span class="tl-subject mono dim">семестры →</span>
         <div class="tl-ticks">

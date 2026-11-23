@@ -1087,16 +1087,35 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
 
 /* ---------- Таблица ---------- */
 .sched-panel { padding: 10px; }
-/* Кнопка «Обновить расписание» — внутри блока расписания, над сеткой */
+/* Шапка блока: выбор группы · «01 Расписание» · обновление.
+   Три колонки; заголовок в центре независимо от ширины боковых блоков. */
 .sched-panel__bar {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-areas: "group title action";
   align-items: center;
-  justify-content: flex-end;
-  flex-wrap: wrap;
   gap: 8px 14px;
   padding: 2px 4px 10px;
   margin-bottom: 2px;
   border-bottom: 1px solid var(--line);
+}
+.sched-panel__bar .group-switch { grid-area: group; justify-self: start; min-width: 0; }
+.sched-panel__title { grid-area: title; justify-self: center; }
+.sched-panel__bar .sched-import-btn { grid-area: action; justify-self: end; }
+@media (max-width: 767px) {
+  /* Узкий экран: селектор отдельной строкой во всю ширину; ниже — заголовок
+     и кнопка, а если они не помещаются, кнопка переносится под заголовок.
+     Горизонтального скролла нет. */
+  .sched-panel__bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 12px;
+  }
+  .sched-panel__bar .group-switch,
+  .sched-panel__bar .group-switch .sel { width: 100%; }
+  .sched-panel__bar .group-switch { flex: 1 1 100%; }
+  .sched-panel__title { flex: 1 1 auto; }
+  .sched-panel__bar .sched-import-btn { margin-left: auto; }
 }
 .sched-import-btn > svg { flex: none; }
 .sched-scroll { overflow-x: auto; }
@@ -1118,7 +1137,10 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
 }
 
 .sched-table {
-  min-width: 760px;
+  /* коробка таблицы не уже своей сетки: сумма минимумов колонок — 53em
+     (5em времени + 6 × 8em дней). Иначе треки вылезают за border-box
+     таблицы и «шапка» таблицы живёт отдельно от тела. */
+  min-width: max(760px, 53em);
   display: grid;
   /* высота строк — по содержимому: названия предметов не обрезаются ни при
      крупном шрифте в «Доступности», ни при масштабе браузера */
@@ -1502,22 +1524,42 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
 }
 
 /* ---------- Ось семестра ---------- */
-.semester-panel { padding: 18px; }
+.semester-panel {
+  padding: 18px;
+  /* Направляющие плана: от --brand-ink, плотнее --line — линия должна читаться
+     на светлом и тёмном фоне (контраст к панели ≥ 1.5:1 во всех темах). */
+  --tl-guide: color-mix(in oklab, var(--brand-ink) 44%, transparent);
+  --tl-guide-now: color-mix(in oklab, var(--accent) 72%, transparent);
+  --tl-guide-now-soft: color-mix(in oklab, var(--accent) 48%, transparent);
+  --tl-now-band: color-mix(in oklab, var(--accent) 10%, transparent);
+}
 .semester-panel__lead { margin: 4px 0 16px; font-size: 0.875rem; max-width: 64ch; }
 .tl-scroll { overflow-x: auto; }
 .tl-grid {
+  --tl-col: 190px;
   min-width: 720px;
   display: grid;
-  grid-template-columns: 190px minmax(0, 1fr);
+  grid-template-columns: var(--tl-col) minmax(0, 1fr);
   row-gap: 10px;
   align-items: center;
+  position: relative;
 }
 .tl-axis { display: contents; }
+/* Плана нет: пустое состояние занимает всю ширину оси, а не 150px первой
+   колонки — иначе текст и кнопка «Загрузить план» вылезают на 320px. */
+.tl-grid > .empty { grid-column: 1 / -1; }
 .tl-subject {
-  padding-right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  padding-right: 0;
   font-size: 0.8125rem;
   line-height: 1.3;
   color: var(--text);
+  /* «Алгоритмизация» при 136% шире колонки 150px — переносим слово,
+     иначе подпись наезжает на дорожку семестров */
+  overflow-wrap: anywhere;
 }
 .tl-axis .tl-subject { color: var(--text-faint); }
 .tl-ticks {
@@ -1527,7 +1569,9 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
 }
 .tl-tick {
   position: absolute;
-  left: calc((var(--w) - 1) / var(--weeks) * 100%);
+  /* номер семестра — по центру своей колонки, а не на границе:
+     вертикальные направляющие проходят по границам и не «прорастают» из цифр */
+  left: calc((var(--w) - 0.5) / var(--weeks) * 100%);
   top: -3px;
   transform: translateX(-50%);
   display: flex;
@@ -1557,10 +1601,22 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
 }
 .tl-gridline {
   position: absolute;
-  inset: 11px 0;
-  background: repeating-linear-gradient(to right, var(--line-strong) 0 4px, transparent 4px 9px);
-  border-radius: 0;
-  opacity: 0.7;
+  left: 0;
+  right: 0;
+  top: 10px;
+  height: 2px;
+  /* сплошная пунктирная направляющая по всей дорожке — до правого края */
+  background: repeating-linear-gradient(to right, var(--tl-guide) 0 4px, transparent 4px 9px);
+}
+/* в колонке текущего семестра та же пунктирная линия — мягко акцентная */
+.tl-grid.has-now .tl-gridline::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc((var(--now) - 1) / var(--weeks) * 100%);
+  width: calc(100% / var(--weeks));
+  background: repeating-linear-gradient(to right, var(--tl-guide-now-soft) 0 4px, transparent 4px 9px);
 }
 .tl-seg {
   position: absolute;
@@ -1584,39 +1640,55 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   from { transform: scaleX(0); opacity: 0; }
   to { transform: scaleX(1); opacity: 1; }
 }
-/* пунктирные направляющие учебного плана */
-.tl-track { isolation: isolate; }
-.tl-grid--semesters .tl-track::before {
+/* пунктирные направляющие учебного плана.
+   Вертикали — одним слоем на всю высоту дорожек: линия не рвётся на стыках строк
+   и начинается ниже оси, поэтому номера семестров не налезают на неё. */
+.tl-guides {
+  position: absolute;
+  left: var(--tl-col);
+  right: 0;
+  top: calc(42px + 10px); /* высота оси + row-gap */
+  bottom: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 9px),
+    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 9px),
+    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 9px),
+    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 9px),
+    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 9px),
+    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 9px),
+    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 9px);
+  background-size: 1.5px 9px;
+  background-repeat: repeat-y;
+  /* границы семестров: 12.5% … 87.5% */
+  background-position: 12.5% 0, 25% 0, 37.5% 0, 50% 0, 62.5% 0, 75% 0, 87.5% 0;
+}
+/* текущий семестр — мягкая акцентная полоса и более яркая граница */
+.tl-grid.has-now .tl-guides::before {
   content: "";
   position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  /* вертикальный пунктир на каждой границе 8 семестров (12.5% … 87.5%) */
-  background-image:
-    linear-gradient(to bottom, var(--line) 0 4px, transparent 4px 8px),
-    linear-gradient(to bottom, var(--line) 0 4px, transparent 4px 8px),
-    linear-gradient(to bottom, var(--line) 0 4px, transparent 4px 8px),
-    linear-gradient(to bottom, var(--line) 0 4px, transparent 4px 8px),
-    linear-gradient(to bottom, var(--line) 0 4px, transparent 4px 8px),
-    linear-gradient(to bottom, var(--line) 0 4px, transparent 4px 8px),
-    linear-gradient(to bottom, var(--line) 0 4px, transparent 4px 8px);
-  background-size: 1px 100%;
-  background-repeat: no-repeat;
-  background-position: 12.5% 0, 25% 0, 37.5% 0, 50% 0, 62.5% 0, 75% 0, 87.5% 0;
-  opacity: 0.8;
+  box-sizing: border-box;
+  top: 0;
+  bottom: 0;
+  left: calc((var(--now) - 1) / var(--weeks) * 100%);
+  width: calc(100% / var(--weeks));
+  /* ровный тинт на всю высоту плана: подсветка не выцветает к нижним строкам */
+  background: var(--tl-now-band);
+  border-left: 1px solid var(--tl-guide-now);
+  border-right: 1px solid var(--tl-guide-now-soft);
+  border-radius: 3px;
 }
-/* короткий пунктирный коннектор от названия дисциплины к её дорожке */
-.tl-subject { position: relative; }
+/* пунктирный коннектор от названия дисциплины до её дорожки */
 .tl-row > .tl-subject::after {
   content: "";
-  position: absolute;
-  right: -10px;
-  top: 50%;
-  width: 10px;
-  border-top: 1px dotted var(--line-strong);
-  opacity: 0.8;
+  flex: 1 1 8px;
+  min-width: 8px;
+  height: 2px;
+  border-radius: 1px;
+  background: repeating-linear-gradient(to right, var(--tl-guide) 0 3px, transparent 3px 7px);
 }
+.tl-axis .tl-subject::after { display: none; }
 
 /* импорт расписания из файла БГИТУ */
 .import-form {
@@ -1630,7 +1702,7 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
 .panel-note { margin-top: 10px; font-size: 0.8125rem; }
 
 /* пилюли подгрупп */
-.sub-line { display: flex; align-items: center; gap: 8px; margin: 10px 0 0; }
+.sub-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 10px 0 0; }
 .sub-pills { display: inline-flex; gap: 4px; align-items: center; }
 .sub-pills__lbl { color: var(--text-faint); font-size: 0.6875rem; margin-right: 4px; }
 .sub-pill {
@@ -1672,11 +1744,12 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   .week-nav__dates { font-size: 1rem; }
   .week-nav__dates .mono { display: block; margin: 2px 0 0; }
   .sched-table {
-    min-width: 720px;
+    /* 5em времени + 6 × 9.5em дней: коробка совпадает с сеткой */
+    min-width: max(720px, 62em);
     /* колонки тянутся от размера шрифта: при крупном тексте в «Доступности» слова не ломаются */
     grid-template-columns: 5em repeat(6, minmax(9.5em, 1fr));
   }
-  .tl-grid { grid-template-columns: 150px minmax(0, 1fr); }
+  .tl-grid { --tl-col: 150px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1735,3 +1808,62 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   50% { transform: rotate(6deg) scale(1.12); opacity: 1; }
   100% { transform: rotate(0) scale(1); }
 }
+
+/* ---------- Крупный шрифт: длинные подписи не рвут панели ---------- */
+/* В контенте кабинета кнопка переносит подпись, если не влезает:
+   при 136% «Импортировать файл из проекта» шире 320px и вылезала
+   за панель на /schedule/import/. В шапке правило не действует —
+   там кнопки остаются однострочными. */
+.cab-main .btn {
+  white-space: normal;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Длинный путь к файлу расписания — переносим, а не расширяем панель. */
+.cab-main code { overflow-wrap: anywhere; }
+
+/* Предформатированный текст (справка, команды) не расширяет страницу:
+   длинные строки прокручиваются внутри блока. */
+.cab-main pre {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-wrap: anywhere;
+  overscroll-behavior-x: contain;
+}
+
+/* «Голые» таблицы контента (table.meta и подобные) без .table-wrap:
+   не шире панели; длинные значения переносятся в ячейках, в том числе
+   там, где разметка ставит white-space: nowrap. .data-table живёт
+   в .table-wrap и скроллится обёрткой — его раскладку не меняем. */
+.cab-main table:not(.data-table):not(.meta) {
+  /* !important: шаблон может задать таблице min-width (например, 314px) —
+     на 320px это снова выносит её за панель. Перенос в ячейках важнее. */
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+/* !important: правила шаблонов вида `.meta td:first-child` грузятся позже
+   и при равной специфичности вернули бы nowrap — ячейка снова расширит
+   страницу на 320px. Для таблиц без .table-wrap перенос важнее nowrap. */
+.cab-main table:not(.data-table):not(.meta) :is(th, td) {
+  overflow-wrap: anywhere !important;
+  white-space: normal !important;
+}
+/* table.meta — пары «подпись — значение»: на узком экране даём таблице
+   собственный горизонтальный скролл, чтобы подписи не ломались по буквам.
+   tbody возвращаем display:table — иначе display:block у table рассыпает
+   строки в бесформенные блоки. */
+.cab-main table.meta {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  display: block;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+.cab-main table.meta > tbody {
+  display: table;
+  width: max-content;
+  min-width: 100%;
+  border-collapse: inherit;
+}
+.cab-main table.data-table :is(th, td) { overflow-wrap: anywhere; }

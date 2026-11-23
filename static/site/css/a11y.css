@@ -1,18 +1,35 @@
 /* Версия для слабовидящих — общий файл для сайта и кабинета. */
 /* Настройки ставятся классами на <html> (extras.js). */
 /* ================= Панель для слабовидящих ================= */
-.a11y-pop { width: 330px; }
+.a11y-pop { width: 330px; max-width: calc(100vw - 24px); }
+/* Панель доступности носит класс .theme-pop, поэтому её чипы ловили грид
+   пунктов темы (30px 1fr 16px) и складывались по буквам. Возвращаем кнопкам
+   обычную строку — подписи читаются целиком при любом размере шрифта. */
+.a11y-pop .chips button {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: auto; height: auto; gap: 0;
+}
+.a11y-pop .chips button::after { content: none; }
 .a11y-row { padding: 6px 6px 10px; }
 .a11y-row .mono { margin-bottom: 8px; }
 .a11y-row .chips button { min-height: 38px; }
 /* id в селекторе: в кабинете .btn--ghost обнуляет рамку двумя классами */
 #a11y-pop .a11y-reset {
+  display: inline-flex; align-items: center; justify-content: center;
   width: calc(100% - 12px); margin: 6px; border-radius: 10px;
   border: 1px solid var(--line-strong);
   background: var(--bg-glass);
 }
+#a11y-pop .a11y-reset::after { content: none; }
 html.a11y-fs1 { font-size: 118%; }
 html.a11y-fs2 { font-size: 136%; }
+/* Крупный шрифт: колонки с фиксированной иконкой не расширяют страницу.
+   Только в режимах 118/136 %, чтобы обычная вёрстка осталась прежней. */
+html.a11y-fs1 .person, html.a11y-fs2 .person { grid-template-columns: 64px minmax(0, 1fr); }
+html.a11y-fs1 .person--lead, html.a11y-fs2 .person--lead { grid-template-columns: 96px minmax(0, 1fr); }
+@media (max-width: 640px) {
+  html.a11y-fs1 .person--lead, html.a11y-fs2 .person--lead { grid-template-columns: 64px minmax(0, 1fr); }
+}
 html.a11y-sp body { letter-spacing: 0.04em; word-spacing: 0.16em; }
 html.a11y-sp :is(p, li, dd) { line-height: 1.9 !important; }
 html.a11y-gray { filter: grayscale(1); }

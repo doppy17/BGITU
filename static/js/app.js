@@ -460,7 +460,16 @@
             window.location.href = links[parity];
             return;
           }
-          dashboard.innerHTML = fresh.innerHTML;
+          // Меняем только сетку недели: шапка блока (выбор группы и кнопка)
+          // остаётся на месте, кастомный селект не пересоздаётся.
+          var freshGrid = fresh.querySelector('.sched-scroll');
+          var gridBox = dashboard.querySelector('.sched-scroll');
+          if (freshGrid && gridBox) {
+            gridBox.replaceWith(freshGrid);
+          } else {
+            dashboard.innerHTML = fresh.innerHTML;
+          }
+          grid = dashboard.querySelector('.sched-table');
           dashboard.className = fresh.className + ' sched-in-' + (parity === 'even' ? 'next' : 'prev');
           if (freshPanel) panel.replaceWith(freshPanel);
           current = parity;
@@ -482,6 +491,9 @@
     // Свайп и «перенос» сетки мышью: pointer events покрывают и тач, и трекпад.
     dashboard.addEventListener('pointerdown', function (event) {
       if (busy || event.button !== 0 || pending) return;
+      // Элементы шапки — выбор группы и кнопка обновления — не свайп:
+      // иначе горизонтальный жест по ним перелистывает неделю.
+      if (event.target.closest('.group-switch, .sched-import-btn')) return;
       // Внутри таблицы не мешаем выделять текст: свайп включается только
       // по пустым местам/шапке (текст там не нужен).
       pending = { x: event.clientX, y: event.clientY, id: event.pointerId, armed: false };
