@@ -1087,44 +1087,58 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
 
 /* ---------- Таблица ---------- */
 .sched-panel { padding: 10px; }
-/* Шапка блока: «01» · выбор группы · заголовок · обновление.
-   Номер блока — первый элемент слева, по центру строки; селектор идёт
-   сразу за ним, заголовок — после селектора, кнопка прижата вправо. */
+/* Шапка блока: слева «01 Расписание», справа — кнопка обновления и выбор
+   группы; селектор — крайний правый, прижат к правому краю шапки.
+   Колонки 1fr auto auto: заголовок забирает свободное место, кнопка и
+   селектор стоят подряд у правого края. Все зоны центрируются по высоте
+   (align-items: center). */
 .sched-panel__bar {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  grid-template-areas: "pick title action";
+  grid-template-columns: 1fr auto auto;
+  grid-template-areas: "head action pick";
   align-items: center;
   gap: 8px 14px;
   padding: 2px 4px 10px;
   margin-bottom: 2px;
   border-bottom: 1px solid var(--line);
 }
-.sched-panel__pick {
-  grid-area: pick;
-  display: flex;
+.sched-panel__head {
+  grid-area: head;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   gap: 10px;
+  justify-self: start;
   min-width: 0;
 }
-.sched-panel__num { flex: none; align-self: center; line-height: 1; }
-.sched-panel__pick .group-switch { min-width: 0; }
-.sched-panel__title { grid-area: title; justify-self: start; }
+.sched-panel__num { align-self: center; line-height: 1; }
+.sched-panel__title { min-width: 0; }
+.sched-panel__pick { grid-area: pick; justify-self: end; min-width: 0; }
+.sched-panel__pick .sel { min-width: 140px; }
 .sched-panel__bar .sched-import-btn { grid-area: action; justify-self: end; }
 @media (max-width: 767px) {
-  /* Узкий экран: «01» и селектор одной строкой (селектор растягивается),
-     ниже — заголовок и кнопка; если не помещаются, кнопка переносится
-     под заголовок. Горизонтального скролла нет. */
+  /* Узкий экран: первая строка — «01 Расписание», вторая — кнопка и
+     селектор во всю оставшуюся ширину. Горизонтального скролла нет. */
   .sched-panel__bar {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 10px 12px;
   }
-  .sched-panel__pick { flex: 1 1 100%; }
-  .sched-panel__pick .group-switch { flex: 1 1 auto; }
-  .sched-panel__bar .group-switch .sel { width: 100%; }
-  .sched-panel__title { flex: 1 1 auto; }
-  .sched-panel__bar .sched-import-btn { margin-left: auto; }
+  .sched-panel__head { order: 1; flex: 1 1 100%; }
+  .sched-panel__bar .sched-import-btn { order: 2; }
+  .sched-panel__pick { order: 3; flex: 1 1 0; min-width: 0; }
+  .sched-panel__pick .sel { width: 100%; min-width: 0; }
+  /* Кнопка с селектором не влезают в строку при крупном шрифте или очень
+     узком экране — селектор уходит на свою строку во всю ширину. */
+  @media (max-width: 480px) {
+    html.a11y-fs2 .sched-panel__pick { flex-basis: 100%; }
+    html.a11y-fs2 .sched-panel__bar .sched-import-btn { margin-left: auto; }
+  }
+  @media (max-width: 379px) {
+    .sched-panel__pick { flex-basis: 100%; }
+    .sched-panel__bar .sched-import-btn { margin-left: auto; }
+  }
 }
 .sched-import-btn > svg { flex: none; }
 .sched-scroll { overflow-x: auto; }
@@ -1243,25 +1257,39 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
 .sched-cell--body.is-today:hover { background: color-mix(in oklab, var(--accent) 12%, transparent); }
 /* Разные пары подгрупп «а»/«б» в одном слоте: две карточки друг под
    другом — сверху «а», снизу «б». Ячейка делится пополам по вертикали,
-   разделитель — горизонтальная линия во всю ширину. */
+   разделитель — горизонтальная линия во всю ширину.
+   Силуэт — как у обычной ячейки: один прямоугольник со скруглёнными
+   внешними углами (верхний блок — верхние, нижний — нижние), внутренние
+   углы прямые; фон и рамки те же, что у одиночной карточки. */
 .sched-cell--body.sched-cell--split {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   grid-auto-rows: minmax(0, 1fr);
   gap: 0;
-  padding: 0;
 }
 .sched-cell--split .sched-lesson {
   min-width: 0;
   min-height: 0;
-  padding: 7px 9px 7px 10px;
-  border: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
   border-left: 2px solid var(--accent);
   border-radius: 0;
-  background: transparent;
+  background: var(--bg-raised);
 }
+/* Внешние углы составной карточки повторяют одиночную; внутренние — прямые. */
+.sched-cell--split .sched-lesson:first-child {
+  border-radius: var(--radius-s) var(--radius-s) 0 0;
+}
+.sched-cell--split .sched-lesson:last-child {
+  border-radius: 0 0 var(--radius-s) var(--radius-s);
+}
+/* Один разделитель на стыке: у верхнего нет нижней рамки, у нижнего —
+   верхняя линией сильнее. Двойных рамок и щелей нет. */
 .sched-cell--split .sched-lesson + .sched-lesson {
   border-top: 1px solid var(--line-strong);
+}
+.sched-cell--split .sched-lesson:not(:last-child) {
+  border-bottom: 0;
 }
 .sched-cell--body.sched-cell--split .sched-lesson:hover { transform: none; box-shadow: none; }
 .sched-lesson {
@@ -1291,11 +1319,28 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   hyphens: auto;
 }
 .sched-meta {
-  /* аудитория и преподаватель тоже переносятся, а не обрезаются многоточием */
+  /* мета занятия: аудитория/корпус и ФИО — каждая своей строкой,
+     ничего не обрезается многоточием */
+  display: block;
   color: var(--text-muted);
   font-size: 0.6875rem;
   line-height: 1.35;
+}
+/* Аудитория и корпус — первая строка: перенос разрешён в любом месте,
+   чтобы длинный «ауд. 314 · 1 корп.» не вылезал из узкой ячейки. */
+.sched-place {
+  display: block;
   overflow-wrap: anywhere;
+}
+/* ФИО преподавателя — отдельной последней строкой. Фамилия не рвётся
+   по слогам: перенос только по пробелу между фамилией и инициалами. */
+.sched-teacher {
+  display: block;
+  margin-top: 2px;
+  hyphens: none;
+  -webkit-hyphens: none;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 /* Корпус — компактно рядом с аудиторией: «314 · 1 корп.». */
 .sched-build {
@@ -1547,14 +1592,16 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
 /* ---------- Ось семестра ---------- */
 .semester-panel {
   padding: 18px;
-  /* Направляющие плана: от --brand-ink, плотнее --line — линия должна читаться
-     на светлом и тёмном фоне (контраст к панели ≥ 1.5:1 во всех темах).
-     --tl-guide-soft — та же сетка под колонкой названий дисциплин: слабее,
-     чтобы пунктир не спорил с текстом. */
-  --tl-guide: color-mix(in oklab, var(--brand-ink) 62%, transparent);
-  --tl-guide-soft: color-mix(in oklab, var(--brand-ink) 40%, transparent);
+  /* Сетка плана: сплошные разделители семестров, зебра по колонкам и строкам.
+     Линии — от чернил темы (одинаково читаются на светлом и тёмном фоне),
+     зебра — 2–2.5% акцента: фон различает колонки и дисциплины, но не
+     спорит с цветными плашками отрезков. */
+  --tl-line: color-mix(in oklab, var(--brand-ink) 11%, transparent);
+  --tl-zebra: color-mix(in oklab, var(--accent) 2%, transparent);
+  --tl-row-bg: color-mix(in oklab, var(--bg-raised), var(--accent) 2.5%);
+  --tl-axis-h: 34px;
+  --tl-row-h: 34px;
 }
-.semester-panel__lead { margin: 4px 0 16px; font-size: 0.875rem; max-width: 64ch; }
 /* Шапка плана: номер «02» — крайний слева и по центру строки, заголовок
    занимает остаток ширины, кнопка прижата вправо. Сетка держит номер
    в одной строке с заголовком при любой ширине и размере шрифта. */
@@ -1577,85 +1624,123 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
     gap: 10px 12px;
   }
 }
-.tl-scroll { overflow-x: auto; }
+.tl-scroll {
+  overflow-x: auto;
+  position: relative;
+}
 .tl-grid {
-  --tl-col: 190px;
-  min-width: 720px;
+  --tl-col: 240px;
+  /* ширина одного семестрового слота: от неё считаются все линии и зебра */
+  --tl-slot: calc(100% / var(--weeks));
+  min-width: 640px;
   display: grid;
   grid-template-columns: var(--tl-col) minmax(0, 1fr);
-  row-gap: 10px;
-  align-items: center;
+  /* строки стыкуются без зазоров — сплошные вертикали не рвутся по высоте */
+  row-gap: 0;
+  align-items: stretch;
   position: relative;
 }
 .tl-axis { display: contents; }
 /* Плана нет: пустое состояние занимает всю ширину оси, а не 150px первой
    колонки — иначе текст и кнопка «Загрузить план» вылезают на 320px. */
 .tl-grid > .empty { grid-column: 1 / -1; }
+/* Название дисциплины — фиксированная колонка, которая остаётся на месте
+   при горизонтальной прокрутке. Одна строка с многоточием, полный текст —
+   в title. Непрозрачный фон обязателен: под колонку уезжает сетка. */
 .tl-subject {
   display: flex;
   align-items: center;
-  gap: 4px;
   min-width: 0;
-  padding-right: 0;
+  min-height: var(--tl-row-h);
+  padding: 6px 15px 6px 0;
   font-size: 0.8125rem;
   line-height: 1.3;
   color: var(--text);
-  /* «Алгоритмизация» при 136% шире колонки 150px — переносим слово,
-     иначе подпись наезжает на дорожку семестров */
-  overflow-wrap: anywhere;
+  background: var(--bg-raised);
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  left: 0;
+  z-index: 2;
 }
-.tl-axis .tl-subject { color: var(--text-faint); }
+.tl-subject > span {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Ось: компактная строка с номерами; текущий семестр — только акцентная
+   цифра и короткая риска, без заливки колонки. */
+.tl-axis .tl-subject {
+  min-height: var(--tl-axis-h);
+  border-bottom-color: var(--line-strong);
+  color: var(--text-faint);
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+}
 .tl-ticks {
   position: relative;
-  height: 30px;
-  border-top: 1px solid var(--line-strong);
+  height: var(--tl-axis-h);
+  border-bottom: 1px solid var(--line-strong);
 }
 .tl-tick {
   position: absolute;
-  /* номер семестра — по центру своей колонки, а не на границе:
-     вертикальные направляющие проходят по границам и не «прорастают» из цифр */
+  /* номер — по центру своей колонки, разделитель проходит по границе */
   left: calc((var(--w) - 0.5) / var(--weeks) * 100%);
-  top: -3px;
+  top: 0;
+  bottom: 0;
   transform: translateX(-50%);
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 2px;
-}
-.tl-tick i {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--line-strong);
+  justify-content: center;
 }
 .tl-tick b {
-  font-size: 0.5625rem;
-  color: var(--text-faint);
-  font-weight: 500;
+  font-size: 0.75rem;
+  line-height: 1;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
 }
-.tl-tick.is-now i { background: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
 .tl-tick.is-now b { color: var(--accent); }
+.tl-tick.is-now::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  width: 14px;
+  height: 2px;
+  margin-left: -7px;
+  border-radius: 1px;
+  background: var(--accent);
+}
 .tl-row {
   display: contents;
 }
+/* Зебра по строкам: соседние дисциплины различаются фоном, а не только
+   линией. Фон непрозрачный — колонка названий остаётся читаемой при скролле. */
+.tl-row:nth-child(even) > .tl-subject { background: var(--tl-row-bg); }
+.tl-row:nth-child(even) > .tl-track { background-color: var(--tl-row-bg); }
 .tl-track {
   position: relative;
-  height: 22px;
-}
-.tl-gridline {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 10px;
-  height: 2px;
-  /* сплошная пунктирная направляющая по всей дорожке — до правого края.
-     Штрих 4px, период 36px: реже прежнего (4/9) ровно вчетверо. */
-  background: repeating-linear-gradient(to right, var(--tl-guide) 0 4px, transparent 4px 36px);
+  min-height: var(--tl-row-h);
+  border-bottom: 1px solid var(--line);
+  /* Сетка нарисована фоном дорожки: 1px-разделитель в конце каждого
+     семестрового слота и зебра каждого второго слота. Дорожки строк
+     стыкуются без зазоров, поэтому вертикали идут от оси до низа блока. */
+  background-image:
+    repeating-linear-gradient(to right,
+      transparent 0 calc(var(--tl-slot) - 1px),
+      var(--tl-line) calc(var(--tl-slot) - 1px) var(--tl-slot)),
+    repeating-linear-gradient(to right,
+      var(--tl-zebra) 0 var(--tl-slot),
+      transparent var(--tl-slot) calc(var(--tl-slot) * 2));
 }
 .tl-seg {
   position: absolute;
-  top: 3px;
-  bottom: 3px;
+  top: calc(50% - 9px);
+  height: 18px;
   left: calc((var(--from) - 1) / var(--weeks) * 100%);
   width: calc((var(--to) - var(--from) + 1) / var(--weeks) * 100%);
   min-width: 10px;
@@ -1664,6 +1749,7 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   align-items: center;
   justify-content: center;
   font-size: 0.5625rem;
+  line-height: 1;
   font-weight: 600;
   letter-spacing: 0.04em;
   animation: tl-grow 0.5s var(--ease) both;
@@ -1680,57 +1766,6 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   from { transform: scaleX(0); opacity: 0; }
   to { transform: scaleX(1); opacity: 1; }
 }
-/* пунктирные направляющие учебного плана.
-   Вертикали — одним слоем на всю высоту дорожек: линия не рвётся на стыках строк
-   и начинается ниже оси, поэтому номера семестров не налезают на неё.
-   Сетка идёт от левого края блока — и под колонкой названий дисциплин тоже,
-   как лист в клетку: шаг колонки продолжается влево от оси семестров.
-   Штрих 4px, период 36px — реже прежнего (4/9) ровно вчетверо. */
-.tl-guides {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: calc(42px + 10px); /* высота оси + row-gap */
-  bottom: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(to bottom, var(--tl-guide-soft) 0 4px, transparent 4px 36px),
-    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 36px),
-    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 36px),
-    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 36px),
-    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 36px),
-    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 36px),
-    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 36px),
-    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 36px),
-    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 36px);
-  background-size: 1.5px 36px;
-  background-repeat: repeat-y;
-  /* x = левый край дорожки + доля её ширины; шаг семестра — 1/8.
-     Линия левее оси (−1/8 шага) продолжает клетку под названиями дисциплин. */
-  background-position:
-    calc(var(--tl-col) - (100% - var(--tl-col)) * 0.125) 0,
-    var(--tl-col) 0,
-    calc(var(--tl-col) + (100% - var(--tl-col)) * 0.125) 0,
-    calc(var(--tl-col) + (100% - var(--tl-col)) * 0.25) 0,
-    calc(var(--tl-col) + (100% - var(--tl-col)) * 0.375) 0,
-    calc(var(--tl-col) + (100% - var(--tl-col)) * 0.5) 0,
-    calc(var(--tl-col) + (100% - var(--tl-col)) * 0.625) 0,
-    calc(var(--tl-col) + (100% - var(--tl-col)) * 0.75) 0,
-    calc(var(--tl-col) + (100% - var(--tl-col)) * 0.875) 0;
-}
-/* название дисциплины идёт поверх мягкой клетки под ним */
-.tl-row > .tl-subject { position: relative; z-index: 1; }
-/* пунктирный коннектор от названия дисциплины до её дорожки */
-.tl-row > .tl-subject::after {
-  content: "";
-  flex: 1 1 8px;
-  min-width: 8px;
-  height: 2px;
-  border-radius: 1px;
-  background: repeating-linear-gradient(to right, var(--tl-guide) 0 4px, transparent 4px 36px);
-}
-.tl-axis .tl-subject::after { display: none; }
 
 /* импорт расписания из файла БГИТУ */
 .import-form {
@@ -1762,14 +1797,6 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
 .sub-pill.is-active { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 
 /* ось учебного плана: 8 семестров */
-.tl-grid--semesters .tl-ticks { height: 42px; }
-.tl-grid--semesters .tl-tick { gap: 1px; }
-.tl-grid--semesters .tl-tick em {
-  font-style: normal;
-  font-size: 0.5rem;
-  letter-spacing: 0.04em;
-  color: var(--text-faint);
-}
 .tl-grid--semesters .tl-seg { font-size: 0.625rem; }
 
 /* Палитра отрезков. Заливка каждого варианта отличима от панели
@@ -1787,6 +1814,9 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
 /* Тёмные темы: те же оттенки, но приглушённые к фону — иначе заливка
    светлее чернил и цифры «в сторону чернил» пропадают. */
 [data-theme="surik"] .semester-panel {
+  /* тёмный фон съедает слабые тинты: зебра чуть плотнее, иначе строки не читаются */
+  --tl-zebra: color-mix(in oklab, var(--accent) 3%, transparent);
+  --tl-row-bg: color-mix(in oklab, var(--bg-raised), var(--accent) 3%);
   --tl-seg-0: color-mix(in oklab, var(--accent) 80%, var(--brand-base));
   --tl-seg-1: color-mix(in oklab, var(--accent) 60%, var(--brand-base));
   --tl-seg-2: color-mix(in oklab, var(--brand-aux) 45%, var(--brand-base));
@@ -1795,6 +1825,8 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   --tl-seg-5: color-mix(in oklab, var(--accent) 70%, var(--brand-base));
 }
 [data-theme="latun"] .semester-panel {
+  --tl-zebra: color-mix(in oklab, var(--accent) 3%, transparent);
+  --tl-row-bg: color-mix(in oklab, var(--bg-raised), var(--accent) 3%);
   --tl-seg-0: color-mix(in oklab, var(--accent) 70%, var(--brand-base));
   --tl-seg-1: color-mix(in oklab, var(--accent) 55%, var(--brand-base));
   --tl-seg-2: color-mix(in oklab, var(--brand-aux) 45%, var(--brand-base));
@@ -1820,7 +1852,12 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
     /* колонки тянутся от размера шрифта: при крупном тексте в «Доступности» слова не ломаются */
     grid-template-columns: 5em repeat(6, minmax(9.5em, 1fr));
   }
-  .tl-grid { --tl-col: 150px; }
+  .tl-grid { --tl-col: 220px; }
+}
+/* 1024 и уже: колонка названий 220px, сетка помещается без внутренней прокрутки
+   до 640px; ниже — горизонтальный скролл только внутри .tl-scroll. */
+@media (max-width: 1023px) {
+  .tl-grid { --tl-col: 220px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

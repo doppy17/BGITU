@@ -169,10 +169,8 @@
             </span>
             <b>{{ lesson.subject }}</b>
             <small class="sched-meta">
-              {% if lesson.room %}ауд. {{ lesson.room }}{% endif %}
-              {% if lesson.room and lesson.building %} · {% endif %}
-              {% if lesson.building %}<span class="sched-build sched-build--{{ lesson.building }}" title="{{ lesson.building_label }}">{{ lesson.building }} корп.</span>{% endif %}
-              {% if lesson.teacher_name %}{% if lesson.room or lesson.building %} · {% endif %}{{ lesson.teacher_name }}{% endif %}
+              {% if lesson.room or lesson.building %}<span class="sched-place">{% if lesson.room %}ауд. {{ lesson.room }}{% endif %}{% if lesson.room and lesson.building %} · {% endif %}{% if lesson.building %}<span class="sched-build sched-build--{{ lesson.building }}" title="{{ lesson.building_label }}">{{ lesson.building }} корп.</span>{% endif %}</span>{% endif %}
+              {% if lesson.teacher_name %}<span class="sched-teacher">{{ lesson.teacher_name }}</span>{% endif %}
             </small>
             {% if lesson.time_label %}<span class="sched-time mono">{{ lesson.time_label }}</span>{% endif %}
           </article>
@@ -279,26 +277,22 @@
   </dialog>
   {% endif %}
 
-  <p class="muted semester-panel__lead">Ось — семестры программы ({{ program_semesters|length }}). Цветные отрезки показывают, в каких семестрах читается дисциплина{% if program_semester %}; текущий семестр — {{ program_semester }}-й{% endif %}.</p>
-
   <div class="tl-scroll">
     <div class="tl-grid tl-grid--semesters" style="--weeks: {{ program_semesters|length }}">
-      <span class="tl-guides" aria-hidden="true"></span>
       <div class="tl-axis">
-        <span class="tl-subject mono dim">семестры →</span>
+        <span class="tl-subject mono dim">семестры</span>
         <div class="tl-ticks">
           {% for sem in program_semesters %}
           <span class="tl-tick{% if sem == program_semester %} is-now{% endif %}" style="--w: {{ sem }}">
-            <i></i><b class="mono">{{ sem }}</b><em>сем.</em>
+            <b class="mono">{{ sem }}</b>
           </span>
           {% endfor %}
         </div>
       </div>
       {% for item in curriculum %}
       <div class="tl-row" style="--i: {{ forloop.counter }}">
-        <span class="tl-subject">{{ item.subject }}</span>
+        <span class="tl-subject" title="{{ item.subject }}"><span>{{ item.subject }}</span></span>
         <div class="tl-track">
-          <span class="tl-gridline" aria-hidden="true"></span>
           {% for start, end in item.segments %}
           <span class="tl-seg tl-seg--{{ item.color }}"
                 style="--from: {{ start }}; --to: {{ end }}"

@@ -1,0 +1,954 @@
+{
+ "paper": {
+  "theme": "paper",
+  "rootFont": "16px",
+  "splitCell": {
+   "x": 297,
+   "y": 475.38,
+   "r": 469,
+   "b": 692.25,
+   "w": 172,
+   "h": 216.88
+  },
+  "normalCell": {
+   "x": 469,
+   "y": 475.38,
+   "r": 641,
+   "b": 692.25,
+   "w": 172,
+   "h": 216.88
+  },
+  "splitUnion": {
+   "x": 306,
+   "y": 484.38,
+   "r": 461,
+   "b": 684.25,
+   "w": 155,
+   "h": 199.87
+  },
+  "normalCard": {
+   "x": 478,
+   "y": 484.38,
+   "r": 633,
+   "b": 684.25,
+   "w": 155,
+   "h": 199.88
+  },
+  "insets": {
+   "split": {
+    "l": 9,
+    "t": 9,
+    "r": 8,
+    "b": 8
+   },
+   "normal": {
+    "l": 9,
+    "t": 9,
+    "r": 8,
+    "b": 8
+   }
+  },
+  "sizeDelta": {
+   "w": 0,
+   "h": -0.01
+  },
+  "radii": {
+   "splitFirst": [
+    "10px",
+    "10px",
+    "0px",
+    "0px"
+   ],
+   "splitLast": [
+    "0px",
+    "0px",
+    "10px",
+    "10px"
+   ],
+   "normal": [
+    "10px",
+    "10px",
+    "10px",
+    "10px"
+   ]
+  },
+  "bg": {
+   "split": "oklab(0.912537 0.00109298 0.011097)",
+   "normal": "oklab(0.912537 0.00109298 0.011097)"
+  },
+  "pad": {
+   "splitCell": "8px",
+   "normalCell": "8px",
+   "splitLesson": "6px 8px",
+   "normalLesson": "6px 8px"
+  },
+  "overflow": {
+   "splitCell": "visible",
+   "lessons": [
+    "visible",
+    "visible"
+   ]
+  },
+  "divider": {
+   "firstBottom": "0px",
+   "secondTop": "1px",
+   "gap": 0
+  },
+  "partOverflowY": [
+   {
+    "scrollH": 99,
+    "clientH": 99
+   },
+   {
+    "scrollH": 98,
+    "clientH": 98
+   }
+  ],
+  "partOverflowX": [
+   {
+    "scrollW": 152,
+    "clientW": 152
+   },
+   {
+    "scrollW": 152,
+    "clientW": 152
+   }
+  ],
+  "pageOverflowX": 0,
+  "screenshot": "/Users/main/Documents/BGITU/docs/screenshots/sched-split-paper.png",
+  "shotBytes": 40588
+ },
+ "brass": {
+  "theme": "brass",
+  "rootFont": "16px",
+  "splitCell": {
+   "x": 297,
+   "y": 475.38,
+   "r": 469,
+   "b": 692.25,
+   "w": 172,
+   "h": 216.88
+  },
+  "normalCell": {
+   "x": 469,
+   "y": 475.38,
+   "r": 641,
+   "b": 692.25,
+   "w": 172,
+   "h": 216.88
+  },
+  "splitUnion": {
+   "x": 306,
+   "y": 484.38,
+   "r": 461,
+   "b": 684.25,
+   "w": 155,
+   "h": 199.87
+  },
+  "normalCard": {
+   "x": 478,
+   "y": 484.38,
+   "r": 633,
+   "b": 684.25,
+   "w": 155,
+   "h": 199.88
+  },
+  "insets": {
+   "split": {
+    "l": 9,
+    "t": 9,
+    "r": 8,
+    "b": 8
+   },
+   "normal": {
+    "l": 9,
+    "t": 9,
+    "r": 8,
+    "b": 8
+   }
+  },
+  "sizeDelta": {
+   "w": 0,
+   "h": -0.01
+  },
+  "radii": {
+   "splitFirst": [
+    "10px",
+    "10px",
+    "0px",
+    "0px"
+   ],
+   "splitLast": [
+    "0px",
+    "0px",
+    "10px",
+    "10px"
+   ],
+   "normal": [
+    "10px",
+    "10px",
+    "10px",
+    "10px"
+   ]
+  },
+  "bg": {
+   "split": "oklab(0.912537 0.00109298 0.011097)",
+   "normal": "oklab(0.912537 0.00109298 0.011097)"
+  },
+  "pad": {
+   "splitCell": "8px",
+   "normalCell": "8px",
+   "splitLesson": "6px 8px",
+   "normalLesson": "6px 8px"
+  },
+  "overflow": {
+   "splitCell": "visible",
+   "lessons": [
+    "visible",
+    "visible"
+   ]
+  },
+  "divider": {
+   "firstBottom": "0px",
+   "secondTop": "1px",
+   "gap": 0
+  },
+  "partOverflowY": [
+   {
+    "scrollH": 99,
+    "clientH": 99
+   },
+   {
+    "scrollH": 98,
+    "clientH": 98
+   }
+  ],
+  "partOverflowX": [
+   {
+    "scrollW": 152,
+    "clientW": 152
+   },
+   {
+    "scrollW": 152,
+    "clientW": 152
+   }
+  ],
+  "pageOverflowX": 0,
+  "screenshot": "/Users/main/Documents/BGITU/docs/screenshots/sched-split-brass.png",
+  "shotBytes": 40554
+ },
+ "surik": {
+  "theme": "surik",
+  "rootFont": "16px",
+  "splitCell": {
+   "x": 297,
+   "y": 475.38,
+   "r": 469,
+   "b": 692.25,
+   "w": 172,
+   "h": 216.88
+  },
+  "normalCell": {
+   "x": 469,
+   "y": 475.38,
+   "r": 641,
+   "b": 692.25,
+   "w": 172,
+   "h": 216.88
+  },
+  "splitUnion": {
+   "x": 306,
+   "y": 484.38,
+   "r": 461,
+   "b": 684.25,
+   "w": 155,
+   "h": 199.87
+  },
+  "normalCard": {
+   "x": 478,
+   "y": 484.38,
+   "r": 633,
+   "b": 684.25,
+   "w": 155,
+   "h": 199.88
+  },
+  "insets": {
+   "split": {
+    "l": 9,
+    "t": 9,
+    "r": 8,
+    "b": 8
+   },
+   "normal": {
+    "l": 9,
+    "t": 9,
+    "r": 8,
+    "b": 8
+   }
+  },
+  "sizeDelta": {
+   "w": 0,
+   "h": -0.01
+  },
+  "radii": {
+   "splitFirst": [
+    "10px",
+    "10px",
+    "0px",
+    "0px"
+   ],
+   "splitLast": [
+    "0px",
+    "0px",
+    "10px",
+    "10px"
+   ],
+   "normal": [
+    "10px",
+    "10px",
+    "10px",
+    "10px"
+   ]
+  },
+  "bg": {
+   "split": "oklab(0.199169 0.00000905879 0.00000397787)",
+   "normal": "oklab(0.199169 0.00000905879 0.00000397787)"
+  },
+  "pad": {
+   "splitCell": "8px",
+   "normalCell": "8px",
+   "splitLesson": "6px 8px",
+   "normalLesson": "6px 8px"
+  },
+  "overflow": {
+   "splitCell": "visible",
+   "lessons": [
+    "visible",
+    "visible"
+   ]
+  },
+  "divider": {
+   "firstBottom": "0px",
+   "secondTop": "1px",
+   "gap": 0
+  },
+  "partOverflowY": [
+   {
+    "scrollH": 99,
+    "clientH": 99
+   },
+   {
+    "scrollH": 98,
+    "clientH": 98
+   }
+  ],
+  "partOverflowX": [
+   {
+    "scrollW": 152,
+    "clientW": 152
+   },
+   {
+    "scrollW": 152,
+    "clientW": 152
+   }
+  ],
+  "pageOverflowX": 0,
+  "screenshot": "/Users/main/Documents/BGITU/docs/screenshots/sched-split-surik.png",
+  "shotBytes": 36160
+ },
+ "latun": {
+  "theme": "latun",
+  "rootFont": "16px",
+  "splitCell": {
+   "x": 297,
+   "y": 475.38,
+   "r": 469,
+   "b": 692.25,
+   "w": 172,
+   "h": 216.88
+  },
+  "normalCell": {
+   "x": 469,
+   "y": 475.38,
+   "r": 641,
+   "b": 692.25,
+   "w": 172,
+   "h": 216.88
+  },
+  "splitUnion": {
+   "x": 306,
+   "y": 484.38,
+   "r": 461,
+   "b": 684.25,
+   "w": 155,
+   "h": 199.87
+  },
+  "normalCard": {
+   "x": 478,
+   "y": 484.38,
+   "r": 633,
+   "b": 684.25,
+   "w": 155,
+   "h": 199.88
+  },
+  "insets": {
+   "split": {
+    "l": 9,
+    "t": 9,
+    "r": 8,
+    "b": 8
+   },
+   "normal": {
+    "l": 9,
+    "t": 9,
+    "r": 8,
+    "b": 8
+   }
+  },
+  "sizeDelta": {
+   "w": 0,
+   "h": -0.01
+  },
+  "radii": {
+   "splitFirst": [
+    "10px",
+    "10px",
+    "0px",
+    "0px"
+   ],
+   "splitLast": [
+    "0px",
+    "0px",
+    "10px",
+    "10px"
+   ],
+   "normal": [
+    "10px",
+    "10px",
+    "10px",
+    "10px"
+   ]
+  },
+  "bg": {
+   "split": "oklab(0.199169 0.00000905879 0.00000397787)",
+   "normal": "oklab(0.199169 0.00000905879 0.00000397787)"
+  },
+  "pad": {
+   "splitCell": "8px",
+   "normalCell": "8px",
+   "splitLesson": "6px 8px",
+   "normalLesson": "6px 8px"
+  },
+  "overflow": {
+   "splitCell": "visible",
+   "lessons": [
+    "visible",
+    "visible"
+   ]
+  },
+  "divider": {
+   "firstBottom": "0px",
+   "secondTop": "1px",
+   "gap": 0
+  },
+  "partOverflowY": [
+   {
+    "scrollH": 99,
+    "clientH": 99
+   },
+   {
+    "scrollH": 98,
+    "clientH": 98
+   }
+  ],
+  "partOverflowX": [
+   {
+    "scrollW": 152,
+    "clientW": 152
+   },
+   {
+    "scrollW": 152,
+    "clientW": 152
+   }
+  ],
+  "pageOverflowX": 0,
+  "screenshot": "/Users/main/Documents/BGITU/docs/screenshots/sched-split-latun.png",
+  "shotBytes": 36227
+ },
+ "paper-a11y-fs2": {
+  "theme": "paper",
+  "rootFont": "21.76px",
+  "splitCell": {
+   "x": 324.75,
+   "y": 647.39,
+   "r": 513.16,
+   "b": 960.17,
+   "w": 188.41,
+   "h": 312.78
+  },
+  "normalCell": {
+   "x": 513.16,
+   "y": 647.39,
+   "r": 701.58,
+   "b": 960.17,
+   "w": 188.42,
+   "h": 312.78
+  },
+  "splitUnion": {
+   "x": 333.75,
+   "y": 656.39,
+   "r": 505.16,
+   "b": 952.17,
+   "w": 171.41,
+   "h": 295.78
+  },
+  "normalCard": {
+   "x": 522.16,
+   "y": 656.39,
+   "r": 693.58,
+   "b": 952.17,
+   "w": 171.42,
+   "h": 295.78
+  },
+  "insets": {
+   "split": {
+    "l": 9,
+    "t": 9,
+    "r": 8,
+    "b": 8
+   },
+   "normal": {
+    "l": 9,
+    "t": 9,
+    "r": 8,
+    "b": 8
+   }
+  },
+  "sizeDelta": {
+   "w": -0.01,
+   "h": 0
+  },
+  "radii": {
+   "splitFirst": [
+    "10px",
+    "10px",
+    "0px",
+    "0px"
+   ],
+   "splitLast": [
+    "0px",
+    "0px",
+    "10px",
+    "10px"
+   ],
+   "normal": [
+    "10px",
+    "10px",
+    "10px",
+    "10px"
+   ]
+  },
+  "bg": {
+   "split": "oklab(0.912537 0.00109298 0.011097)",
+   "normal": "oklab(0.912537 0.00109298 0.011097)"
+  },
+  "pad": {
+   "splitCell": "8px",
+   "normalCell": "8px",
+   "splitLesson": "6px 8px",
+   "normalLesson": "6px 8px"
+  },
+  "overflow": {
+   "splitCell": "visible",
+   "lessons": [
+    "visible",
+    "visible"
+   ]
+  },
+  "divider": {
+   "firstBottom": "0px",
+   "secondTop": "1px",
+   "gap": 0
+  },
+  "partOverflowY": [
+   {
+    "scrollH": 147,
+    "clientH": 147
+   },
+   {
+    "scrollH": 146,
+    "clientH": 146
+   }
+  ],
+  "partOverflowX": [
+   {
+    "scrollW": 168,
+    "clientW": 168
+   },
+   {
+    "scrollW": 168,
+    "clientW": 168
+   }
+  ],
+  "pageOverflowX": 0,
+  "screenshot": "/Users/main/Documents/BGITU/docs/screenshots/sched-split-paper-a11y-fs2.png",
+  "shotBytes": 57193
+ },
+ "brass-a11y-fs2": {
+  "theme": "brass",
+  "rootFont": "21.76px",
+  "splitCell": {
+   "x": 324.75,
+   "y": 647.39,
+   "r": 513.16,
+   "b": 960.17,
+   "w": 188.41,
+   "h": 312.78
+  },
+  "normalCell": {
+   "x": 513.16,
+   "y": 647.39,
+   "r": 701.58,
+   "b": 960.17,
+   "w": 188.42,
+   "h": 312.78
+  },
+  "splitUnion": {
+   "x": 333.75,
+   "y": 656.39,
+   "r": 505.16,
+   "b": 952.17,
+   "w": 171.41,
+   "h": 295.78
+  },
+  "normalCard": {
+   "x": 522.16,
+   "y": 656.39,
+   "r": 693.58,
+   "b": 952.17,
+   "w": 171.42,
+   "h": 295.78
+  },
+  "insets": {
+   "split": {
+    "l": 9,
+    "t": 9,
+    "r": 8,
+    "b": 8
+   },
+   "normal": {
+    "l": 9,
+    "t": 9,
+    "r": 8,
+    "b": 8
+   }
+  },
+  "sizeDelta": {
+   "w": -0.01,
+   "h": 0
+  },
+  "radii": {
+   "splitFirst": [
+    "10px",
+    "10px",
+    "0px",
+    "0px"
+   ],
+   "splitLast": [
+    "0px",
+    "0px",
+    "10px",
+    "10px"
+   ],
+   "normal": [
+    "10px",
+    "10px",
+    "10px",
+    "10px"
+   ]
+  },
+  "bg": {
+   "split": "oklab(0.912537 0.00109298 0.011097)",
+   "normal": "oklab(0.912537 0.00109298 0.011097)"
+  },
+  "pad": {
+   "splitCell": "8px",
+   "normalCell": "8px",
+   "splitLesson": "6px 8px",
+   "normalLesson": "6px 8px"
+  },
+  "overflow": {
+   "splitCell": "visible",
+   "lessons": [
+    "visible",
+    "visible"
+   ]
+  },
+  "divider": {
+   "firstBottom": "0px",
+   "secondTop": "1px",
+   "gap": 0
+  },
+  "partOverflowY": [
+   {
+    "scrollH": 147,
+    "clientH": 147
+   },
+   {
+    "scrollH": 146,
+    "clientH": 146
+   }
+  ],
+  "partOverflowX": [
+   {
+    "scrollW": 168,
+    "clientW": 168
+   },
+   {
+    "scrollW": 168,
+    "clientW": 168
+   }
+  ],
+  "pageOverflowX": 0,
+  "screenshot": "/Users/main/Documents/BGITU/docs/screenshots/sched-split-brass-a11y-fs2.png",
+  "shotBytes": 57118
+ },
+ "surik-a11y-fs2": {
+  "theme": "surik",
+  "rootFont": "21.76px",
+  "splitCell": {
+   "x": 324.75,
+   "y": 647.39,
+   "r": 513.16,
+   "b": 960.17,
+   "w": 188.41,
+   "h": 312.78
+  },
+  "normalCell": {
+   "x": 513.16,
+   "y": 647.39,
+   "r": 701.58,
+   "b": 960.17,
+   "w": 188.42,
+   "h": 312.78
+  },
+  "splitUnion": {
+   "x": 333.75,
+   "y": 656.39,
+   "r": 505.16,
+   "b": 952.17,
+   "w": 171.41,
+   "h": 295.78
+  },
+  "normalCard": {
+   "x": 522.16,
+   "y": 656.39,
+   "r": 693.58,
+   "b": 952.17,
+   "w": 171.42,
+   "h": 295.78
+  },
+  "insets": {
+   "split": {
+    "l": 9,
+    "t": 9,
+    "r": 8,
+    "b": 8
+   },
+   "normal": {
+    "l": 9,
+    "t": 9,
+    "r": 8,
+    "b": 8
+   }
+  },
+  "sizeDelta": {
+   "w": -0.01,
+   "h": 0
+  },
+  "radii": {
+   "splitFirst": [
+    "10px",
+    "10px",
+    "0px",
+    "0px"
+   ],
+   "splitLast": [
+    "0px",
+    "0px",
+    "10px",
+    "10px"
+   ],
+   "normal": [
+    "10px",
+    "10px",
+    "10px",
+    "10px"
+   ]
+  },
+  "bg": {
+   "split": "oklab(0.199169 0.00000905879 0.00000397787)",
+   "normal": "oklab(0.199169 0.00000905879 0.00000397787)"
+  },
+  "pad": {
+   "splitCell": "8px",
+   "normalCell": "8px",
+   "splitLesson": "6px 8px",
+   "normalLesson": "6px 8px"
+  },
+  "overflow": {
+   "splitCell": "visible",
+   "lessons": [
+    "visible",
+    "visible"
+   ]
+  },
+  "divider": {
+   "firstBottom": "0px",
+   "secondTop": "1px",
+   "gap": 0
+  },
+  "partOverflowY": [
+   {
+    "scrollH": 147,
+    "clientH": 147
+   },
+   {
+    "scrollH": 146,
+    "clientH": 146
+   }
+  ],
+  "partOverflowX": [
+   {
+    "scrollW": 168,
+    "clientW": 168
+   },
+   {
+    "scrollW": 168,
+    "clientW": 168
+   }
+  ],
+  "pageOverflowX": 0,
+  "screenshot": "/Users/main/Documents/BGITU/docs/screenshots/sched-split-surik-a11y-fs2.png",
+  "shotBytes": 51015
+ },
+ "latun-a11y-fs2": {
+  "theme": "latun",
+  "rootFont": "21.76px",
+  "splitCell": {
+   "x": 324.75,
+   "y": 647.39,
+   "r": 513.16,
+   "b": 960.17,
+   "w": 188.41,
+   "h": 312.78
+  },
+  "normalCell": {
+   "x": 513.16,
+   "y": 647.39,
+   "r": 701.58,
+   "b": 960.17,
+   "w": 188.42,
+   "h": 312.78
+  },
+  "splitUnion": {
+   "x": 333.75,
+   "y": 656.39,
+   "r": 505.16,
+   "b": 952.17,
+   "w": 171.41,
+   "h": 295.78
+  },
+  "normalCard": {
+   "x": 522.16,
+   "y": 656.39,
+   "r": 693.58,
+   "b": 952.17,
+   "w": 171.42,
+   "h": 295.78
+  },
+  "insets": {
+   "split": {
+    "l": 9,
+    "t": 9,
+    "r": 8,
+    "b": 8
+   },
+   "normal": {
+    "l": 9,
+    "t": 9,
+    "r": 8,
+    "b": 8
+   }
+  },
+  "sizeDelta": {
+   "w": -0.01,
+   "h": 0
+  },
+  "radii": {
+   "splitFirst": [
+    "10px",
+    "10px",
+    "0px",
+    "0px"
+   ],
+   "splitLast": [
+    "0px",
+    "0px",
+    "10px",
+    "10px"
+   ],
+   "normal": [
+    "10px",
+    "10px",
+    "10px",
+    "10px"
+   ]
+  },
+  "bg": {
+   "split": "oklab(0.199169 0.00000905879 0.00000397787)",
+   "normal": "oklab(0.199169 0.00000905879 0.00000397787)"
+  },
+  "pad": {
+   "splitCell": "8px",
+   "normalCell": "8px",
+   "splitLesson": "6px 8px",
+   "normalLesson": "6px 8px"
+  },
+  "overflow": {
+   "splitCell": "visible",
+   "lessons": [
+    "visible",
+    "visible"
+   ]
+  },
+  "divider": {
+   "firstBottom": "0px",
+   "secondTop": "1px",
+   "gap": 0
+  },
+  "partOverflowY": [
+   {
+    "scrollH": 147,
+    "clientH": 147
+   },
+   {
+    "scrollH": 146,
+    "clientH": 146
+   }
+  ],
+  "partOverflowX": [
+   {
+    "scrollW": 168,
+    "clientW": 168
+   },
+   {
+    "scrollW": 168,
+    "clientW": 168
+   }
+  ],
+  "pageOverflowX": 0,
+  "screenshot": "/Users/main/Documents/BGITU/docs/screenshots/sched-split-latun-a11y-fs2.png",
+  "shotBytes": 51080
+ }
+}
