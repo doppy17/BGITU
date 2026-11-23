@@ -59,3 +59,24 @@ kbd { font: 500 0.6875rem/1 var(--font-mono); padding: 0.3em 0.55em; border: 1px
   .burger { display: block; }
   .head-actions { margin-left: auto; }
 }
+/* «Версия для слабовидящих»: шапка в em — при крупном шрифте меню и кнопки
+   растут вместе с текстом. Переносим их в две строки ТОЛЬКО когда включён
+   крупный шрифт (html.a11y-fs1/fs2), иначе шапка остаётся однострочной 56px.
+   Высота шапки живёт в --head-h: заголовки страниц и рельс кабинета отступают
+   на неё в calc(), поэтому переменную пересчитываем вместе с переносом.
+   Правило дублируется в scripts/build_static_site.py (MOBILE_HEAD_CSS). */
+@media (min-width: 1181px) {
+  /* на 118% и 136% пилюля шире контейнера (до 1521px при 1238px): меню и кнопки
+     переносим в две строки, --head-h 150px — высота шапки при 136%; заголовки
+     и рельс отступают на неё в calc(), занижать нельзя — меню налезет на контент */
+  html.a11y-fs1,
+  html.a11y-fs2 { --head-h: 150px; }
+  html.a11y-fs1 .head-pill,
+  html.a11y-fs2 .head-pill {
+    height: auto; min-height: var(--head-h); flex-wrap: wrap; row-gap: 6px; padding-block: 6px;
+  }
+  html.a11y-fs1 .nav,
+  html.a11y-fs2 .nav { flex-shrink: 0; margin-inline: auto 0; }
+  html.a11y-fs1 .head-actions,
+  html.a11y-fs2 .head-actions { flex-shrink: 0; margin-left: auto; }
+}

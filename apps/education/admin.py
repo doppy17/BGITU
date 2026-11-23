@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Assignment, Attendance, Course, Enrollment, Grade, Group, Submission
+from .models import Assignment, Attendance, Course, CurriculumEntry, Enrollment, Grade, Group, PlanSource, Submission
 
 
 @admin.register(Group)
@@ -44,3 +44,17 @@ class AttendanceAdmin(admin.ModelAdmin):
 class GradeAdmin(admin.ModelAdmin):
     list_display = ('course', 'student', 'kind', 'value', 'date')
     list_filter = ('course', 'kind', 'value')
+
+
+@admin.register(PlanSource)
+class PlanSourceAdmin(admin.ModelAdmin):
+    list_display = ('original_name', 'direction', 'entries_count', 'uploaded_at', 'uploaded_by')
+    list_filter = ('direction_code',)
+    search_fields = ('original_name', 'direction')
+
+
+@admin.register(CurriculumEntry)
+class CurriculumEntryAdmin(admin.ModelAdmin):
+    list_display = ('subject', 'code', 'semester_from', 'semester_to', 'source')
+    list_filter = ('code', 'source')
+    search_fields = ('subject',)

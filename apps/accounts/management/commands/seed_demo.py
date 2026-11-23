@@ -134,7 +134,7 @@ class Command(BaseCommand):
                 imported_by=user,
             )
             record.file.save(Path(SCHEDULE_FILE).name, File(handle), save=True)
-        run_import(record, source_url=SCHEDULE_URL)
+        run_import(record, source_url=SCHEDULE_URL, replace_all=True)
         self.stdout.write(f'Расписание: {record.lessons_count} занятий, {record.groups_count} групп.')
 
     def assign_groups(self, users):

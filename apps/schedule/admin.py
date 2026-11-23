@@ -10,12 +10,12 @@ class BellAdmin(admin.ModelAdmin):
 
 @admin.register(ScheduleImport)
 class ScheduleImportAdmin(admin.ModelAdmin):
-    list_display = ('original_name', 'imported_at', 'lessons_count', 'groups_count', 'imported_by')
+    list_display = ('original_name', 'institute', 'imported_at', 'size', 'lessons_count', 'groups_count', 'imported_by')
     readonly_fields = ('lessons_count', 'groups_count')
 
 
 @admin.register(Lesson)
 class LessonAdmin(admin.ModelAdmin):
-    list_display = ('group', 'weekday', 'pair', 'subject', 'room', 'teacher_name', 'subgroup')
-    list_filter = ('group', 'weekday', 'week')
+    list_display = ('group', 'weekday', 'pair', 'subject', 'room', 'building', 'teacher_name', 'subgroup', 'week')
+    list_filter = ('group', 'weekday', 'week', 'building')
     search_fields = ('subject', 'teacher_name', 'room')

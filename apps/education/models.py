@@ -176,6 +176,44 @@ class Grade(models.Model):
         return int(self.value) if self.value in ('2', '3', '4', '5') else None
 
 
+class PlanSource(models.Model):
+    """Загруженный файл учебного плана — источник дисциплин направления.
+
+    Один файл = один учебный план направления (09.03.02 и т.п.). Файлы разных
+    направлений живут в БД одновременно; при конфликте дисциплины в одном
+    семестре побеждает запись из самого свежего по uploaded_at файла.
+    """
+
+    file = models.FileField('файл', upload_to='plans/%Y/%m/')
+    original_name = models.CharField('имя файла', max_length=255)
+    direction = models.CharField('направление', max_length=200, blank=True, db_index=True)
+    direction_code = models.CharField('код направления', max_length=32, blank=True, db_index=True)
+    size = models.PositiveBigIntegerField('размер, байт', default=0)
+    uploaded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='plan_sources'
+    )
+    uploaded_at = models.DateTimeField('загружен', auto_now_add=True)
+    entries_count = models.PositiveIntegerField('дисциплин', default=0)
+    note = models.CharField('примечание', max_length=255, blank=True)
+
+    class Meta:
+        verbose_name = 'источник учебного плана'
+        verbose_name_plural = 'источники учебного плана'
+        ordering = ['-uploaded_at']
+
+    def __str__(self):
+        return f'{self.original_name} · {self.direction or "направление не определено"}'
+
+    @property
+    def size_label(self):
+        size = self.size or 0
+        if size >= 1024 * 1024:
+            return f'{size / (1024 * 1024):.1f} МБ'
+        if size >= 1024:
+            return f'{size / 1024:.0f} КБ'
+        return f'{size} Б' if size else '—'
+
+
 class CurriculumEntry(models.Model):
     """Строка учебного плана: дисциплина и семестры, в которых она читается."""
 
@@ -183,6 +221,9 @@ class CurriculumEntry(models.Model):
     subject = models.CharField('дисциплина', max_length=200)
     semester_from = models.PositiveSmallIntegerField('с семестра', default=1)
     semester_to = models.PositiveSmallIntegerField('по семестр', default=1)
+    source = models.ForeignKey(
+        PlanSource, on_delete=models.CASCADE, null=True, blank=True, related_name='entries'
+    )
 
     class Meta:
         verbose_name = 'учебный план'

@@ -10,6 +10,7 @@ from apps.accounts.permissions import get_role, role_can
 from apps.education.models import Assignment, Enrollment, Grade, Submission
 from apps.schedule.import_service import WEEKDAYS
 from apps.schedule.models import Bell, Lesson
+from apps.schedule.services import parity_of_monday
 
 
 def home(request):
@@ -19,7 +20,8 @@ def home(request):
 
 
 def parity_for(day):
-    return 'odd' if day.isocalendar()[1] % 2 else 'even'
+    """Чётность учебной недели — по номеру недели семестра, как в файле БГИТУ."""
+    return parity_of_monday(day)
 
 
 def parity():
