@@ -96,7 +96,7 @@
   text-decoration: none;
   transition: border-color var(--dur-fast), color var(--dur-fast), background var(--dur-fast);
 }
-.icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+.icon-btn:hover { border-color: var(--accent-text); color: var(--accent-text); }
 .icon-btn svg { width: 18px; height: 18px; }
 .icon-btn--dot { position: relative; }
 .icon-btn--dot::after {
@@ -161,6 +161,11 @@
   inset: calc(12px + var(--head-h) + 8px) max(12px, calc((100vw - var(--container)) / 2)) auto auto;
   margin: 0;
   width: 290px;
+  /* Панель «Доступность» при 136% выше экрана (877px на 320×568):
+     ограничиваем высоту и прокручиваем, иначе «Сбросить настройки» недоступна. */
+  max-height: calc(100dvh - var(--head-h) - 32px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 14px;
   color: var(--text);
   background: var(--bg-raised);
@@ -243,7 +248,7 @@
   letter-spacing: -0.02em;
   text-decoration: none;
 }
-.menu__nav a[aria-current="page"] { color: var(--accent); }
+.menu__nav a[aria-current="page"] { color: var(--accent-text); }
 .menu__foot { margin-top: auto; color: var(--text-faint); }
 
 body.menu-open { overflow: hidden; }
@@ -282,7 +287,7 @@ body.menu-open { overflow: hidden; }
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
-.btn--ghost:hover { border-color: var(--accent); color: var(--accent); }
+.btn--ghost:hover { border-color: var(--accent-text); color: var(--accent-text); }
 .btn--sm { min-height: 44px; padding-inline: 1.2em; font-size: 0.875rem; }
 .btn--block { width: 100%; }
 
@@ -301,8 +306,8 @@ body.menu-open { overflow: hidden; }
   text-transform: uppercase;
   white-space: nowrap;
 }
-.badge--accent { border-color: color-mix(in oklab, var(--accent) 55%, transparent); color: var(--accent); }
-.badge--soft { background: var(--accent-soft); border-color: transparent; color: var(--accent); }
+.badge--accent { border-color: color-mix(in oklab, var(--accent) 55%, transparent); color: var(--accent-text); }
+.badge--soft { background: var(--accent-soft); border-color: transparent; color: var(--accent-text); }
 
 /* ---------- Формы ---------- */
 .field { display: grid; gap: 6px; align-content: start; }
@@ -328,7 +333,7 @@ body.menu-open { overflow: hidden; }
 .input:hover, .select:hover, .textarea:hover { border-color: color-mix(in oklab, var(--brand-ink) 38%, transparent); }
 .input:focus, .select:focus, .textarea:focus {
   outline: none;
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .input::placeholder { color: var(--text-faint); }
@@ -408,7 +413,7 @@ body.menu-open { overflow: hidden; }
   margin: 0 0 16px;
   padding-left: 10px;
   border-left: 2px solid var(--accent);
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 0.875rem;
   line-height: 1.5;
 }
@@ -428,6 +433,13 @@ body.menu-open { overflow: hidden; }
   box-shadow: 0 40px 100px rgb(0 0 0 / 0.5), 0 0 0 6px var(--accent-soft);
   overflow: hidden;
 }
+/* колонка только у ОТКРЫТОЙ модалки: `display: flex` на закрытом <dialog>
+   отменяет встроенный `dialog:not([open]) { display: none }` — модалки висели
+   на странице постоянно. Шапка и подвал всегда видны, тело прокручивается. */
+.dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
 .dialog::backdrop {
   background: rgb(13 13 13 / 0.72);
   -webkit-backdrop-filter: blur(8px);
@@ -435,6 +447,7 @@ body.menu-open { overflow: hidden; }
 }
 .dialog__head {
   display: flex;
+  flex: none;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
@@ -442,15 +455,20 @@ body.menu-open { overflow: hidden; }
   border-bottom: 1px solid var(--line);
 }
 .dialog__head h2 { font-size: 1.25rem; letter-spacing: -0.01em; }
-.dialog__body { padding: 24px; overflow: auto; max-height: calc(100vh - 220px); }
+.dialog__body { flex: 1 1 0%; min-height: 0; padding: 24px; overflow: auto; max-height: none; }
+/* форма-обёртка тоже колонка, иначе шапка/тело/подвал не участвуют во flex */
+.dialog > form { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
 .dialog__foot {
   display: flex;
+  flex: none;                    /* подвал не сжимается: кнопки всегда целиком */
+  flex-wrap: wrap;               /* крупный шрифт: кнопки переносятся, а не режутся */
   justify-content: flex-end;
   gap: 10px;
   padding: 16px 24px;
   border-top: 1px solid var(--line);
   background: color-mix(in oklab, var(--bg-raised), var(--bg) 40%);
 }
+.dialog__foot .btn { flex: 0 1 auto; min-width: 0; }
 .dialog__close {
   width: 44px; height: 44px;
   display: inline-grid;
@@ -460,7 +478,7 @@ body.menu-open { overflow: hidden; }
   background: transparent;
   cursor: pointer;
 }
-.dialog__close:hover { border-color: var(--accent); color: var(--accent); }
+.dialog__close:hover { border-color: var(--accent-text); color: var(--accent-text); }
 .dialog__close svg { width: 16px; height: 16px; }
 
 /* ---------- Тост ---------- */
@@ -507,9 +525,12 @@ body.menu-open { overflow: hidden; }
   align-items: baseline;
   gap: 12px;
   flex-wrap: wrap;
+  min-width: 0;
 }
-.panel__title h2 { font-size: clamp(1.125rem, 1rem + 0.5vw, 1.5rem); }
-.panel__num { color: var(--accent); }
+/* Длинное слово в заголовке панели («Программирование») при 136% шире
+   панели 320px — переносим, иначе заголовок наезжает на кнопку. */
+.panel__title h2 { font-size: clamp(1.125rem, 1rem + 0.5vw, 1.5rem); overflow-wrap: anywhere; }
+.panel__num { color: var(--accent-text); }
 
 /* ---------- Крошки ---------- */
 .crumbs {
@@ -520,7 +541,7 @@ body.menu-open { overflow: hidden; }
   color: var(--text-faint);
 }
 .crumbs a { color: var(--text-muted); text-decoration: none; }
-.crumbs a:hover { color: var(--accent); }
+.crumbs a:hover { color: var(--accent-text); }
 .crumbs i { font-style: normal; color: var(--line-strong); }
 
 /* ---------- Подвал ---------- */
@@ -543,7 +564,7 @@ body.menu-open { overflow: hidden; }
 }
 .foot-grid p, .foot-grid a { color: var(--text-muted); font-size: 0.9375rem; line-height: 1.7; }
 .foot-grid a { text-decoration: none; }
-.foot-grid a:hover { color: var(--accent); }
+.foot-grid a:hover { color: var(--accent-text); }
 .foot-bottom {
   display: flex;
   flex-wrap: wrap;
@@ -588,6 +609,16 @@ body.menu-open { overflow: hidden; }
 .sel__native {
   position: absolute;
   inset: 0;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  /* нативный select — только для отправки формы: размер не должен участвовать
+     в раскладке, иначе его внутренняя ширина выпирает за вьюпорт на ~6px */
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  border: 0;
   opacity: 0;
   pointer-events: none;
 }
@@ -612,11 +643,11 @@ body.menu-open { overflow: hidden; }
 .sel__btn:hover { border-color: color-mix(in oklab, var(--accent) 55%, transparent); }
 .sel__btn:focus-visible {
   outline: none;
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .sel.is-open .sel__btn {
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .sel__val {
@@ -631,7 +662,7 @@ body.menu-open { overflow: hidden; }
   transition: transform var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
 }
 .sel__chev svg { width: 16px; height: 16px; }
-.sel.is-open .sel__chev { transform: rotate(180deg); color: var(--accent); }
+.sel.is-open .sel__chev { transform: rotate(180deg); color: var(--accent-text); }
 .sel__panel {
   position: absolute;
   z-index: 80;

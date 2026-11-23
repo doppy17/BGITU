@@ -31,13 +31,15 @@
   --line:        color-mix(in oklab, var(--brand-ink) 13%, transparent);
   --line-strong: color-mix(in oklab, var(--brand-ink) 26%, transparent);
 
-  --accent:       var(--brand-accent);
-  --accent-ink:   var(--brand-on-accent);
+  --accent:       var(--brand-accent);       /* заливки: кнопки, плашки, бары            */
+  --accent-ink:   var(--brand-on-accent);    /* текст НА заливке                          */
+  --accent-text:  var(--brand-accent);       /* акцентный ТЕКСТ: ссылки, подписи, цифры   */
+  --accent-text-hover: color-mix(in oklab, var(--accent-text), var(--brand-ink) 15%);
   --accent-hover: color-mix(in oklab, var(--brand-accent), var(--brand-ink) 28%);
   --accent-soft:  color-mix(in oklab, var(--brand-accent) 14%, transparent);
   --accent-glow:  color-mix(in oklab, var(--brand-accent) 42%, transparent);
   --aux-soft:     color-mix(in oklab, var(--brand-aux) 20%, transparent);
-  --focus:        var(--brand-accent);
+  --focus:        var(--accent-text);       /* видимый фокус ≥ 3:1 к фону               */
 
   /* ---------- 3. ТИПОГРАФИКА ---------- */
   --font-display: 'Unbounded', 'Arial Black', 'Helvetica Neue', sans-serif;
@@ -109,8 +111,35 @@
   color-scheme: dark;
 }
 
+/* «Бронза» — светлая, но акцент — золото «Латуни» (#d6b072).
+   Двухслойная схема:
+   • ЗАЛИВКИ (кнопки, плашки, бары, сегменты) — #d2a83c: тёплое золото
+     (золотая середина между #cf9f4f и латунью #d6b072), контраст к фону 1.93:1
+     (≥ 1.8:1 для заливок и графики);
+   • ТЕКСТ на заливке — тёмные чернила #1b1712: 7.99:1 к золоту (≥ 4.5:1);
+   • ТЕКСТ/ссылки/подписи — тёмное золото #8c6408: 4.60:1 к #f2eee6 (≥ 4.5:1).
+   --brand-accent намеренно равен заливке: favicon и свотч показывают золото. */
+[data-theme="brass"] {
+  --trail-op:        0.38;
+  --brand-base:      #f2eee6;
+  --brand-ink:       #171614;
+  --brand-accent:    #d2a83c;
+  --brand-on-accent: #1b1712;
+  --brand-aux:       #d4af37;
+  --aurora-blend:    multiply;
+  /* затемнённые состояния: hover-заливка сохраняет 5.48:1 с тёмными чернилами */
+  --accent-text:     #8c6408;
+  --accent-hover:    #b8860b;
+  color-scheme: light;
+}
+
 /* Плавная смена палитры при переключении темы. */
 .theme-anim,
 .theme-anim * {
   transition: background-color 0.45s, color 0.45s, border-color 0.45s, fill 0.45s !important;
 }
+
+/* «Бронза»: подписи на золотых сегментах учебного плана — тёмные чернила.
+   cabinet.css выводит цвет текста из заливки (mix 24% к чернилам): на светлом
+   золоте это даёт 1.6:1. Здесь — 8.0:1, без правки cabinet.css. */
+[data-theme="brass"] .tl-seg { color: var(--brand-on-accent); }

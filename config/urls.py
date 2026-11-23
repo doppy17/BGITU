@@ -4,8 +4,12 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
+from apps.core.ai_views import ai_status
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # диагностика локальной LLM — только для staff
+    path('api/ai/status/', ai_status, name='ai_status'),
     # публичная часть — на корне: /, /university/, /news/, /timetable/ и т.д.
     path('', include('apps.site.urls')),
     path('', include('apps.portal.urls')),

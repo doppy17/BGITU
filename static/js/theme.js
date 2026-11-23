@@ -1,11 +1,11 @@
-/* БГИТУ — темы оформления (paper/surik/latun).
+/* БГИТУ — темы оформления (paper/surik/latun/brass).
    Порядок: ?theme= в адресе → сохранённый выбор → «Бумага» (data-theme на <html>). */
 (function () {
   'use strict';
 
-  var THEMES = ['paper', 'surik', 'latun'];
+  var THEMES = ['paper', 'surik', 'latun', 'brass'];
   var COOKIE = 'bgitu-theme';
-  var META_COLORS = { paper: '#f2eee6', surik: '#0d0d0d', latun: '#0d0d0d' };
+  var META_COLORS = { paper: '#f2eee6', surik: '#0d0d0d', latun: '#0d0d0d', brass: '#f2eee6' };
   var root = document.documentElement;
 
   /* Тему задаёт сервер (профиль пользователя или cookie) — до отрисовки.
@@ -49,6 +49,28 @@
     if (meta) meta.setAttribute('content', META_COLORS[root.dataset.theme] || META_COLORS.paper);
   }
 
+  /* Favicon перерисовывается из токенов темы: те же --brand-accent и
+     --brand-on-accent, что в tokens.css. Сеть не нужна — data-URI. */
+  function syncFavicon() {
+    var styles = getComputedStyle(root);
+    var accent = styles.getPropertyValue('--brand-accent').trim();
+    var ink = styles.getPropertyValue('--brand-on-accent').trim();
+    if (!accent || !ink) return; // CSS ещё не применён — остаётся серверная иконка
+
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">' +
+      '<rect width="64" height="64" rx="14" fill="' + accent + '"/>' +
+      '<text x="32" y="46" font-family="Arial,sans-serif" font-size="40" font-weight="bold" ' +
+      'text-anchor="middle" fill="' + ink + '">Б</text></svg>';
+    var href = 'data:image/svg+xml,' + encodeURIComponent(svg);
+    var link = document.querySelector('link[rel="icon"]');
+    if (!link) {
+      link = document.createElement('link');
+      link.setAttribute('rel', 'icon');
+      document.head.appendChild(link);
+    }
+    if (link.getAttribute('href') !== href) link.setAttribute('href', href);
+  }
+
   function syncRadios() {
     var current = root.dataset.theme || 'paper';
     document.querySelectorAll('[data-theme-set]').forEach(function (btn) {
@@ -63,12 +85,14 @@
     persist(name);
     syncRadios();
     syncMeta();
+    syncFavicon();
     document.dispatchEvent(new Event('bgitu:palette'));
   }
 
   document.addEventListener('DOMContentLoaded', function () {
     syncMeta();
     syncRadios();
+    syncFavicon();
 
     document.addEventListener('click', function (event) {
       var btn = event.target.closest('[data-theme-set]');

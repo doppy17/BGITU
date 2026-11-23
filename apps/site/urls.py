@@ -2,12 +2,14 @@
 from django.urls import path
 
 from .pages import PAGES
+from .suggest import suggest
 from .views import PageView, SearchView
 
 app_name = 'site'
 
 urlpatterns = [
     path('search/', SearchView.as_view(), name='search'),
+    path('api/search/suggest/', suggest, name='search_suggest'),
 ]
 
 urlpatterns += [

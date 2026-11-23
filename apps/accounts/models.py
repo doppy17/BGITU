@@ -49,10 +49,14 @@ class Profile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
     role = models.ForeignKey(Role, on_delete=models.PROTECT, related_name='profiles', null=True, blank=True)
     group = models.ForeignKey('education.Group', on_delete=models.SET_NULL, related_name='profiles', null=True, blank=True)
-    subgroup = models.PositiveSmallIntegerField('подгруппа', null=True, blank=True)
+    subgroup = models.CharField(
+        'подгруппа', max_length=8, blank=True, default='',
+        choices=[('', 'не выбрана'), ('а', 'подгруппа «а»'), ('б', 'подгруппа «б»')],
+        help_text='Подгруппа по расписанию — в файле БГИТУ это колонки «а»/«б» или пара под номером',
+    )
     theme = models.CharField(
         'тема оформления', max_length=10, blank=True,
-        choices=[('paper', 'Бумага'), ('surik', 'Сурик'), ('latun', 'Латунь')],
+        choices=[('paper', 'Бумага'), ('surik', 'Сурик'), ('latun', 'Латунь'), ('brass', 'Бронза')],
         help_text='Выбор пользователя переносится между устройствами',
     )
     record_book = models.CharField('зачётная книжка', max_length=32, blank=True)

@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from . import plan_views, views
 
 app_name = 'education'
 
@@ -15,4 +15,7 @@ urlpatterns = [
     path('assignments/<int:assignment_id>/submit/', views.submit_work, name='submit_work'),
     path('submissions/<int:submission_id>/review/', views.review_submission, name='review_submission'),
     path('works/', views.my_works, name='works'),
+    path('plan/import/', plan_views.plan_import, name='plan_import'),
+    path('plan/source/<int:pk>/delete/', plan_views.plan_source_delete, name='plan_source_delete'),
+    path('plan/source/<int:pk>/file/', plan_views.plan_source_download, name='plan_source_file'),
 ]

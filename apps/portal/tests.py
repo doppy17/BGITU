@@ -6,7 +6,7 @@ from apps.accounts.models import Role
 
 
 class ThemeUITests(TestCase):
-    """Переключатель тем (paper/surik/latun) — как на основном сайте bgitu."""
+    """Переключатель тем (paper/surik/latun/brass) — как на основном сайте bgitu."""
 
     @classmethod
     def setUpTestData(cls):
@@ -20,7 +20,7 @@ class ThemeUITests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'data-theme="paper"')
         self.assertContains(response, 'id="theme-pop"')
-        for name in ('paper', 'surik', 'latun'):
+        for name in ('paper', 'surik', 'latun', 'brass'):
             self.assertContains(response, f'data-theme-set="{name}"')
         self.assertContains(response, 'js/theme.js')
 
@@ -117,6 +117,19 @@ class NavCompositionTests(TestCase):
         self.assertContains(response, 'id="cabToggle"')
         for cls in ('overview', 'schedule', 'stipendia', 'courses', 'grades', 'roles', 'profile'):
             self.assertContains(response, f'cab-nav__icon--{cls}')
+
+    def test_rail_outside_click_wiring(self):
+        """Клик вне раскрытого рельса закрывает его: отдельный rail.js
+        (не трогает app.js) и data-rail-* хуки в разметке. Само поведение
+        проверяется в браузере — Django-тесты JS не исполняют."""
+        self.client.force_login(self.dev)
+        response = self.client.get(reverse('portal:dashboard'))
+        content = response.content.decode()
+        self.assertEqual(content.count("js/rail.js"), 1)
+        self.assertContains(response, 'data-rail="cabinet"')
+        self.assertContains(response, 'data-rail-toggle')
+        self.assertContains(response, 'data-rail-backdrop')
+        self.assertContains(response, 'data-rail-tip')
 
     def test_nav_is_flat_single_list(self):
         """Единый список без подзаголовка «управление» и разделителей;
