@@ -15,9 +15,15 @@
   }
 
   const norm = (value) => value.toLowerCase().replace(/ё/g, 'е');
+  const SUGGEST_URL = '/api/search/suggest/';
+  const AI_MIN = 2;
   let index = null;
   let shown = [];
   let active = 0;
+  let aiItems = null;
+  let aiSeq = 0;
+  let aiTimer = 0;
+  let aiController = null;
 
   const pageItems = () => Array.from(document.querySelectorAll('[data-s]')).map((el) => {
     const title = (el.dataset.t || el.textContent).replace(/\s+/g, ' ').trim();
@@ -62,14 +68,18 @@
     if (current) current.scrollIntoView({ block: 'nearest' });
   };
 
-  const render = () => {
+  const render = (override) => {
     const words = norm(input.value).split(/\s+/).filter(Boolean);
-    shown = words.length
-      ? index
-          .filter((item) => words.every((word) => item.hay.includes(word)))
-          .sort((a, b) => (norm(a.title).indexOf(words[0]) + 1 || 99) - (norm(b.title).indexOf(words[0]) + 1 || 99))
-          .slice(0, 10)
-      : index.filter((item) => item.cat === 'Раздел' || item.cat === 'Институт' || item.cat === 'Кабинет').slice(0, 10);
+    if (Array.isArray(override)) {
+      shown = override;
+    } else if (words.length) {
+      shown = index
+        .filter((item) => words.every((word) => item.hay.includes(word)))
+        .sort((a, b) => (norm(a.title).indexOf(words[0]) + 1 || 99) - (norm(b.title).indexOf(words[0]) + 1 || 99))
+        .slice(0, 10);
+    } else {
+      shown = index.filter((item) => item.cat === 'Раздел' || item.cat === 'Институт' || item.cat === 'Кабинет').slice(0, 10);
+    }
 
     list.replaceChildren();
     if (!shown.length) {
@@ -104,6 +114,7 @@
       const cat = document.createElement('span');
       cat.className = 'search__cat mono';
       cat.textContent = item.cat;
+      if (item.why) li.title = item.why;
       li.append(title, cat);
       list.append(li);
     });
@@ -121,8 +132,69 @@
     if (item.href) window.location.href = item.href;
   };
 
+  const aiItemsFrom = (items) => {
+    const byKey = new Map(index.map((item) => [item.href + '|' + item.title, item]));
+    return items.map((item) => {
+      const base = byKey.get(item.url + '|' + item.title);
+      return {
+        title: item.title,
+        cat: (base && base.cat) || 'Раздел',
+        soon: !!(base && base.soon),
+        href: item.url,
+        why: item.why || '',
+        hay: base ? base.hay : norm(item.title),
+      };
+    });
+  };
+
+  const cancelSuggest = () => {
+    clearTimeout(aiTimer);
+    if (aiController) {
+      aiController.abort();
+      aiController = null;
+    }
+  };
+
+  const askSuggest = () => {
+    const query = input.value.trim();
+    if (!dlg.open || query.length < AI_MIN) return;
+    const seq = ++aiSeq;
+    const controller = new AbortController();
+    aiController = controller;
+    const timer = setTimeout(() => controller.abort(), 4000);
+    fetch(SUGGEST_URL + '?q=' + encodeURIComponent(query), {
+      headers: { Accept: 'application/json' },
+      signal: controller.signal,
+    })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (!data || seq !== aiSeq || !dlg.open || input.value.trim() !== query) return;
+        const items = Array.isArray(data.items) ? data.items : [];
+        if (!items.length) return;
+        aiItems = aiItemsFrom(items);
+        render(aiItems);
+      })
+      .catch(() => {})
+      .finally(() => {
+        clearTimeout(timer);
+        if (aiController === controller) aiController = null;
+      });
+  };
+
+  const onInput = () => {
+    const query = input.value.trim();
+    cancelSuggest();
+    aiSeq += 1;
+    aiItems = null;
+    render();
+    if (query.length >= AI_MIN) aiTimer = setTimeout(askSuggest, 180);
+  };
+
   const openSearch = () => {
     index = index || build();
+    cancelSuggest();
+    aiSeq += 1;
+    aiItems = null;
     dlg.showModal();
     input.value = '';
     render();
@@ -142,7 +214,12 @@
     }
   });
   dlg.addEventListener('click', (event) => { if (event.target === dlg) dlg.close(); });
-  input.addEventListener('input', render);
+  dlg.addEventListener('close', () => {
+    cancelSuggest();
+    aiSeq += 1;
+    aiItems = null;
+  });
+  input.addEventListener('input', onInput);
   input.addEventListener('keydown', (event) => {
     if (!shown.length) return;
     if (event.key === 'ArrowDown') { event.preventDefault(); setActive(active + 1); }

@@ -15,3 +15,6 @@ staticfiles/
 
 # статический экспорт для GitHub Pages (собирается в CI)
 dist/
+
+# локальная LLM: GGUF ~1 ГБ, в репозитории не хранится
+models/
