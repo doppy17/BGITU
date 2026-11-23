@@ -1,0 +1,32 @@
+# Blueprint для Render: Django-портал БГИТУ + managed Postgres.
+# Применяется одной кнопкой: https://dashboard.render.com/blueprint/new
+databases:
+  - name: bgitu-db
+    databaseName: bgitu
+    user: bgitu
+    plan: free
+    region: frankfurt
+
+services:
+  - type: web
+    name: bgitu-portal
+    runtime: python
+    plan: free
+    region: frankfurt
+    branch: main
+    buildCommand: ./build.sh
+    startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 60 --access-logfile -
+    healthCheckPath: /login/
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.render
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: bgitu-db
+          property: connectionString
+      - key: WEB_CONCURRENCY
+        value: 2
