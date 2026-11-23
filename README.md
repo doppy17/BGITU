@@ -196,3 +196,19 @@ BGITU/
 - Расписание обновляется вручную импортом файла, автоматической синхронизации с bgitu.ru нет.
 - Стипендия рассчитывается упрощённо (базовая + ×1,8 при среднем ≥4,5), без ПГАС и социальных выплат.
 - Файлы работ принимаются до 20 МБ, расширения: pdf, doc(x), zip, rar, txt, py, xlsx, png, jpg.
+
+## Деплой на Render
+
+Прод-конфигурация лежит в `config/settings/render.py` + `render.yaml`
+(web-сервис и managed Postgres создаются одним Blueprint):
+
+```
+https://render.com/deploy?repo=https://github.com/doppy17/BGITU
+```
+
+Что делает `build.sh`: ставит зависимости, `collectstatic`, `migrate`, `seed_demo`.
+База берётся из `DATABASE_URL` (Render подставляет строку подключения сам;
+вместо Render Postgres можно указать Neon — код не меняется).
+Статику отдаёт WhiteNoise, приложение — gunicorn.
+Загрузки работ лежат на эфемерном диске и теряются при передеплое.
+
