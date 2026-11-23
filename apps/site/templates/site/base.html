@@ -1,4 +1,5 @@
 {% load static %}
+{% load bgitu %}
 <!DOCTYPE html>
 <html lang="ru" data-theme="{{ ui_theme|default:'paper' }}" data-auth="{% if user.is_authenticated %}1{% else %}0{% endif %}">
 <head>
@@ -7,7 +8,7 @@
   <title>{% block title %}{{ page.title }}{% endblock %} — БГИТУ</title>
   <meta name="description" content="{{ page.description }}">
   <meta name="theme-color" content="#f2eee6">
-  <link rel="icon" href="{% static 'site/icon-192.png' %}">
+  <link rel="icon" href="{{ ui_theme|favicon_uri }}">
   <link rel="manifest" href="{% static 'site/manifest.webmanifest' %}">
   <link rel="apple-touch-icon" href="{% static 'site/icon-180.png' %}">
   <script src="{% static 'site/js/mode.js' %}"></script>

@@ -20,7 +20,11 @@ body {
 }
 
 img, svg { display: block; max-width: 100%; }
-a { color: inherit; }
+/* Ссылки без подчёркивания: смысл несут цвет и акцент на наведении.
+   line-through у выполненных задач задаётся отдельно (.task … b). */
+a { color: inherit; text-decoration: none; }
+a:hover { text-decoration: none; }
+a:not([class]):hover { color: var(--accent); }
 button, input, select, textarea { font: inherit; color: inherit; }
 
 h1, h2, h3, h4 {

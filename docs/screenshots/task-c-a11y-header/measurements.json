@@ -1,0 +1,582 @@
+{
+ "generated": "2026-11-23T19:47:55",
+ "css": "static/site/css/header.css + scripts/build_static_site.py MOBILE_HEAD_CSS",
+ "thresholds": {
+  "gap_diff_max": 2,
+  "row_center_spread_max": 2
+ },
+ "site": {
+  "1440/base": {
+   "viewport": "1440x900",
+   "scrollWidth": 1440,
+   "innerWidth": 1440,
+   "headH": 56,
+   "pillHeight": 56,
+   "pillRect": {
+    "l": 100,
+    "r": 1340,
+    "t": 12,
+    "b": 68
+   },
+   "gapLeft": 19,
+   "gapRight": 7,
+   "verticalTopInset": 14,
+   "verticalBottomInset": 14,
+   "overlapPairs": 0,
+   "rows": [
+    {
+     "center": 40,
+     "count": 6,
+     "spread": 0,
+     "left": 119,
+     "right": 1333
+    }
+   ],
+   "rowCount": 1
+  },
+  "1440/fs1": {
+   "viewport": "1440x900",
+   "scrollWidth": 1440,
+   "innerWidth": 1440,
+   "headH": 134,
+   "pillHeight": 134,
+   "pillRect": {
+    "l": 100,
+    "r": 1340,
+    "t": 12,
+    "b": 146
+   },
+   "gapLeft": 29,
+   "gapRight": 29,
+   "verticalTopInset": 18,
+   "verticalBottomInset": 18,
+   "overlapPairs": 0,
+   "rows": [
+    {
+     "center": 52,
+     "count": 2,
+     "spread": 0,
+     "left": 129,
+     "right": 1311
+    },
+    {
+     "center": 106,
+     "count": 4,
+     "spread": 0,
+     "left": 129,
+     "right": 1311
+    }
+   ],
+   "rowCount": 2
+  },
+  "1440/fs2": {
+   "viewport": "1440x900",
+   "scrollWidth": 1440,
+   "innerWidth": 1440,
+   "headH": 134,
+   "pillHeight": 134,
+   "pillRect": {
+    "l": 100,
+    "r": 1340,
+    "t": 12,
+    "b": 146
+   },
+   "gapLeft": 29,
+   "gapRight": 29,
+   "verticalTopInset": 18,
+   "verticalBottomInset": 18,
+   "overlapPairs": 0,
+   "rows": [
+    {
+     "center": 52,
+     "count": 2,
+     "spread": 0,
+     "left": 129,
+     "right": 1311
+    },
+    {
+     "center": 106,
+     "count": 4,
+     "spread": 0,
+     "left": 129,
+     "right": 1311
+    }
+   ],
+   "rowCount": 2
+  },
+  "1024/base": {
+   "viewport": "1024x768",
+   "scrollWidth": 1024,
+   "innerWidth": 1024,
+   "headH": 56,
+   "pillHeight": 56,
+   "pillRect": {
+    "l": 12,
+    "r": 1012,
+    "t": 12,
+    "b": 68
+   },
+   "gapLeft": 19,
+   "gapRight": 7,
+   "verticalTopInset": 14,
+   "verticalBottomInset": 14,
+   "overlapPairs": 0,
+   "rows": [
+    {
+     "center": 40,
+     "count": 5,
+     "spread": 0,
+     "left": 31,
+     "right": 1005
+    }
+   ],
+   "rowCount": 1
+  },
+  "1024/fs1": {
+   "viewport": "1024x768",
+   "scrollWidth": 1024,
+   "innerWidth": 1024,
+   "headH": 56,
+   "pillHeight": 56,
+   "pillRect": {
+    "l": 12,
+    "r": 1012,
+    "t": 12,
+    "b": 68
+   },
+   "gapLeft": 21.47,
+   "gapRight": 21.47,
+   "verticalTopInset": 6,
+   "verticalBottomInset": 6,
+   "overlapPairs": 0,
+   "rows": [
+    {
+     "center": 40,
+     "count": 5,
+     "spread": 0,
+     "left": 33.47,
+     "right": 990.53
+    }
+   ],
+   "rowCount": 1
+  },
+  "1024/fs2": {
+   "viewport": "1024x768",
+   "scrollWidth": 1024,
+   "innerWidth": 1024,
+   "headH": 56,
+   "pillHeight": 56,
+   "pillRect": {
+    "l": 12,
+    "r": 1012,
+    "t": 12,
+    "b": 68
+   },
+   "gapLeft": 21.47,
+   "gapRight": 21.47,
+   "verticalTopInset": 6,
+   "verticalBottomInset": 6,
+   "overlapPairs": 0,
+   "rows": [
+    {
+     "center": 40,
+     "count": 5,
+     "spread": 0,
+     "left": 33.47,
+     "right": 990.53
+    }
+   ],
+   "rowCount": 1
+  },
+  "390/base": {
+   "viewport": "390x844",
+   "scrollWidth": 390,
+   "innerWidth": 390,
+   "headH": 56,
+   "pillHeight": 56,
+   "pillRect": {
+    "l": 12,
+    "r": 378,
+    "t": 12,
+    "b": 68
+   },
+   "gapLeft": 19,
+   "gapRight": 7,
+   "verticalTopInset": 14,
+   "verticalBottomInset": 14,
+   "overlapPairs": 0,
+   "rows": [
+    {
+     "center": 40,
+     "count": 4,
+     "spread": 0,
+     "left": 31,
+     "right": 371
+    }
+   ],
+   "rowCount": 1
+  },
+  "390/fs1": {
+   "viewport": "390x844",
+   "scrollWidth": 390,
+   "innerWidth": 390,
+   "headH": 56,
+   "pillHeight": 56,
+   "pillRect": {
+    "l": 12,
+    "r": 378,
+    "t": 12,
+    "b": 68
+   },
+   "gapLeft": 15,
+   "gapRight": 15,
+   "verticalTopInset": 6,
+   "verticalBottomInset": 6,
+   "overlapPairs": 0,
+   "rows": [
+    {
+     "center": 40,
+     "count": 4,
+     "spread": 0,
+     "left": 27,
+     "right": 363
+    }
+   ],
+   "rowCount": 1
+  },
+  "390/fs2": {
+   "viewport": "390x844",
+   "scrollWidth": 390,
+   "innerWidth": 390,
+   "headH": 56,
+   "pillHeight": 56,
+   "pillRect": {
+    "l": 12,
+    "r": 378,
+    "t": 12,
+    "b": 68
+   },
+   "gapLeft": 15,
+   "gapRight": 15,
+   "verticalTopInset": 6,
+   "verticalBottomInset": 6,
+   "overlapPairs": 0,
+   "rows": [
+    {
+     "center": 40,
+     "count": 4,
+     "spread": 0,
+     "left": 27,
+     "right": 363
+    }
+   ],
+   "rowCount": 1
+  }
+ },
+ "cabinet": {
+  "1440/base": {
+   "viewport": "1440x900",
+   "scrollWidth": 1440,
+   "innerWidth": 1440,
+   "headH": 56,
+   "pillHeight": 56,
+   "pillRect": {
+    "l": 100,
+    "r": 1340,
+    "t": 12,
+    "b": 68
+   },
+   "gapLeft": 19,
+   "gapRight": 7,
+   "verticalTopInset": 14,
+   "verticalBottomInset": 14,
+   "overlapPairs": 0,
+   "rows": [
+    {
+     "center": 40,
+     "count": 6,
+     "spread": 0,
+     "left": 119,
+     "right": 1333
+    }
+   ],
+   "rowCount": 1
+  },
+  "1440/fs1": {
+   "viewport": "1440x900",
+   "scrollWidth": 1440,
+   "innerWidth": 1440,
+   "headH": 134,
+   "pillHeight": 134,
+   "pillRect": {
+    "l": 100,
+    "r": 1340,
+    "t": 12,
+    "b": 146
+   },
+   "gapLeft": 29,
+   "gapRight": 29,
+   "verticalTopInset": 18,
+   "verticalBottomInset": 18,
+   "overlapPairs": 0,
+   "rows": [
+    {
+     "center": 52,
+     "count": 2,
+     "spread": 0,
+     "left": 129,
+     "right": 1311
+    },
+    {
+     "center": 106,
+     "count": 4,
+     "spread": 0,
+     "left": 129,
+     "right": 1311
+    }
+   ],
+   "rowCount": 2
+  },
+  "1440/fs2": {
+   "viewport": "1440x900",
+   "scrollWidth": 1440,
+   "innerWidth": 1440,
+   "headH": 134,
+   "pillHeight": 134,
+   "pillRect": {
+    "l": 100,
+    "r": 1340,
+    "t": 12,
+    "b": 146
+   },
+   "gapLeft": 29,
+   "gapRight": 29,
+   "verticalTopInset": 18,
+   "verticalBottomInset": 18,
+   "overlapPairs": 0,
+   "rows": [
+    {
+     "center": 52,
+     "count": 2,
+     "spread": 0,
+     "left": 129,
+     "right": 1311
+    },
+    {
+     "center": 106,
+     "count": 4,
+     "spread": 0,
+     "left": 129,
+     "right": 1311
+    }
+   ],
+   "rowCount": 2
+  },
+  "1024/base": {
+   "viewport": "1024x768",
+   "scrollWidth": 1024,
+   "innerWidth": 1024,
+   "headH": 56,
+   "pillHeight": 56,
+   "pillRect": {
+    "l": 12,
+    "r": 1012,
+    "t": 12,
+    "b": 68
+   },
+   "gapLeft": 19,
+   "gapRight": 7,
+   "verticalTopInset": 14,
+   "verticalBottomInset": 14,
+   "overlapPairs": 0,
+   "rows": [
+    {
+     "center": 40,
+     "count": 5,
+     "spread": 0,
+     "left": 31,
+     "right": 1005
+    }
+   ],
+   "rowCount": 1
+  },
+  "1024/fs1": {
+   "viewport": "1024x768",
+   "scrollWidth": 1024,
+   "innerWidth": 1024,
+   "headH": 56,
+   "pillHeight": 56,
+   "pillRect": {
+    "l": 12,
+    "r": 1012,
+    "t": 12,
+    "b": 68
+   },
+   "gapLeft": 21.47,
+   "gapRight": 21.47,
+   "verticalTopInset": 6,
+   "verticalBottomInset": 6,
+   "overlapPairs": 0,
+   "rows": [
+    {
+     "center": 40,
+     "count": 5,
+     "spread": 0,
+     "left": 33.47,
+     "right": 990.53
+    }
+   ],
+   "rowCount": 1
+  },
+  "1024/fs2": {
+   "viewport": "1024x768",
+   "scrollWidth": 1024,
+   "innerWidth": 1024,
+   "headH": 56,
+   "pillHeight": 56,
+   "pillRect": {
+    "l": 12,
+    "r": 1012,
+    "t": 12,
+    "b": 68
+   },
+   "gapLeft": 21.47,
+   "gapRight": 21.47,
+   "verticalTopInset": 6,
+   "verticalBottomInset": 6,
+   "overlapPairs": 0,
+   "rows": [
+    {
+     "center": 40,
+     "count": 5,
+     "spread": 0,
+     "left": 33.47,
+     "right": 990.53
+    }
+   ],
+   "rowCount": 1
+  },
+  "390/base": {
+   "viewport": "390x844",
+   "scrollWidth": 390,
+   "innerWidth": 390,
+   "headH": 56,
+   "pillHeight": 56,
+   "pillRect": {
+    "l": 12,
+    "r": 378,
+    "t": 12,
+    "b": 68
+   },
+   "gapLeft": 19,
+   "gapRight": 7,
+   "verticalTopInset": 14,
+   "verticalBottomInset": 14,
+   "overlapPairs": 0,
+   "rows": [
+    {
+     "center": 40,
+     "count": 4,
+     "spread": 0,
+     "left": 31,
+     "right": 371
+    }
+   ],
+   "rowCount": 1
+  },
+  "390/fs1": {
+   "viewport": "390x844",
+   "scrollWidth": 390,
+   "innerWidth": 390,
+   "headH": 56,
+   "pillHeight": 56,
+   "pillRect": {
+    "l": 12,
+    "r": 378,
+    "t": 12,
+    "b": 68
+   },
+   "gapLeft": 15,
+   "gapRight": 15,
+   "verticalTopInset": 6,
+   "verticalBottomInset": 6,
+   "overlapPairs": 0,
+   "rows": [
+    {
+     "center": 40,
+     "count": 4,
+     "spread": 0,
+     "left": 27,
+     "right": 363
+    }
+   ],
+   "rowCount": 1
+  },
+  "390/fs2": {
+   "viewport": "390x844",
+   "scrollWidth": 390,
+   "innerWidth": 390,
+   "headH": 56,
+   "pillHeight": 56,
+   "pillRect": {
+    "l": 12,
+    "r": 378,
+    "t": 12,
+    "b": 68
+   },
+   "gapLeft": 15,
+   "gapRight": 15,
+   "verticalTopInset": 6,
+   "verticalBottomInset": 6,
+   "overlapPairs": 0,
+   "rows": [
+    {
+     "center": 40,
+     "count": 4,
+     "spread": 0,
+     "left": 27,
+     "right": 363
+    }
+   ],
+   "rowCount": 1
+  }
+ },
+ "content_clearance": {
+  "site 1440/base": {
+   "pillBottom": 68,
+   "titleTop": 226.7,
+   "clear": 158.7
+  },
+  "site 1440/fs2": {
+   "pillBottom": 146,
+   "titleTop": 336.6,
+   "clear": 190.6
+  },
+  "site 1024/base": {
+   "pillBottom": 68,
+   "titleTop": 189.2,
+   "clear": 121.2
+  },
+  "site 1024/fs2": {
+   "pillBottom": 68,
+   "titleTop": 200.7,
+   "clear": 132.7
+  },
+  "site 390/base": {
+   "pillBottom": 68,
+   "titleTop": 207.2,
+   "clear": 139.2
+  },
+  "site 390/fs2": {
+   "pillBottom": 68,
+   "titleTop": 249.3,
+   "clear": 181.3
+  }
+ },
+ "screenshots": [
+  "/Users/main/Documents/BGITU/docs/screenshots/task-c-a11y-header/1440-base.png",
+  "/Users/main/Documents/BGITU/docs/screenshots/task-c-a11y-header/1440-fs2.png",
+  "/Users/main/Documents/BGITU/docs/screenshots/task-c-a11y-header/390-base.png",
+  "/Users/main/Documents/BGITU/docs/screenshots/task-c-a11y-header/390-fs2.png"
+ ]
+}

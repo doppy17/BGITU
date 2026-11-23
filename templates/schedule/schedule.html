@@ -3,10 +3,6 @@
 {% block title %}Расписание{% endblock %}
 {% block content %}
 
-<header class="page-head">
-  <h1>Расписание</h1>
-</header>
-
 {% if can_import %}
 <!-- Обновление расписания: файл с bgitu.ru подгружается из модального окна -->
 <dialog class="dialog sched-import" id="scheduleImport" aria-labelledby="scheduleImportTitle" data-import-confirm="Удалить файл и все его занятия?" data-import-ext=".xls,.xlsx" data-import-max-size="15728640">
@@ -195,9 +191,9 @@
 
 <!-- Учебный план: вся программа по семестрам -->
 <section class="panel semester-panel">
-  <header class="panel__head">
+  <header class="panel__head semester-panel__head">
+    <span class="panel__num mono">02</span>
     <div class="panel__title">
-      <span class="panel__num mono">02</span>
       <h2>Учебный план · вся программа обучения</h2>
     </div>
     {% if can_import %}
@@ -287,7 +283,7 @@
   <p class="muted semester-panel__lead">Ось — семестры программы ({{ program_semesters|length }}). Цветные отрезки показывают, в каких семестрах читается дисциплина{% if program_semester %}; текущий семестр — {{ program_semester }}-й{% endif %}.</p>
 
   <div class="tl-scroll">
-    <div class="tl-grid tl-grid--semesters{% if program_semester %} has-now{% endif %}" style="--weeks: {{ program_semesters|length }}{% if program_semester %}; --now: {{ program_semester }}{% endif %}">
+    <div class="tl-grid tl-grid--semesters" style="--weeks: {{ program_semesters|length }}">
       <span class="tl-guides" aria-hidden="true"></span>
       <div class="tl-axis">
         <span class="tl-subject mono dim">семестры →</span>

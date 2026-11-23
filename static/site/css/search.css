@@ -89,7 +89,7 @@
 .search__cat { flex: none; padding: 0.3em 0.7em; border: 1px solid var(--line-strong); border-radius: var(--radius-pill); color: var(--text-faint); font-size: 0.6875rem; }
 .search__item[aria-selected="true"] .search__cat { border-color: color-mix(in oklab, var(--accent-ink) 40%, transparent); color: var(--accent-ink); }
 .search__empty { padding: 28px 16px; text-align: center; color: var(--text-muted); }
-.search__empty a { color: var(--accent); border-bottom: 1px solid currentColor; }
+.search__empty a { color: var(--accent); font-weight: 600; }
 .search__hint { display: flex; gap: 20px; padding: 12px 18px; border-top: 1px solid var(--line); color: var(--text-faint); }
 .search-btn span, .search-btn kbd { display: none; }
 .search-btn { width: 44px; justify-content: center; padding: 0; }

@@ -1,6 +1,11 @@
+import re
+from urllib.parse import unquote
+
+from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
 
+from apps.core.templatetags.bgitu import THEME_FAVICON, favicon_uri
 from apps.site.pages import PAGES
 
 
@@ -126,3 +131,40 @@ class NoOldSiteLinksTests(TestCase):
     def test_old_news_links_point_inside(self):
         response = self.client.get(reverse('site:news'))
         self.assertNotContains(response, 'bgitu.ru/news/index.php')
+
+
+class FaviconTests(TestCase):
+    """Favicon — data-URI в цветах выбранной темы, без запросов к серверу."""
+
+    @staticmethod
+    def _icon_svg(html):
+        match = re.search(r'<link rel="icon" href="([^"]+)"', html)
+        if not match:
+            return None
+        return unquote(match.group(1).split(',', 1)[1])
+
+    def test_icon_follows_theme_cookie(self):
+        for theme, (accent, ink) in THEME_FAVICON.items():
+            with self.subTest(theme=theme):
+                self.client.cookies['bgitu-theme'] = theme
+                svg = self._icon_svg(self.client.get(reverse('site:index')).content.decode())
+                expected = unquote(favicon_uri(theme).split(',', 1)[1])
+                self.assertEqual(svg, expected)
+                self.assertIn(f'fill="{accent}"', svg)
+                self.assertIn(f'fill="{ink}"', svg)
+
+    def test_login_page_has_themed_icon(self):
+        self.client.cookies['bgitu-theme'] = 'surik'
+        svg = self._icon_svg(self.client.get(reverse('accounts:login')).content.decode())
+        self.assertIsNotNone(svg)
+        self.assertIn('fill="#ff5a2e"', svg)
+
+    def test_colors_match_tokens_css(self):
+        tokens = (settings.BASE_DIR / 'static' / 'css' / 'tokens.css').read_text(encoding='utf-8')
+        for theme, (accent, ink) in THEME_FAVICON.items():
+            with self.subTest(theme=theme):
+                block = re.search(rf'\[data-theme="{theme}"\]\s*\{{(.*?)\}}', tokens, re.S)
+                self.assertIsNotNone(block, f'нет темы {theme} в tokens.css')
+                body = block.group(1)
+                self.assertEqual(re.search(r'--brand-accent:\s*(#[0-9a-fA-F]{6})', body).group(1).lower(), accent)
+                self.assertEqual(re.search(r'--brand-on-accent:\s*(#[0-9a-fA-F]{6})', body).group(1).lower(), ink)

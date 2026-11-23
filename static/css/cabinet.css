@@ -855,7 +855,7 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   font: 600 0.8125rem/1.4 var(--font-text);
   cursor: pointer;
 }
-.link-btn:hover { text-decoration: underline; }
+.link-btn:hover { color: var(--accent-hover); }
 
 /* ---------- Портфолио ---------- */
 .pf-stats { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-bottom: 16px; }
@@ -1087,33 +1087,42 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
 
 /* ---------- Таблица ---------- */
 .sched-panel { padding: 10px; }
-/* Шапка блока: выбор группы · «01 Расписание» · обновление.
-   Три колонки; заголовок в центре независимо от ширины боковых блоков. */
+/* Шапка блока: «01» · выбор группы · заголовок · обновление.
+   Номер блока — первый элемент слева, по центру строки; селектор идёт
+   сразу за ним, заголовок — после селектора, кнопка прижата вправо. */
 .sched-panel__bar {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  grid-template-areas: "group title action";
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: "pick title action";
   align-items: center;
   gap: 8px 14px;
   padding: 2px 4px 10px;
   margin-bottom: 2px;
   border-bottom: 1px solid var(--line);
 }
-.sched-panel__bar .group-switch { grid-area: group; justify-self: start; min-width: 0; }
-.sched-panel__title { grid-area: title; justify-self: center; }
+.sched-panel__pick {
+  grid-area: pick;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.sched-panel__num { flex: none; align-self: center; line-height: 1; }
+.sched-panel__pick .group-switch { min-width: 0; }
+.sched-panel__title { grid-area: title; justify-self: start; }
 .sched-panel__bar .sched-import-btn { grid-area: action; justify-self: end; }
 @media (max-width: 767px) {
-  /* Узкий экран: селектор отдельной строкой во всю ширину; ниже — заголовок
-     и кнопка, а если они не помещаются, кнопка переносится под заголовок.
-     Горизонтального скролла нет. */
+  /* Узкий экран: «01» и селектор одной строкой (селектор растягивается),
+     ниже — заголовок и кнопка; если не помещаются, кнопка переносится
+     под заголовок. Горизонтального скролла нет. */
   .sched-panel__bar {
     display: flex;
     flex-wrap: wrap;
     gap: 10px 12px;
   }
-  .sched-panel__bar .group-switch,
+  .sched-panel__pick { flex: 1 1 100%; }
+  .sched-panel__pick .group-switch { flex: 1 1 auto; }
   .sched-panel__bar .group-switch .sel { width: 100%; }
-  .sched-panel__bar .group-switch { flex: 1 1 100%; }
   .sched-panel__title { flex: 1 1 auto; }
   .sched-panel__bar .sched-import-btn { margin-left: auto; }
 }
@@ -1232,16 +1241,29 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
 .sched-cell--body:hover { background: var(--accent-soft); }
 .sched-cell--body.is-today { background: color-mix(in oklab, var(--accent) 6%, transparent); }
 .sched-cell--body.is-today:hover { background: color-mix(in oklab, var(--accent) 12%, transparent); }
-/* Разные пары подгрупп «а»/«б» в одном слоте: две карточки рядом —
-   слева «а», справа «б». Ячейка делится пополам по горизонтали. */
+/* Разные пары подгрупп «а»/«б» в одном слоте: две карточки друг под
+   другом — сверху «а», снизу «б». Ячейка делится пополам по вертикали,
+   разделитель — горизонтальная линия во всю ширину. */
 .sched-cell--body.sched-cell--split {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6px;
-  align-items: stretch;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-rows: minmax(0, 1fr);
+  gap: 0;
+  padding: 0;
 }
-.sched-cell--split .sched-lesson { min-width: 0; }
-.sched-cell--split .sched-lesson + .sched-lesson { border-left-color: var(--line-strong); }
+.sched-cell--split .sched-lesson {
+  min-width: 0;
+  min-height: 0;
+  padding: 7px 9px 7px 10px;
+  border: 0;
+  border-left: 2px solid var(--accent);
+  border-radius: 0;
+  background: transparent;
+}
+.sched-cell--split .sched-lesson + .sched-lesson {
+  border-top: 1px solid var(--line-strong);
+}
+.sched-cell--body.sched-cell--split .sched-lesson:hover { transform: none; box-shadow: none; }
 .sched-lesson {
   display: flex;
   flex-direction: column;
@@ -1291,7 +1313,6 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   letter-spacing: 0.04em;
   font-variant-numeric: tabular-nums;
 }
-.sched-cell--split .sched-time { text-align: center; }
 .sched-kind {
   align-self: flex-start;
   padding: 1px 6px;
@@ -1527,13 +1548,35 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
 .semester-panel {
   padding: 18px;
   /* Направляющие плана: от --brand-ink, плотнее --line — линия должна читаться
-     на светлом и тёмном фоне (контраст к панели ≥ 1.5:1 во всех темах). */
+     на светлом и тёмном фоне (контраст к панели ≥ 1.5:1 во всех темах).
+     --tl-guide-soft — та же сетка под колонкой названий дисциплин: слабее,
+     чтобы пунктир не спорил с текстом. */
   --tl-guide: color-mix(in oklab, var(--brand-ink) 62%, transparent);
-  --tl-guide-now: color-mix(in oklab, var(--accent) 82%, transparent);
-  --tl-guide-now-soft: color-mix(in oklab, var(--accent) 62%, transparent);
-  --tl-now-band: color-mix(in oklab, var(--accent) 17%, transparent);
+  --tl-guide-soft: color-mix(in oklab, var(--brand-ink) 40%, transparent);
 }
 .semester-panel__lead { margin: 4px 0 16px; font-size: 0.875rem; max-width: 64ch; }
+/* Шапка плана: номер «02» — крайний слева и по центру строки, заголовок
+   занимает остаток ширины, кнопка прижата вправо. Сетка держит номер
+   в одной строке с заголовком при любой ширине и размере шрифта. */
+.semester-panel__head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: "num title action";
+  align-items: center;
+  gap: 12px;
+}
+.semester-panel__head .panel__num { grid-area: num; align-self: center; line-height: 1; }
+.semester-panel__head .panel__title { grid-area: title; }
+.semester-panel__head .sched-import-btn { grid-area: action; justify-self: end; }
+@media (max-width: 767px) {
+  /* Узкий экран: «02» и заголовок одной строкой (номер по центру заголовка),
+     кнопка — отдельной строкой справа. */
+  .semester-panel__head {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: "num title" "action action";
+    gap: 10px 12px;
+  }
+}
 .tl-scroll { overflow-x: auto; }
 .tl-grid {
   --tl-col: 190px;
@@ -1605,18 +1648,9 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   right: 0;
   top: 10px;
   height: 2px;
-  /* сплошная пунктирная направляющая по всей дорожке — до правого края */
-  background: repeating-linear-gradient(to right, var(--tl-guide) 0 4px, transparent 4px 9px);
-}
-/* в колонке текущего семестра та же пунктирная линия — мягко акцентная */
-.tl-grid.has-now .tl-gridline::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: calc((var(--now) - 1) / var(--weeks) * 100%);
-  width: calc(100% / var(--weeks));
-  background: repeating-linear-gradient(to right, var(--tl-guide-now-soft) 0 4px, transparent 4px 9px);
+  /* сплошная пунктирная направляющая по всей дорожке — до правого края.
+     Штрих 4px, период 36px: реже прежнего (4/9) ровно вчетверо. */
+  background: repeating-linear-gradient(to right, var(--tl-guide) 0 4px, transparent 4px 36px);
 }
 .tl-seg {
   position: absolute;
@@ -1635,7 +1669,11 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   animation: tl-grow 0.5s var(--ease) both;
   animation-delay: calc(140ms + var(--i) * 70ms);
   transform-origin: left center;
-  /* тонкий контур: светлые отрезки не сливаются с панелью в светлых темах */
+  /* Заливка — из палитры отрезков (--tl-seg-0…5, задаётся темой);
+     цифры не белые и не чёрные: заливка, сдвинутая на 24% к чернилам темы. */
+  background: var(--tl-seg-fill, var(--tl-seg-0));
+  color: color-mix(in oklab, var(--tl-seg-fill, var(--tl-seg-0)), var(--brand-ink) 24%);
+  /* тонкий контур: отрезки не сливаются с панелью в светлых темах */
   box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--brand-ink) 22%, transparent);
 }
 @keyframes tl-grow {
@@ -1644,43 +1682,45 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
 }
 /* пунктирные направляющие учебного плана.
    Вертикали — одним слоем на всю высоту дорожек: линия не рвётся на стыках строк
-   и начинается ниже оси, поэтому номера семестров не налезают на неё. */
+   и начинается ниже оси, поэтому номера семестров не налезают на неё.
+   Сетка идёт от левого края блока — и под колонкой названий дисциплин тоже,
+   как лист в клетку: шаг колонки продолжается влево от оси семестров.
+   Штрих 4px, период 36px — реже прежнего (4/9) ровно вчетверо. */
 .tl-guides {
   position: absolute;
-  left: var(--tl-col);
+  left: 0;
   right: 0;
   top: calc(42px + 10px); /* высота оси + row-gap */
   bottom: 0;
   z-index: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 9px),
-    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 9px),
-    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 9px),
-    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 9px),
-    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 9px),
-    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 9px),
-    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 9px);
-  background-size: 1.5px 9px;
+    linear-gradient(to bottom, var(--tl-guide-soft) 0 4px, transparent 4px 36px),
+    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 36px),
+    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 36px),
+    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 36px),
+    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 36px),
+    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 36px),
+    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 36px),
+    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 36px),
+    linear-gradient(to bottom, var(--tl-guide) 0 4px, transparent 4px 36px);
+  background-size: 1.5px 36px;
   background-repeat: repeat-y;
-  /* границы семестров: 12.5% … 87.5% */
-  background-position: 12.5% 0, 25% 0, 37.5% 0, 50% 0, 62.5% 0, 75% 0, 87.5% 0;
+  /* x = левый край дорожки + доля её ширины; шаг семестра — 1/8.
+     Линия левее оси (−1/8 шага) продолжает клетку под названиями дисциплин. */
+  background-position:
+    calc(var(--tl-col) - (100% - var(--tl-col)) * 0.125) 0,
+    var(--tl-col) 0,
+    calc(var(--tl-col) + (100% - var(--tl-col)) * 0.125) 0,
+    calc(var(--tl-col) + (100% - var(--tl-col)) * 0.25) 0,
+    calc(var(--tl-col) + (100% - var(--tl-col)) * 0.375) 0,
+    calc(var(--tl-col) + (100% - var(--tl-col)) * 0.5) 0,
+    calc(var(--tl-col) + (100% - var(--tl-col)) * 0.625) 0,
+    calc(var(--tl-col) + (100% - var(--tl-col)) * 0.75) 0,
+    calc(var(--tl-col) + (100% - var(--tl-col)) * 0.875) 0;
 }
-/* текущий семестр — мягкая акцентная полоса и более яркая граница */
-.tl-grid.has-now .tl-guides::before {
-  content: "";
-  position: absolute;
-  box-sizing: border-box;
-  top: 0;
-  bottom: 0;
-  left: calc((var(--now) - 1) / var(--weeks) * 100%);
-  width: calc(100% / var(--weeks));
-  /* ровный тинт на всю высоту плана: подсветка не выцветает к нижним строкам */
-  background: var(--tl-now-band);
-  border-left: 1px solid var(--tl-guide-now);
-  border-right: 1px solid var(--tl-guide-now-soft);
-  border-radius: 3px;
-}
+/* название дисциплины идёт поверх мягкой клетки под ним */
+.tl-row > .tl-subject { position: relative; z-index: 1; }
 /* пунктирный коннектор от названия дисциплины до её дорожки */
 .tl-row > .tl-subject::after {
   content: "";
@@ -1688,7 +1728,7 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   min-width: 8px;
   height: 2px;
   border-radius: 1px;
-  background: repeating-linear-gradient(to right, var(--tl-guide) 0 3px, transparent 3px 7px);
+  background: repeating-linear-gradient(to right, var(--tl-guide) 0 4px, transparent 4px 36px);
 }
 .tl-axis .tl-subject::after { display: none; }
 
@@ -1732,13 +1772,42 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
 }
 .tl-grid--semesters .tl-seg { font-size: 0.625rem; }
 
-/* палитра отрезков — на основе токенов темы, читается в любой теме */
-.tl-seg--0 { background: var(--accent); color: var(--accent-ink); }
-.tl-seg--1 { background: color-mix(in oklab, var(--accent) 62%, var(--aux)); color: var(--accent-ink); }
-.tl-seg--2 { background: var(--aux); color: var(--brand-on-accent); }
-.tl-seg--3 { background: color-mix(in oklab, var(--aux) 55%, var(--brand-ink) 45%); color: var(--brand-base); }
-.tl-seg--4 { background: var(--accent-soft); color: var(--text); }
-.tl-seg--5 { background: color-mix(in oklab, var(--accent) 30%, var(--brand-ink) 70%); color: var(--brand-base); }
+/* Палитра отрезков. Заливка каждого варианта отличима от панели
+   (контраст к --bg-raised ≥ 1.45:1 во всех темах), цифры — та же заливка,
+   сдвинутая на 24% к чернилам темы: не белые и не чёрные.
+   Светлые темы (бумага, бронза): заливки от акцента и охры к бумаге. */
+.semester-panel {
+  --tl-seg-0: var(--accent);
+  --tl-seg-1: color-mix(in oklab, var(--accent) 55%, var(--brand-aux));
+  --tl-seg-2: var(--brand-aux);
+  --tl-seg-3: color-mix(in oklab, var(--brand-aux) 55%, var(--brand-base));
+  --tl-seg-4: color-mix(in oklab, var(--accent) 40%, var(--brand-base));
+  --tl-seg-5: color-mix(in oklab, var(--accent) 70%, var(--brand-base));
+}
+/* Тёмные темы: те же оттенки, но приглушённые к фону — иначе заливка
+   светлее чернил и цифры «в сторону чернил» пропадают. */
+[data-theme="surik"] .semester-panel {
+  --tl-seg-0: color-mix(in oklab, var(--accent) 80%, var(--brand-base));
+  --tl-seg-1: color-mix(in oklab, var(--accent) 60%, var(--brand-base));
+  --tl-seg-2: color-mix(in oklab, var(--brand-aux) 45%, var(--brand-base));
+  --tl-seg-3: color-mix(in oklab, var(--brand-aux) 38%, var(--brand-base));
+  --tl-seg-4: color-mix(in oklab, var(--accent) 40%, var(--brand-base));
+  --tl-seg-5: color-mix(in oklab, var(--accent) 70%, var(--brand-base));
+}
+[data-theme="latun"] .semester-panel {
+  --tl-seg-0: color-mix(in oklab, var(--accent) 70%, var(--brand-base));
+  --tl-seg-1: color-mix(in oklab, var(--accent) 55%, var(--brand-base));
+  --tl-seg-2: color-mix(in oklab, var(--brand-aux) 45%, var(--brand-base));
+  --tl-seg-3: color-mix(in oklab, var(--brand-aux) 33%, var(--brand-base));
+  --tl-seg-4: color-mix(in oklab, var(--accent) 36%, var(--brand-base));
+  --tl-seg-5: color-mix(in oklab, var(--accent) 45%, var(--brand-base));
+}
+.tl-seg--0 { --tl-seg-fill: var(--tl-seg-0); }
+.tl-seg--1 { --tl-seg-fill: var(--tl-seg-1); }
+.tl-seg--2 { --tl-seg-fill: var(--tl-seg-2); }
+.tl-seg--3 { --tl-seg-fill: var(--tl-seg-3); }
+.tl-seg--4 { --tl-seg-fill: var(--tl-seg-4); }
+.tl-seg--5 { --tl-seg-fill: var(--tl-seg-5); }
 
 @media (max-width: 640px) {
   .week-nav { gap: 8px; }
