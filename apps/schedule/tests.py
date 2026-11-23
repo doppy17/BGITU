@@ -3,6 +3,7 @@ from datetime import date, timedelta
 from io import BytesIO
 from pathlib import Path
 import tempfile
+from urllib.parse import quote
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -356,7 +357,18 @@ class WeekParityTests(TestCase):
         self.assertContains(response, 'sub-pill is-active')
 
     def test_curriculum_block_lists_program(self):
-        """Блок учебного плана: все дисциплины программы по семестрам."""
+        """Блок учебного плана: дисциплины загруженного плана направления группы."""
+        from apps.education.models import CurriculumEntry, PlanSource
+
+        source = PlanSource.objects.create(
+            original_name='plan-ist.xlsx', direction='09.03.02', direction_code='ist',
+        )
+        CurriculumEntry.objects.create(
+            code='ist', subject='Математический анализ', semester_from=1, semester_to=2, source=source,
+        )
+        CurriculumEntry.objects.create(
+            code='ist', subject='Иностранный язык', semester_from=1, semester_to=4, source=source,
+        )
         self.client.force_login(self.student)
         response = self.client.get(reverse('schedule:schedule'))
         self.assertContains(response, 'Учебный план · вся программа обучения')
@@ -365,6 +377,14 @@ class WeekParityTests(TestCase):
         # многолетняя дисциплина — отрезок по семестрам
         self.assertContains(response, 'Иностранный язык: 1–4 семестры')
         self.assertContains(response, '>3</b><em>сем.</em>')
+
+    def test_curriculum_block_empty_without_uploaded_plan(self):
+        """Без загруженного плана — честное пустое состояние, без демо-дисциплин."""
+        self.client.force_login(self.student)
+        response = self.client.get(reverse('schedule:schedule'))
+        self.assertContains(response, 'План для направления не загружен')
+        self.assertNotContains(response, 'Математический анализ')
+        self.assertNotContains(response, 'class="tl-row"')
 
     def test_curriculum_marks_current_semester(self):
         from datetime import date
@@ -1214,3 +1234,134 @@ class ScheduleRowCountTests(TestCase):
         html = response.content.decode()
         self.assertIn('занятий нет', html)
         self.assertNotIn('class="sched-table"', html)
+
+
+@override_settings(MEDIA_ROOT=tempfile.mkdtemp(prefix='bgitu-schedule-download-'))
+class ScheduleDownloadTests(TestCase):
+    """Скачивание исходников расписания: вложение с исходным именем и проверка прав."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.dean_role = Role.objects.create(code='dl_dean', name='Деканат', can_manage_schedule=True)
+        cls.student_role = Role.objects.create(code='dl_student', name='Студент', can_upload_works=True)
+        cls.owner = User.objects.create_user('dl_owner', password='demo12345')
+        cls.owner.profile.role = cls.dean_role
+        cls.owner.profile.save()
+        cls.other_dean = User.objects.create_user('dl_other', password='demo12345')
+        cls.other_dean.profile.role = cls.dean_role
+        cls.other_dean.profile.save()
+        cls.staff_dean = User.objects.create_user('dl_staff', password='demo12345', is_staff=True)
+        cls.staff_dean.profile.role = cls.dean_role
+        cls.staff_dean.profile.save()
+        cls.student = User.objects.create_user('dl_student_user', password='demo12345')
+        cls.student.profile.role = cls.student_role
+        cls.student.profile.save()
+
+    def setUp(self):
+        self.payload = b'xls-bytes-for-download'
+        self.record = ScheduleImport.objects.create(
+            file=SimpleUploadedFile('schedule-ist.xls', self.payload),
+            original_name='schedule-ist.xls',
+            size=len(self.payload),
+            imported_by=self.owner,
+        )
+
+    def file_url(self):
+        return reverse('schedule:source_file', args=[self.record.pk])
+
+    def test_owner_gets_attachment_with_original_name(self):
+        self.client.force_login(self.owner)
+        response = self.client.get(self.file_url())
+        self.assertEqual(response.status_code, 200)
+        disposition = response['Content-Disposition']
+        self.assertIn('attachment', disposition)
+        self.assertIn('filename="schedule-ist.xls"', disposition)
+        self.assertEqual(b''.join(response.streaming_content), self.payload)
+
+    def test_cyrillic_name_is_preserved(self):
+        self.record.original_name = 'расписание ИСТ.xls'
+        self.record.save(update_fields=['original_name'])
+        self.client.force_login(self.owner)
+        response = self.client.get(self.file_url())
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("filename*=utf-8''" + quote('расписание ИСТ.xls'), response['Content-Disposition'])
+
+    def test_staff_can_download_foreign_file(self):
+        self.client.force_login(self.staff_dean)
+        self.assertEqual(self.client.get(self.file_url()).status_code, 200)
+
+    def test_other_dean_cannot_download_foreign_file(self):
+        self.client.force_login(self.other_dean)
+        self.assertEqual(self.client.get(self.file_url()).status_code, 403)
+
+    def test_student_cannot_download(self):
+        self.client.force_login(self.student)
+        self.assertEqual(self.client.get(self.file_url()).status_code, 403)
+
+    def test_anonymous_is_redirected_to_login(self):
+        response = self.client.get(self.file_url())
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/login/', response['Location'])
+
+    def test_modal_has_drag_drop_zone_and_download_link(self):
+        self.client.force_login(self.owner)
+        response = self.client.get(reverse('schedule:schedule'), {'group': 'ИСТ-201'})
+        html = response.content.decode()
+        self.assertIn('data-import-drop', html)
+        self.assertIn('data-import-ext=".xls,.xlsx"', html)
+        self.assertIn('data-import-max-size="15728640"', html)
+        self.assertIn('data-import-error', html)
+        self.assertIn(self.file_url(), html)
+        self.assertIn('download="schedule-ist.xls"', html)
+        script = (settings.BASE_DIR / 'static/js/app.js').read_text(encoding='utf-8')
+        for marker in ("'dragenter'", "'dragover'", "'dragleave'", "'drop'", 'dataTransfer', 'is-dragover'):
+            self.assertIn(marker, script)
+
+
+class ScheduleKindBadgeTests(TestCase):
+    """Бейдж вида занятия не дублирует предмет; в hero нет служебной подписи."""
+
+    @classmethod
+    def setUpTestData(cls):
+        role = Role.objects.create(code='badge_student', name='Студент', can_upload_works=True)
+        cls.group = Group.objects.create(code='ИСТ-501', course=5)
+        cls.student = User.objects.create_user('badge_student', password='demo12345')
+        cls.student.profile.role = role
+        cls.student.profile.group = cls.group
+        cls.student.profile.save()
+
+    def page(self):
+        self.client.force_login(self.student)
+        response = self.client.get(reverse('schedule:schedule'), {'week': '12'})
+        self.assertEqual(response.status_code, 200)
+        return response.content.decode()
+
+    def test_hero_has_no_semester_caption(self):
+        """Служебная подпись «учебный процесс · семестр 2026/27» убрана из hero."""
+        Lesson.objects.create(group=self.group, weekday=1, pair=1, subject='Философия')
+        html = self.page()
+        self.assertNotIn('учебный процесс', html)
+        self.assertNotIn('семестр 2026/27', html)
+
+    def test_physical_education_kind_badge_is_hidden(self):
+        """«физкультура» не повторяет предмет отдельным бейджем."""
+        Lesson.objects.create(
+            group=self.group, weekday=1, pair=1,
+            subject='Элективные дисциплины по физкультуре и спорту', kind='физкультура',
+        )
+        html = self.page()
+        self.assertIn('Элективные дисциплины по физкультуре и спорту', html)
+        self.assertNotIn('sched-kind', html)
+
+    def test_lab_kind_badge_stays(self):
+        """Для лабораторной бейдж вида остаётся."""
+        Lesson.objects.create(group=self.group, weekday=1, pair=1, subject='Базы данных', kind='лаб')
+        html = self.page()
+        self.assertIn('<span class="sched-kind mono">лаб</span>', html)
+
+    def test_kind_inside_subject_is_hidden(self):
+        """Вид, целиком входящий в название дисциплины, не дублируется бейджем."""
+        Lesson.objects.create(group=self.group, weekday=1, pair=1, subject='Лекция по философии', kind='лекция')
+        html = self.page()
+        self.assertIn('Лекция по философии', html)
+        self.assertNotIn('sched-kind', html)

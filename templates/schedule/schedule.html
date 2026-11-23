@@ -3,21 +3,8 @@
 {% block title %}Расписание{% endblock %}
 {% block content %}
 
-<header class="page-head page-head--row">
-  <div>
-    <p class="mono dim">учебный процесс · семестр 2026/27</p>
-    <h1>Расписание</h1>
-    <p>{% if group %}Группа {{ group.code }}{% if group.course %} · {{ group.course }} курс{% endif %}{% else %}Группа не выбрана{% endif %}</p>
-  </div>
-  {% if can_choose_group %}
-  <form method="get" class="group-switch">
-    <select class="input" name="group" aria-label="Группа" onchange="this.form.submit()">
-      {% for g in groups %}
-        <option value="{{ g.code }}" {% if group and g.id == group.id %}selected{% endif %}>{{ g.code }}</option>
-      {% endfor %}
-    </select>
-  </form>
-  {% endif %}
+<header class="page-head">
+  <h1>Расписание</h1>
 </header>
 
 {% if can_import %}
@@ -71,12 +58,14 @@
               </small>
               <small class="mono dim">{{ source.imported_at|date:"d.m.Y H:i" }}{% if source.imported_by %} · {{ source.imported_by.username }}{% endif %}</small>
             </span>
+            {% if source.imported_by_id == user.id or user.is_staff or user.is_superuser %}
             <a class="sched-file__dl" href="{% url 'schedule:source_file' source.pk %}"
                download="{{ source.original_name }}"
                aria-label="Скачать файл {{ source.original_name }}">
               <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4"/><path d="M4 17v3h16v-3"/></svg>
               <span>скачать</span>
             </a>
+            {% endif %}
             <button class="sched-file__del" type="submit"
                     formaction="{% url 'schedule:source_delete' source.pk %}" formmethod="post" formnovalidate
                     data-import-delete
@@ -150,27 +139,15 @@
 <!-- Таблица расписания -->
 {% if no_lessons %}
 <section class="panel">
+  {% include 'schedule/_schedule_head.html' %}
   <div class="empty">
     <b>На {{ week_label }} неделе занятий нет</b>
     <p>В файле БГИТУ для группы {{ group.code }} на {{ monday|date:"d.m.Y" }} — {{ sunday|date:"d.m.Y" }} пар нет{% if has_subgroups %} для выбранной подгруппы{% endif %}.</p>
-    {% if can_import %}
-    <button class="btn btn--accent btn--sm sched-import-btn" type="button" id="scheduleImportOpen" aria-haspopup="dialog" aria-controls="scheduleImport">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v11m0-11 4 4m-4-4-4 4"/><path d="M4 17v3h16v-3"/></svg>
-      Обновить расписание
-    </button>
-    {% endif %}
   </div>
 </section>
 {% else %}
 <section class="panel sched-panel{% if direction == 'next' %} sched-in-next{% elif direction == 'prev' %} sched-in-prev{% endif %}">
-  {% if can_import %}
-  <div class="sched-panel__bar">
-    <button class="btn btn--accent btn--sm sched-import-btn" type="button" id="scheduleImportOpen" aria-haspopup="dialog" aria-controls="scheduleImport">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v11m0-11 4 4m-4-4-4 4"/><path d="M4 17v3h16v-3"/></svg>
-      Обновить расписание
-    </button>
-  </div>
-  {% endif %}
+  {% include 'schedule/_schedule_head.html' %}
   <div class="sched-scroll" data-week-grid>
     <div class="sched-table" style="--pairs: {{ grid|length }}">
       <div class="sched-head">
@@ -192,7 +169,7 @@
           {% for lesson in cell.lessons %}
           <article class="sched-lesson{% if lesson.kind == 'лаб' or lesson.kind == 'лаб.' or lesson.kind == 'практ' %} sched-lesson--lab{% endif %}">
             <span class="sched-tags">
-              {% if lesson.kind %}<span class="sched-kind mono">{{ lesson.kind }}</span>{% endif %}
+              {% if lesson.kind_label %}<span class="sched-kind mono">{{ lesson.kind_label }}</span>{% endif %}
               {% if lesson.subgroup and has_subgroups %}<span class="sched-sub mono" title="пара подгруппы {{ lesson.subgroup_label }}">подгр. {{ lesson.subgroup_label }}</span>{% endif %}
             </span>
             <b>{{ lesson.subject }}</b>
@@ -278,12 +255,14 @@
                 </small>
                 <small class="mono dim">{{ source.uploaded_at|date:"d.m.Y H:i" }}{% if source.uploaded_by %} · {{ source.uploaded_by.username }}{% endif %}</small>
               </span>
+              {% if source.uploaded_by_id == user.id or user.is_staff or user.is_superuser %}
               <a class="sched-file__dl" href="{% url 'education:plan_source_file' source.pk %}"
                  download="{{ source.original_name }}"
                  aria-label="Скачать файл {{ source.original_name }}">
                 <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4"/><path d="M4 17v3h16v-3"/></svg>
                 <span>скачать</span>
               </a>
+              {% endif %}
               <button class="sched-file__del" type="submit"
                       formaction="{% url 'education:plan_source_delete' source.pk %}" formmethod="post" formnovalidate
                       data-import-delete
@@ -334,7 +313,7 @@
         </div>
       </div>
       {% empty %}
-      <div class="empty"><b>Учебный план не загружен</b><p>Для этого направления план появится позже.</p></div>
+      <div class="empty"><b>План для направления не загружен</b><p>Загрузите файл учебного плана — дисциплины появятся здесь.</p></div>
       {% endfor %}
     </div>
   </div>

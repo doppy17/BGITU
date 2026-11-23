@@ -128,5 +128,24 @@ class Lesson(models.Model):
         return {'all': '', 'odd': '1-я неделя', 'even': '2-я неделя'}.get(str(self.week), '')
 
     @property
+    def kind_label(self):
+        """Вид занятия для бейджа: пусто, если он дублирует название дисциплины.
+
+        У физкультуры вид «физкультура» повторяет предмет — бейдж не нужен.
+        В общем случае вид скрывается, когда он целиком входит в название
+        дисциплины или наоборот.
+        """
+        kind = str(self.kind or '').strip()
+        subject = str(self.subject or '').strip().lower()
+        if not kind:
+            return ''
+        lowered = kind.lower()
+        if 'физкультур' in subject:
+            return ''
+        if subject and (lowered in subject or subject in lowered):
+            return ''
+        return kind
+
+    @property
     def building_label(self):
         return f'{self.building} корпус' if self.building else ''
