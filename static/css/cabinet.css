@@ -1528,9 +1528,9 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   padding: 18px;
   /* Направляющие плана: от --brand-ink, плотнее --line — линия должна читаться
      на светлом и тёмном фоне (контраст к панели ≥ 1.5:1 во всех темах). */
-  --tl-guide: color-mix(in oklab, var(--brand-ink) 44%, transparent);
-  --tl-guide-now: color-mix(in oklab, var(--accent) 72%, transparent);
-  --tl-guide-now-soft: color-mix(in oklab, var(--accent) 48%, transparent);
+  --tl-guide: color-mix(in oklab, var(--brand-ink) 62%, transparent);
+  --tl-guide-now: color-mix(in oklab, var(--accent) 82%, transparent);
+  --tl-guide-now-soft: color-mix(in oklab, var(--accent) 62%, transparent);
   --tl-now-band: color-mix(in oklab, var(--accent) 10%, transparent);
 }
 .semester-panel__lead { margin: 4px 0 16px; font-size: 0.875rem; max-width: 64ch; }
@@ -1635,6 +1635,8 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   animation: tl-grow 0.5s var(--ease) both;
   animation-delay: calc(140ms + var(--i) * 70ms);
   transform-origin: left center;
+  /* тонкий контур: светлые отрезки не сливаются с панелью в светлых темах */
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--brand-ink) 22%, transparent);
 }
 @keyframes tl-grow {
   from { transform: scaleX(0); opacity: 0; }
