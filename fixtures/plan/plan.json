@@ -1,0 +1,2372 @@
+{
+  "meta": {
+    "direction": "09.03.02 Информационные системы и технологии",
+    "level": "бакалавриат",
+    "form": "очная",
+    "institute": "ИЭИ (инженерно-экономический институт), БГИТУ",
+    "enrollment_year": 2026,
+    "academic_year": "2026/27",
+    "source_url": "https://bgitu.ru/sveden/education/uchebnye-plany/2026-27/up-ochnoe/bac/УП 09.03.02 ИСТ 2026.pdf",
+    "source_page": "https://bgitu.ru/sveden/education/",
+    "file_name": "Учебный план 09.03.02 ИСТ 2026 (БГИТУ, очная, бакалавриат).pdf",
+    "file_size": 507150,
+    "sha256": "544ad9f01ee681ebf0c81230b77434b8def6e38c2ebe74a0ea9f73f0f94aeaae",
+    "retrieved": "2026-11-23",
+    "assumption": "Точный файл для 09.03.02 (очная форма, план набора 2026) найден на bgitu.ru; скачан без допущений.",
+    "control_note": "В плане проставлены только экзамен (номер семестра) и курсовая работа («ргр»/«2ргр»); остальные сессии — зачёт. Элективная физкультура (Б1.ДВ.3) в плане без з.е.",
+    "zets_block1_total": 210,
+    "zets_total_with_practices_and_gia": 240
+  },
+  "semester_counts": {
+    "1": 12,
+    "2": 11,
+    "3": 11,
+    "4": 10,
+    "5": 11,
+    "6": 12,
+    "7": 10,
+    "8": 8
+  },
+  "semester_zets": {
+    "1": 27.0,
+    "2": 30.0,
+    "3": 27.0,
+    "4": 27.0,
+    "5": 27.0,
+    "6": 27.0,
+    "7": 24.0,
+    "8": 21.0
+  },
+  "disciplines": [
+    {
+      "code": "Б1.О.1",
+      "subject": "Иностранный язык",
+      "semesters": [
+        1,
+        2
+      ],
+      "zets_by_semester": {
+        "1": 3.0,
+        "2": 4.0
+      },
+      "total_zets": 7.0,
+      "department": "РиИЯ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.2",
+      "subject": "История России",
+      "semesters": [
+        2
+      ],
+      "zets_by_semester": {
+        "2": 4.0
+      },
+      "total_zets": 4.0,
+      "department": "ФИиС",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.3",
+      "subject": "Философия",
+      "semesters": [
+        3
+      ],
+      "zets_by_semester": {
+        "3": 3.0
+      },
+      "total_zets": 3.0,
+      "department": "ФИиС",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.4",
+      "subject": "Правовое обеспечение профессиональной деятельности",
+      "semesters": [
+        8
+      ],
+      "zets_by_semester": {
+        "8": 2.0
+      },
+      "total_zets": 2.0,
+      "department": null,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.5",
+      "subject": "Основы российской государственности",
+      "semesters": [
+        2
+      ],
+      "zets_by_semester": {
+        "2": 2.0
+      },
+      "total_zets": 2.0,
+      "department": "ФИиС",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.6",
+      "subject": "Актуальные проблемы межкультурного взаимодействия",
+      "semesters": [
+        4
+      ],
+      "zets_by_semester": {
+        "4": 2.0
+      },
+      "total_zets": 2.0,
+      "department": null,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.7",
+      "subject": "Этика и психология в профессиональной деятельности",
+      "semesters": [
+        6
+      ],
+      "zets_by_semester": {
+        "6": 2.0
+      },
+      "total_zets": 2.0,
+      "department": null,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.8",
+      "subject": "Экономика и основы финансовой грамотности",
+      "semesters": [
+        4
+      ],
+      "zets_by_semester": {
+        "4": 3.0
+      },
+      "total_zets": 3.0,
+      "department": "ЭиЭБ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.9",
+      "subject": "Основы здорового образа жизни",
+      "semesters": [
+        3
+      ],
+      "zets_by_semester": {
+        "3": 1.0
+      },
+      "total_zets": 1.0,
+      "department": "ПЭиТБ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.10",
+      "subject": "Культура речи и деловое общение",
+      "semesters": [
+        1
+      ],
+      "zets_by_semester": {
+        "1": 2.0
+      },
+      "total_zets": 2.0,
+      "department": "РиИЯ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.11",
+      "subject": "Экология",
+      "semesters": [
+        5
+      ],
+      "zets_by_semester": {
+        "5": 2.0
+      },
+      "total_zets": 2.0,
+      "department": "ПЭиТБ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.12",
+      "subject": "Математика",
+      "semesters": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "zets_by_semester": {
+        "1": 5.0,
+        "2": 5.0,
+        "3": 5.0,
+        "4": 5.0
+      },
+      "total_zets": 20.0,
+      "department": "Матем.",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.13",
+      "subject": "Информатика",
+      "semesters": [
+        1
+      ],
+      "zets_by_semester": {
+        "1": 3.0
+      },
+      "total_zets": 3.0,
+      "department": "ИТ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.14",
+      "subject": "Физика",
+      "semesters": [
+        1,
+        2,
+        3
+      ],
+      "zets_by_semester": {
+        "1": 3.0,
+        "2": 3.0,
+        "3": 4.0
+      },
+      "total_zets": 10.0,
+      "department": "ОТДиФ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.15",
+      "subject": "Алгоритмизация и программирование",
+      "semesters": [
+        1,
+        2
+      ],
+      "zets_by_semester": {
+        "1": 2.0,
+        "2": 4.0
+      },
+      "total_zets": 6.0,
+      "department": "ИТ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.16",
+      "subject": "Разработка приложений в среде Java",
+      "semesters": [
+        7,
+        8
+      ],
+      "zets_by_semester": {
+        "7": 3.0,
+        "8": 4.0
+      },
+      "total_zets": 7.0,
+      "department": "ИТ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.17",
+      "subject": "Проектирование бизнес-приложений",
+      "semesters": [
+        5,
+        6
+      ],
+      "zets_by_semester": {
+        "5": 3.0,
+        "6": 3.0
+      },
+      "total_zets": 6.0,
+      "department": "ИТ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.18",
+      "subject": "JavaScript-разработка",
+      "semesters": [
+        3,
+        4
+      ],
+      "zets_by_semester": {
+        "3": 3.0,
+        "4": 3.0
+      },
+      "total_zets": 6.0,
+      "department": "ИТ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.19",
+      "subject": "Безопасность жизнедеятельности",
+      "semesters": [
+        6
+      ],
+      "zets_by_semester": {
+        "6": 3.0
+      },
+      "total_zets": 3.0,
+      "department": "ПЭиТБ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.20",
+      "subject": "Физическая культура и спорт",
+      "semesters": [
+        1,
+        3
+      ],
+      "zets_by_semester": {
+        "1": 1.0,
+        "3": 1.0
+      },
+      "total_zets": 2.0,
+      "department": "физвосп.",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.1",
+      "subject": "Web-дизайн",
+      "semesters": [
+        1,
+        2
+      ],
+      "zets_by_semester": {
+        "1": 2.0,
+        "2": 3.0
+      },
+      "total_zets": 5.0,
+      "department": "ИТ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.2",
+      "subject": "Методы машинного обучения",
+      "semesters": [
+        5,
+        6
+      ],
+      "zets_by_semester": {
+        "5": 3.0,
+        "6": 3.0
+      },
+      "total_zets": 6.0,
+      "department": "ИТ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.3",
+      "subject": "Backend-разработка",
+      "semesters": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "zets_by_semester": {
+        "5": 3.0,
+        "6": 2.0,
+        "7": 2.0,
+        "8": 3.0
+      },
+      "total_zets": 10.0,
+      "department": "ИТ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.4",
+      "subject": "Моделирование систем и процессов",
+      "semesters": [
+        6,
+        7
+      ],
+      "zets_by_semester": {
+        "6": 3.0,
+        "7": 3.0
+      },
+      "total_zets": 6.0,
+      "department": "ИТ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.5",
+      "subject": "Базы данных",
+      "semesters": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "zets_by_semester": {
+        "1": 2.0,
+        "2": 2.0,
+        "3": 2.0,
+        "4": 4.0
+      },
+      "total_zets": 10.0,
+      "department": "ИТ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.6",
+      "subject": "Язык программирования Python",
+      "semesters": [
+        1
+      ],
+      "zets_by_semester": {
+        "1": 3.0
+      },
+      "total_zets": 3.0,
+      "department": "ИТ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.7",
+      "subject": "Прикладная разработка на Python",
+      "semesters": [
+        2,
+        3
+      ],
+      "zets_by_semester": {
+        "2": 2.0,
+        "3": 4.0
+      },
+      "total_zets": 6.0,
+      "department": null,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.8",
+      "subject": "Инфокоммуникационные системы и сети",
+      "semesters": [
+        7,
+        8
+      ],
+      "zets_by_semester": {
+        "7": 3.0,
+        "8": 3.0
+      },
+      "total_zets": 6.0,
+      "department": "ИТ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.9",
+      "subject": "Тестирование программного обеспечения",
+      "semesters": [
+        7,
+        8
+      ],
+      "zets_by_semester": {
+        "7": 2.0,
+        "8": 2.0
+      },
+      "total_zets": 4.0,
+      "department": "ИТ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.10",
+      "subject": "Объектно-ориентированное программирование",
+      "semesters": [
+        3,
+        4
+      ],
+      "zets_by_semester": {
+        "3": 3.0,
+        "4": 4.0
+      },
+      "total_zets": 7.0,
+      "department": "ИТ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.11",
+      "subject": "Язык программирования Java",
+      "semesters": [
+        5,
+        6
+      ],
+      "zets_by_semester": {
+        "5": 3.0,
+        "6": 3.0
+      },
+      "total_zets": 6.0,
+      "department": "ИТ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.12",
+      "subject": "Разработка на бизнес-ориентированных языках программирования",
+      "semesters": [
+        4,
+        5,
+        6
+      ],
+      "zets_by_semester": {
+        "4": 2.0,
+        "5": 3.0,
+        "6": 2.0
+      },
+      "total_zets": 7.0,
+      "department": null,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.13",
+      "subject": "Дополнительные механизмы платформы 1С",
+      "semesters": [
+        7,
+        8
+      ],
+      "zets_by_semester": {
+        "7": 3.0,
+        "8": 3.0
+      },
+      "total_zets": 6.0,
+      "department": "ИТ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.14",
+      "subject": "Технологии разработки мобильных приложений",
+      "semesters": [
+        5,
+        6
+      ],
+      "zets_by_semester": {
+        "5": 2.0,
+        "6": 3.0
+      },
+      "total_zets": 5.0,
+      "department": "ИТ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.15",
+      "subject": "Программирование мобильных приложений",
+      "semesters": [
+        7,
+        8
+      ],
+      "zets_by_semester": {
+        "7": 2.0,
+        "8": 3.0
+      },
+      "total_zets": 5.0,
+      "department": "ИТ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.16",
+      "subject": "Фреймворки машинного обучения",
+      "semesters": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "zets_by_semester": {
+        "4": 3.0,
+        "5": 3.0,
+        "6": 2.0,
+        "7": 3.0
+      },
+      "total_zets": 11.0,
+      "department": "ИТ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.17",
+      "subject": "Индустриальная разработка",
+      "semesters": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "zets_by_semester": {
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "4": 1.0,
+        "5": 1.0,
+        "6": 1.0,
+        "7": 1.0,
+        "8": 1.0
+      },
+      "total_zets": 8.0,
+      "department": "ИТ",
+      "elective_options": false
+    },
+    {
+      "code": "Б1.ДВ.1",
+      "subject": "Вычислительные машины и операционные / Архитектура информационных систем",
+      "semesters": [
+        5
+      ],
+      "zets_by_semester": {
+        "5": 4.0
+      },
+      "total_zets": 4.0,
+      "department": "ИТ",
+      "elective_options": true
+    },
+    {
+      "code": "Б1.ДВ.2",
+      "subject": "Адаптация типовых конфигураций 1С / Информационные системы в оперативно-плановом управлении",
+      "semesters": [
+        7
+      ],
+      "zets_by_semester": {
+        "7": 2.0
+      },
+      "total_zets": 2.0,
+      "department": null,
+      "elective_options": true
+    },
+    {
+      "code": "Б1.ДВ.3",
+      "subject": "Элективные дисциплины по физической культуре и спорту",
+      "semesters": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "zets_by_semester": {
+        "1": null,
+        "2": null,
+        "3": null,
+        "4": null,
+        "5": null,
+        "6": null
+      },
+      "total_zets": 0,
+      "department": null,
+      "elective_options": true
+    }
+  ],
+  "by_semester": {
+    "1": [
+      {
+        "code": "Б1.В.1",
+        "subject": "Web-дизайн",
+        "semester": 1,
+        "zets": 2.0,
+        "control": "экзамен, курсовая работа",
+        "department": "ИТ",
+        "source_page": 3,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.17",
+        "subject": "Индустриальная разработка",
+        "semester": 1,
+        "zets": 1.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 6,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.5",
+        "subject": "Базы данных",
+        "semester": 1,
+        "zets": 2.0,
+        "control": "экзамен, курсовая работа",
+        "department": "ИТ",
+        "source_page": 4,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.6",
+        "subject": "Язык программирования Python",
+        "semester": 1,
+        "zets": 3.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 4,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.ДВ.3",
+        "subject": "Элективные дисциплины по физической культуре и спорту",
+        "semester": 1,
+        "zets": null,
+        "control": "зачет",
+        "department": null,
+        "source_page": 6,
+        "elective_options": true
+      },
+      {
+        "code": "Б1.О.1",
+        "subject": "Иностранный язык",
+        "semester": 1,
+        "zets": 3.0,
+        "control": "экзамен",
+        "department": "РиИЯ",
+        "source_page": 2,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.О.10",
+        "subject": "Культура речи и деловое общение",
+        "semester": 1,
+        "zets": 2.0,
+        "control": "экзамен",
+        "department": "РиИЯ",
+        "source_page": 2,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.О.12",
+        "subject": "Математика",
+        "semester": 1,
+        "zets": 5.0,
+        "control": "экзамен, курсовая работа",
+        "department": "Матем.",
+        "source_page": 2,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.О.13",
+        "subject": "Информатика",
+        "semester": 1,
+        "zets": 3.0,
+        "control": "экзамен, курсовая работа",
+        "department": "ИТ",
+        "source_page": 2,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.О.14",
+        "subject": "Физика",
+        "semester": 1,
+        "zets": 3.0,
+        "control": "экзамен, курсовая работа",
+        "department": "ОТДиФ",
+        "source_page": 3,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.О.15",
+        "subject": "Алгоритмизация и программирование",
+        "semester": 1,
+        "zets": 2.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 3,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.О.20",
+        "subject": "Физическая культура и спорт",
+        "semester": 1,
+        "zets": 1.0,
+        "control": "зачет",
+        "department": "физвосп.",
+        "source_page": 3,
+        "elective_options": false
+      }
+    ],
+    "2": [
+      {
+        "code": "Б1.В.1",
+        "subject": "Web-дизайн",
+        "semester": 2,
+        "zets": 3.0,
+        "control": "экзамен, курсовая работа",
+        "department": "ИТ",
+        "source_page": 3,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.17",
+        "subject": "Индустриальная разработка",
+        "semester": 2,
+        "zets": 1.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 6,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.5",
+        "subject": "Базы данных",
+        "semester": 2,
+        "zets": 2.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 4,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.7",
+        "subject": "Прикладная разработка на Python",
+        "semester": 2,
+        "zets": 2.0,
+        "control": "экзамен",
+        "department": null,
+        "source_page": 4,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.ДВ.3",
+        "subject": "Элективные дисциплины по физической культуре и спорту",
+        "semester": 2,
+        "zets": null,
+        "control": "зачет",
+        "department": null,
+        "source_page": 6,
+        "elective_options": true
+      },
+      {
+        "code": "Б1.О.1",
+        "subject": "Иностранный язык",
+        "semester": 2,
+        "zets": 4.0,
+        "control": "экзамен",
+        "department": "РиИЯ",
+        "source_page": 2,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.О.12",
+        "subject": "Математика",
+        "semester": 2,
+        "zets": 5.0,
+        "control": "экзамен, курсовая работа",
+        "department": "Матем.",
+        "source_page": 2,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.О.14",
+        "subject": "Физика",
+        "semester": 2,
+        "zets": 3.0,
+        "control": "экзамен, курсовая работа",
+        "department": "ОТДиФ",
+        "source_page": 3,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.О.15",
+        "subject": "Алгоритмизация и программирование",
+        "semester": 2,
+        "zets": 4.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 3,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.О.2",
+        "subject": "История России",
+        "semester": 2,
+        "zets": 4.0,
+        "control": "экзамен",
+        "department": "ФИиС",
+        "source_page": 2,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.О.5",
+        "subject": "Основы российской государственности",
+        "semester": 2,
+        "zets": 2.0,
+        "control": "экзамен",
+        "department": "ФИиС",
+        "source_page": 2,
+        "elective_options": false
+      }
+    ],
+    "3": [
+      {
+        "code": "Б1.В.10",
+        "subject": "Объектно-ориентированное программирование",
+        "semester": 3,
+        "zets": 3.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 5,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.17",
+        "subject": "Индустриальная разработка",
+        "semester": 3,
+        "zets": 1.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 6,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.5",
+        "subject": "Базы данных",
+        "semester": 3,
+        "zets": 2.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 4,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.7",
+        "subject": "Прикладная разработка на Python",
+        "semester": 3,
+        "zets": 4.0,
+        "control": "экзамен",
+        "department": null,
+        "source_page": 4,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.ДВ.3",
+        "subject": "Элективные дисциплины по физической культуре и спорту",
+        "semester": 3,
+        "zets": null,
+        "control": "зачет",
+        "department": null,
+        "source_page": 6,
+        "elective_options": true
+      },
+      {
+        "code": "Б1.О.12",
+        "subject": "Математика",
+        "semester": 3,
+        "zets": 5.0,
+        "control": "экзамен, курсовая работа",
+        "department": "Матем.",
+        "source_page": 2,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.О.14",
+        "subject": "Физика",
+        "semester": 3,
+        "zets": 4.0,
+        "control": "экзамен, курсовая работа",
+        "department": "ОТДиФ",
+        "source_page": 3,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.О.18",
+        "subject": "JavaScript-разработка",
+        "semester": 3,
+        "zets": 3.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 3,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.О.20",
+        "subject": "Физическая культура и спорт",
+        "semester": 3,
+        "zets": 1.0,
+        "control": "экзамен",
+        "department": "физвосп.",
+        "source_page": 3,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.О.3",
+        "subject": "Философия",
+        "semester": 3,
+        "zets": 3.0,
+        "control": "экзамен",
+        "department": "ФИиС",
+        "source_page": 2,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.О.9",
+        "subject": "Основы здорового образа жизни",
+        "semester": 3,
+        "zets": 1.0,
+        "control": "экзамен",
+        "department": "ПЭиТБ",
+        "source_page": 2,
+        "elective_options": false
+      }
+    ],
+    "4": [
+      {
+        "code": "Б1.В.10",
+        "subject": "Объектно-ориентированное программирование",
+        "semester": 4,
+        "zets": 4.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 5,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.12",
+        "subject": "Разработка на бизнес-ориентированных языках программирования",
+        "semester": 4,
+        "zets": 2.0,
+        "control": "экзамен, курсовая работа",
+        "department": null,
+        "source_page": 5,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.16",
+        "subject": "Фреймворки машинного обучения",
+        "semester": 4,
+        "zets": 3.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 5,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.17",
+        "subject": "Индустриальная разработка",
+        "semester": 4,
+        "zets": 1.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 6,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.5",
+        "subject": "Базы данных",
+        "semester": 4,
+        "zets": 4.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 4,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.ДВ.3",
+        "subject": "Элективные дисциплины по физической культуре и спорту",
+        "semester": 4,
+        "zets": null,
+        "control": "зачет",
+        "department": null,
+        "source_page": 6,
+        "elective_options": true
+      },
+      {
+        "code": "Б1.О.12",
+        "subject": "Математика",
+        "semester": 4,
+        "zets": 5.0,
+        "control": "экзамен, курсовая работа",
+        "department": "Матем.",
+        "source_page": 2,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.О.18",
+        "subject": "JavaScript-разработка",
+        "semester": 4,
+        "zets": 3.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 3,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.О.6",
+        "subject": "Актуальные проблемы межкультурного взаимодействия",
+        "semester": 4,
+        "zets": 2.0,
+        "control": "экзамен",
+        "department": null,
+        "source_page": 2,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.О.8",
+        "subject": "Экономика и основы финансовой грамотности",
+        "semester": 4,
+        "zets": 3.0,
+        "control": "экзамен",
+        "department": "ЭиЭБ",
+        "source_page": 2,
+        "elective_options": false
+      }
+    ],
+    "5": [
+      {
+        "code": "Б1.В.11",
+        "subject": "Язык программирования Java",
+        "semester": 5,
+        "zets": 3.0,
+        "control": "экзамен, курсовая работа",
+        "department": "ИТ",
+        "source_page": 5,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.12",
+        "subject": "Разработка на бизнес-ориентированных языках программирования",
+        "semester": 5,
+        "zets": 3.0,
+        "control": "экзамен",
+        "department": null,
+        "source_page": 5,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.14",
+        "subject": "Технологии разработки мобильных приложений",
+        "semester": 5,
+        "zets": 2.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 5,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.16",
+        "subject": "Фреймворки машинного обучения",
+        "semester": 5,
+        "zets": 3.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 5,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.17",
+        "subject": "Индустриальная разработка",
+        "semester": 5,
+        "zets": 1.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 6,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.2",
+        "subject": "Методы машинного обучения",
+        "semester": 5,
+        "zets": 3.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 4,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.3",
+        "subject": "Backend-разработка",
+        "semester": 5,
+        "zets": 3.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 4,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.ДВ.1",
+        "subject": "Вычислительные машины и операционные / Архитектура информационных систем",
+        "semester": 5,
+        "zets": 4.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 6,
+        "elective_options": true
+      },
+      {
+        "code": "Б1.ДВ.3",
+        "subject": "Элективные дисциплины по физической культуре и спорту",
+        "semester": 5,
+        "zets": null,
+        "control": "зачет",
+        "department": null,
+        "source_page": 6,
+        "elective_options": true
+      },
+      {
+        "code": "Б1.О.11",
+        "subject": "Экология",
+        "semester": 5,
+        "zets": 2.0,
+        "control": "экзамен",
+        "department": "ПЭиТБ",
+        "source_page": 2,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.О.17",
+        "subject": "Проектирование бизнес-приложений",
+        "semester": 5,
+        "zets": 3.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 3,
+        "elective_options": false
+      }
+    ],
+    "6": [
+      {
+        "code": "Б1.В.11",
+        "subject": "Язык программирования Java",
+        "semester": 6,
+        "zets": 3.0,
+        "control": "экзамен, курсовая работа",
+        "department": "ИТ",
+        "source_page": 5,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.12",
+        "subject": "Разработка на бизнес-ориентированных языках программирования",
+        "semester": 6,
+        "zets": 2.0,
+        "control": "экзамен",
+        "department": null,
+        "source_page": 5,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.14",
+        "subject": "Технологии разработки мобильных приложений",
+        "semester": 6,
+        "zets": 3.0,
+        "control": "экзамен, курсовая работа",
+        "department": "ИТ",
+        "source_page": 5,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.16",
+        "subject": "Фреймворки машинного обучения",
+        "semester": 6,
+        "zets": 2.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 5,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.17",
+        "subject": "Индустриальная разработка",
+        "semester": 6,
+        "zets": 1.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 6,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.2",
+        "subject": "Методы машинного обучения",
+        "semester": 6,
+        "zets": 3.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 4,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.3",
+        "subject": "Backend-разработка",
+        "semester": 6,
+        "zets": 2.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 4,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.4",
+        "subject": "Моделирование систем и процессов",
+        "semester": 6,
+        "zets": 3.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 4,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.ДВ.3",
+        "subject": "Элективные дисциплины по физической культуре и спорту",
+        "semester": 6,
+        "zets": null,
+        "control": "зачет",
+        "department": null,
+        "source_page": 6,
+        "elective_options": true
+      },
+      {
+        "code": "Б1.О.17",
+        "subject": "Проектирование бизнес-приложений",
+        "semester": 6,
+        "zets": 3.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 3,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.О.19",
+        "subject": "Безопасность жизнедеятельности",
+        "semester": 6,
+        "zets": 3.0,
+        "control": "экзамен, курсовая работа",
+        "department": "ПЭиТБ",
+        "source_page": 3,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.О.7",
+        "subject": "Этика и психология в профессиональной деятельности",
+        "semester": 6,
+        "zets": 2.0,
+        "control": "экзамен",
+        "department": null,
+        "source_page": 2,
+        "elective_options": false
+      }
+    ],
+    "7": [
+      {
+        "code": "Б1.В.13",
+        "subject": "Дополнительные механизмы платформы 1С",
+        "semester": 7,
+        "zets": 3.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 5,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.15",
+        "subject": "Программирование мобильных приложений",
+        "semester": 7,
+        "zets": 2.0,
+        "control": "экзамен, курсовая работа",
+        "department": "ИТ",
+        "source_page": 5,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.16",
+        "subject": "Фреймворки машинного обучения",
+        "semester": 7,
+        "zets": 3.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 5,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.17",
+        "subject": "Индустриальная разработка",
+        "semester": 7,
+        "zets": 1.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 6,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.3",
+        "subject": "Backend-разработка",
+        "semester": 7,
+        "zets": 2.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 4,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.4",
+        "subject": "Моделирование систем и процессов",
+        "semester": 7,
+        "zets": 3.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 4,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.8",
+        "subject": "Инфокоммуникационные системы и сети",
+        "semester": 7,
+        "zets": 3.0,
+        "control": "экзамен, курсовая работа",
+        "department": "ИТ",
+        "source_page": 4,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.9",
+        "subject": "Тестирование программного обеспечения",
+        "semester": 7,
+        "zets": 2.0,
+        "control": "экзамен, курсовая работа",
+        "department": "ИТ",
+        "source_page": 4,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.ДВ.2",
+        "subject": "Адаптация типовых конфигураций 1С / Информационные системы в оперативно-плановом управлении",
+        "semester": 7,
+        "zets": 2.0,
+        "control": "экзамен, курсовая работа",
+        "department": null,
+        "source_page": 6,
+        "elective_options": true
+      },
+      {
+        "code": "Б1.О.16",
+        "subject": "Разработка приложений в среде Java",
+        "semester": 7,
+        "zets": 3.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 3,
+        "elective_options": false
+      }
+    ],
+    "8": [
+      {
+        "code": "Б1.В.13",
+        "subject": "Дополнительные механизмы платформы 1С",
+        "semester": 8,
+        "zets": 3.0,
+        "control": "экзамен, курсовая работа",
+        "department": "ИТ",
+        "source_page": 5,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.15",
+        "subject": "Программирование мобильных приложений",
+        "semester": 8,
+        "zets": 3.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 5,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.17",
+        "subject": "Индустриальная разработка",
+        "semester": 8,
+        "zets": 1.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 6,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.3",
+        "subject": "Backend-разработка",
+        "semester": 8,
+        "zets": 3.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 4,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.8",
+        "subject": "Инфокоммуникационные системы и сети",
+        "semester": 8,
+        "zets": 3.0,
+        "control": "экзамен, курсовая работа",
+        "department": "ИТ",
+        "source_page": 4,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.В.9",
+        "subject": "Тестирование программного обеспечения",
+        "semester": 8,
+        "zets": 2.0,
+        "control": "экзамен, курсовая работа",
+        "department": "ИТ",
+        "source_page": 4,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.О.16",
+        "subject": "Разработка приложений в среде Java",
+        "semester": 8,
+        "zets": 4.0,
+        "control": "экзамен",
+        "department": "ИТ",
+        "source_page": 3,
+        "elective_options": false
+      },
+      {
+        "code": "Б1.О.4",
+        "subject": "Правовое обеспечение профессиональной деятельности",
+        "semester": 8,
+        "zets": 2.0,
+        "control": "экзамен",
+        "department": null,
+        "source_page": 2,
+        "elective_options": false
+      }
+    ]
+  },
+  "flat_rows": [
+    {
+      "code": "Б1.В.1",
+      "subject": "Web-дизайн",
+      "semester": 1,
+      "zets": 2.0,
+      "control": "экзамен, курсовая работа",
+      "department": "ИТ",
+      "source_page": 3,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.17",
+      "subject": "Индустриальная разработка",
+      "semester": 1,
+      "zets": 1.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 6,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.5",
+      "subject": "Базы данных",
+      "semester": 1,
+      "zets": 2.0,
+      "control": "экзамен, курсовая работа",
+      "department": "ИТ",
+      "source_page": 4,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.6",
+      "subject": "Язык программирования Python",
+      "semester": 1,
+      "zets": 3.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 4,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.ДВ.3",
+      "subject": "Элективные дисциплины по физической культуре и спорту",
+      "semester": 1,
+      "zets": null,
+      "control": "зачет",
+      "department": null,
+      "source_page": 6,
+      "elective_options": true
+    },
+    {
+      "code": "Б1.О.1",
+      "subject": "Иностранный язык",
+      "semester": 1,
+      "zets": 3.0,
+      "control": "экзамен",
+      "department": "РиИЯ",
+      "source_page": 2,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.10",
+      "subject": "Культура речи и деловое общение",
+      "semester": 1,
+      "zets": 2.0,
+      "control": "экзамен",
+      "department": "РиИЯ",
+      "source_page": 2,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.12",
+      "subject": "Математика",
+      "semester": 1,
+      "zets": 5.0,
+      "control": "экзамен, курсовая работа",
+      "department": "Матем.",
+      "source_page": 2,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.13",
+      "subject": "Информатика",
+      "semester": 1,
+      "zets": 3.0,
+      "control": "экзамен, курсовая работа",
+      "department": "ИТ",
+      "source_page": 2,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.14",
+      "subject": "Физика",
+      "semester": 1,
+      "zets": 3.0,
+      "control": "экзамен, курсовая работа",
+      "department": "ОТДиФ",
+      "source_page": 3,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.15",
+      "subject": "Алгоритмизация и программирование",
+      "semester": 1,
+      "zets": 2.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 3,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.20",
+      "subject": "Физическая культура и спорт",
+      "semester": 1,
+      "zets": 1.0,
+      "control": "зачет",
+      "department": "физвосп.",
+      "source_page": 3,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.1",
+      "subject": "Web-дизайн",
+      "semester": 2,
+      "zets": 3.0,
+      "control": "экзамен, курсовая работа",
+      "department": "ИТ",
+      "source_page": 3,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.17",
+      "subject": "Индустриальная разработка",
+      "semester": 2,
+      "zets": 1.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 6,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.5",
+      "subject": "Базы данных",
+      "semester": 2,
+      "zets": 2.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 4,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.7",
+      "subject": "Прикладная разработка на Python",
+      "semester": 2,
+      "zets": 2.0,
+      "control": "экзамен",
+      "department": null,
+      "source_page": 4,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.ДВ.3",
+      "subject": "Элективные дисциплины по физической культуре и спорту",
+      "semester": 2,
+      "zets": null,
+      "control": "зачет",
+      "department": null,
+      "source_page": 6,
+      "elective_options": true
+    },
+    {
+      "code": "Б1.О.1",
+      "subject": "Иностранный язык",
+      "semester": 2,
+      "zets": 4.0,
+      "control": "экзамен",
+      "department": "РиИЯ",
+      "source_page": 2,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.12",
+      "subject": "Математика",
+      "semester": 2,
+      "zets": 5.0,
+      "control": "экзамен, курсовая работа",
+      "department": "Матем.",
+      "source_page": 2,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.14",
+      "subject": "Физика",
+      "semester": 2,
+      "zets": 3.0,
+      "control": "экзамен, курсовая работа",
+      "department": "ОТДиФ",
+      "source_page": 3,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.15",
+      "subject": "Алгоритмизация и программирование",
+      "semester": 2,
+      "zets": 4.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 3,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.2",
+      "subject": "История России",
+      "semester": 2,
+      "zets": 4.0,
+      "control": "экзамен",
+      "department": "ФИиС",
+      "source_page": 2,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.5",
+      "subject": "Основы российской государственности",
+      "semester": 2,
+      "zets": 2.0,
+      "control": "экзамен",
+      "department": "ФИиС",
+      "source_page": 2,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.10",
+      "subject": "Объектно-ориентированное программирование",
+      "semester": 3,
+      "zets": 3.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 5,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.17",
+      "subject": "Индустриальная разработка",
+      "semester": 3,
+      "zets": 1.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 6,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.5",
+      "subject": "Базы данных",
+      "semester": 3,
+      "zets": 2.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 4,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.7",
+      "subject": "Прикладная разработка на Python",
+      "semester": 3,
+      "zets": 4.0,
+      "control": "экзамен",
+      "department": null,
+      "source_page": 4,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.ДВ.3",
+      "subject": "Элективные дисциплины по физической культуре и спорту",
+      "semester": 3,
+      "zets": null,
+      "control": "зачет",
+      "department": null,
+      "source_page": 6,
+      "elective_options": true
+    },
+    {
+      "code": "Б1.О.12",
+      "subject": "Математика",
+      "semester": 3,
+      "zets": 5.0,
+      "control": "экзамен, курсовая работа",
+      "department": "Матем.",
+      "source_page": 2,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.14",
+      "subject": "Физика",
+      "semester": 3,
+      "zets": 4.0,
+      "control": "экзамен, курсовая работа",
+      "department": "ОТДиФ",
+      "source_page": 3,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.18",
+      "subject": "JavaScript-разработка",
+      "semester": 3,
+      "zets": 3.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 3,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.20",
+      "subject": "Физическая культура и спорт",
+      "semester": 3,
+      "zets": 1.0,
+      "control": "экзамен",
+      "department": "физвосп.",
+      "source_page": 3,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.3",
+      "subject": "Философия",
+      "semester": 3,
+      "zets": 3.0,
+      "control": "экзамен",
+      "department": "ФИиС",
+      "source_page": 2,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.9",
+      "subject": "Основы здорового образа жизни",
+      "semester": 3,
+      "zets": 1.0,
+      "control": "экзамен",
+      "department": "ПЭиТБ",
+      "source_page": 2,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.10",
+      "subject": "Объектно-ориентированное программирование",
+      "semester": 4,
+      "zets": 4.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 5,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.12",
+      "subject": "Разработка на бизнес-ориентированных языках программирования",
+      "semester": 4,
+      "zets": 2.0,
+      "control": "экзамен, курсовая работа",
+      "department": null,
+      "source_page": 5,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.16",
+      "subject": "Фреймворки машинного обучения",
+      "semester": 4,
+      "zets": 3.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 5,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.17",
+      "subject": "Индустриальная разработка",
+      "semester": 4,
+      "zets": 1.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 6,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.5",
+      "subject": "Базы данных",
+      "semester": 4,
+      "zets": 4.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 4,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.ДВ.3",
+      "subject": "Элективные дисциплины по физической культуре и спорту",
+      "semester": 4,
+      "zets": null,
+      "control": "зачет",
+      "department": null,
+      "source_page": 6,
+      "elective_options": true
+    },
+    {
+      "code": "Б1.О.12",
+      "subject": "Математика",
+      "semester": 4,
+      "zets": 5.0,
+      "control": "экзамен, курсовая работа",
+      "department": "Матем.",
+      "source_page": 2,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.18",
+      "subject": "JavaScript-разработка",
+      "semester": 4,
+      "zets": 3.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 3,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.6",
+      "subject": "Актуальные проблемы межкультурного взаимодействия",
+      "semester": 4,
+      "zets": 2.0,
+      "control": "экзамен",
+      "department": null,
+      "source_page": 2,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.8",
+      "subject": "Экономика и основы финансовой грамотности",
+      "semester": 4,
+      "zets": 3.0,
+      "control": "экзамен",
+      "department": "ЭиЭБ",
+      "source_page": 2,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.11",
+      "subject": "Язык программирования Java",
+      "semester": 5,
+      "zets": 3.0,
+      "control": "экзамен, курсовая работа",
+      "department": "ИТ",
+      "source_page": 5,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.12",
+      "subject": "Разработка на бизнес-ориентированных языках программирования",
+      "semester": 5,
+      "zets": 3.0,
+      "control": "экзамен",
+      "department": null,
+      "source_page": 5,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.14",
+      "subject": "Технологии разработки мобильных приложений",
+      "semester": 5,
+      "zets": 2.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 5,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.16",
+      "subject": "Фреймворки машинного обучения",
+      "semester": 5,
+      "zets": 3.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 5,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.17",
+      "subject": "Индустриальная разработка",
+      "semester": 5,
+      "zets": 1.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 6,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.2",
+      "subject": "Методы машинного обучения",
+      "semester": 5,
+      "zets": 3.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 4,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.3",
+      "subject": "Backend-разработка",
+      "semester": 5,
+      "zets": 3.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 4,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.ДВ.1",
+      "subject": "Вычислительные машины и операционные / Архитектура информационных систем",
+      "semester": 5,
+      "zets": 4.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 6,
+      "elective_options": true
+    },
+    {
+      "code": "Б1.ДВ.3",
+      "subject": "Элективные дисциплины по физической культуре и спорту",
+      "semester": 5,
+      "zets": null,
+      "control": "зачет",
+      "department": null,
+      "source_page": 6,
+      "elective_options": true
+    },
+    {
+      "code": "Б1.О.11",
+      "subject": "Экология",
+      "semester": 5,
+      "zets": 2.0,
+      "control": "экзамен",
+      "department": "ПЭиТБ",
+      "source_page": 2,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.17",
+      "subject": "Проектирование бизнес-приложений",
+      "semester": 5,
+      "zets": 3.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 3,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.11",
+      "subject": "Язык программирования Java",
+      "semester": 6,
+      "zets": 3.0,
+      "control": "экзамен, курсовая работа",
+      "department": "ИТ",
+      "source_page": 5,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.12",
+      "subject": "Разработка на бизнес-ориентированных языках программирования",
+      "semester": 6,
+      "zets": 2.0,
+      "control": "экзамен",
+      "department": null,
+      "source_page": 5,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.14",
+      "subject": "Технологии разработки мобильных приложений",
+      "semester": 6,
+      "zets": 3.0,
+      "control": "экзамен, курсовая работа",
+      "department": "ИТ",
+      "source_page": 5,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.16",
+      "subject": "Фреймворки машинного обучения",
+      "semester": 6,
+      "zets": 2.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 5,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.17",
+      "subject": "Индустриальная разработка",
+      "semester": 6,
+      "zets": 1.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 6,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.2",
+      "subject": "Методы машинного обучения",
+      "semester": 6,
+      "zets": 3.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 4,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.3",
+      "subject": "Backend-разработка",
+      "semester": 6,
+      "zets": 2.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 4,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.4",
+      "subject": "Моделирование систем и процессов",
+      "semester": 6,
+      "zets": 3.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 4,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.ДВ.3",
+      "subject": "Элективные дисциплины по физической культуре и спорту",
+      "semester": 6,
+      "zets": null,
+      "control": "зачет",
+      "department": null,
+      "source_page": 6,
+      "elective_options": true
+    },
+    {
+      "code": "Б1.О.17",
+      "subject": "Проектирование бизнес-приложений",
+      "semester": 6,
+      "zets": 3.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 3,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.19",
+      "subject": "Безопасность жизнедеятельности",
+      "semester": 6,
+      "zets": 3.0,
+      "control": "экзамен, курсовая работа",
+      "department": "ПЭиТБ",
+      "source_page": 3,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.7",
+      "subject": "Этика и психология в профессиональной деятельности",
+      "semester": 6,
+      "zets": 2.0,
+      "control": "экзамен",
+      "department": null,
+      "source_page": 2,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.13",
+      "subject": "Дополнительные механизмы платформы 1С",
+      "semester": 7,
+      "zets": 3.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 5,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.15",
+      "subject": "Программирование мобильных приложений",
+      "semester": 7,
+      "zets": 2.0,
+      "control": "экзамен, курсовая работа",
+      "department": "ИТ",
+      "source_page": 5,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.16",
+      "subject": "Фреймворки машинного обучения",
+      "semester": 7,
+      "zets": 3.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 5,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.17",
+      "subject": "Индустриальная разработка",
+      "semester": 7,
+      "zets": 1.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 6,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.3",
+      "subject": "Backend-разработка",
+      "semester": 7,
+      "zets": 2.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 4,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.4",
+      "subject": "Моделирование систем и процессов",
+      "semester": 7,
+      "zets": 3.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 4,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.8",
+      "subject": "Инфокоммуникационные системы и сети",
+      "semester": 7,
+      "zets": 3.0,
+      "control": "экзамен, курсовая работа",
+      "department": "ИТ",
+      "source_page": 4,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.9",
+      "subject": "Тестирование программного обеспечения",
+      "semester": 7,
+      "zets": 2.0,
+      "control": "экзамен, курсовая работа",
+      "department": "ИТ",
+      "source_page": 4,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.ДВ.2",
+      "subject": "Адаптация типовых конфигураций 1С / Информационные системы в оперативно-плановом управлении",
+      "semester": 7,
+      "zets": 2.0,
+      "control": "экзамен, курсовая работа",
+      "department": null,
+      "source_page": 6,
+      "elective_options": true
+    },
+    {
+      "code": "Б1.О.16",
+      "subject": "Разработка приложений в среде Java",
+      "semester": 7,
+      "zets": 3.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 3,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.13",
+      "subject": "Дополнительные механизмы платформы 1С",
+      "semester": 8,
+      "zets": 3.0,
+      "control": "экзамен, курсовая работа",
+      "department": "ИТ",
+      "source_page": 5,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.15",
+      "subject": "Программирование мобильных приложений",
+      "semester": 8,
+      "zets": 3.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 5,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.17",
+      "subject": "Индустриальная разработка",
+      "semester": 8,
+      "zets": 1.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 6,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.3",
+      "subject": "Backend-разработка",
+      "semester": 8,
+      "zets": 3.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 4,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.8",
+      "subject": "Инфокоммуникационные системы и сети",
+      "semester": 8,
+      "zets": 3.0,
+      "control": "экзамен, курсовая работа",
+      "department": "ИТ",
+      "source_page": 4,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.В.9",
+      "subject": "Тестирование программного обеспечения",
+      "semester": 8,
+      "zets": 2.0,
+      "control": "экзамен, курсовая работа",
+      "department": "ИТ",
+      "source_page": 4,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.16",
+      "subject": "Разработка приложений в среде Java",
+      "semester": 8,
+      "zets": 4.0,
+      "control": "экзамен",
+      "department": "ИТ",
+      "source_page": 3,
+      "elective_options": false
+    },
+    {
+      "code": "Б1.О.4",
+      "subject": "Правовое обеспечение профессиональной деятельности",
+      "semester": 8,
+      "zets": 2.0,
+      "control": "экзамен",
+      "department": null,
+      "source_page": 2,
+      "elective_options": false
+    }
+  ]
+}

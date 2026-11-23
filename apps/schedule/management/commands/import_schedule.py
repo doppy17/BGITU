@@ -14,6 +14,10 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('path', help='Путь к файлу расписания')
         parser.add_argument('--url', default='', help='URL источника')
+        parser.add_argument(
+            '--append', action='store_true',
+            help='Не заменять расписание других институтов (по умолчанию файл считается полным).',
+        )
 
     def handle(self, *args, **options):
         path = Path(options['path'])
@@ -22,7 +26,7 @@ class Command(BaseCommand):
         record = ScheduleImport(original_name=path.name, source_url=options['url'])
         with path.open('rb') as handle:
             record.file.save(path.name, File(handle), save=True)
-        run_import(record, source_url=options['url'])
+        run_import(record, source_url=options['url'], replace_all=not options['append'])
         self.stdout.write(self.style.SUCCESS(
             f'Импортировано занятий: {record.lessons_count}, групп: {record.groups_count}.'
         ))

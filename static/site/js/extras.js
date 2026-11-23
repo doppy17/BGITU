@@ -30,4 +30,5 @@ Cookies / ПДн: только технические, без трекеров �
 /*
 
 PWA: сайт ставится на экран телефона как приложение и открывается офлайн */
-if ('serviceWorker' in navigator && /^https?:/.test(location.protocol)) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+// Офлайн-кэш отключён: архивный sw.js кэширует *.html, которых в Django-версии нет
+// (/schedule/sw.js отдавал 404). PWA-манифест остаётся, service worker не регистрируем.

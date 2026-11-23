@@ -53,6 +53,23 @@ MOBILE_HEAD_CSS = """
   .burger { display: block; }
   .head-actions { margin-left: auto; }
 }
+/* «Версия для слабовидящих»: шапка в em — при крупном шрифте меню и кнопки
+   растут вместе с текстом. Переносим их в две строки ТОЛЬКО при включённом
+   крупном шрифте (html.a11y-fs1/fs2), иначе шапка однострочная 56px. */
+@media (min-width: 1181px) {
+  /* на 118% и 136% ширина пилюли em-зависимая: меню и кнопки переносим
+     в две строки, --head-h 150px — высота при 136% и крупнее. */
+  html.a11y-fs1,
+  html.a11y-fs2 { --head-h: 150px; }
+  html.a11y-fs1 .head-pill,
+  html.a11y-fs2 .head-pill {
+    height: auto; min-height: var(--head-h); flex-wrap: wrap; row-gap: 6px; padding-block: 6px;
+  }
+  html.a11y-fs1 .nav,
+  html.a11y-fs2 .nav { flex-shrink: 0; margin-inline: auto 0; }
+  html.a11y-fs1 .head-actions,
+  html.a11y-fs2 .head-actions { flex-shrink: 0; margin-left: auto; }
+}
 """
 SOURCE = Path(sys.argv[1]) if len(sys.argv) > 1 else Path.home() / 'Downloads' / 'bgitu-site-main'
 

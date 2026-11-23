@@ -4,7 +4,7 @@
 <div class="page-head">
   <p class="mono dim">расписание · управление</p>
   <h1>Импорт файла БГИТУ</h1>
-  <p class="muted">Загрузите .xls или .xlsx с сайта bgitu.ru. Парсер заменит занятия в базе: группы, дни, пары, аудитории, преподаватели.</p>
+  <p class="muted">Загрузите один или несколько .xls/.xlsx с сайта bgitu.ru. Каждый файл — отдельный источник занятий; файлы разных институтов хранятся вместе, повторная загрузка файла того же охвата заменяет его занятия.</p>
 </div>
 
 <div class="grid-2">
@@ -15,7 +15,7 @@
     </header>
     <form method="post" enctype="multipart/form-data" class="form-stack">
       {% csrf_token %}
-      <div class="field"><label for="schedFile">Файл расписания *</label><input class="file-input" id="schedFile" name="file" type="file" accept=".xls,.xlsx" required></div>
+      <div class="field"><label for="schedFile">Файлы расписания *</label><input class="file-input" id="schedFile" name="file" type="file" accept=".xls,.xlsx" multiple required></div>
       <div class="field"><label for="schedUrl">Источник</label><input class="input" id="schedUrl" name="source_url" value="{{ source_url }}"></div>
       <button class="btn btn--accent" type="submit">Импортировать</button>
     </form>
@@ -34,7 +34,7 @@
     <div class="pf-rules">
       <p><b>Источник.</b> Страница «Расписание → Очное обучение» на bgitu.ru: файл по группам ИВТ / ИСТ / ПИ / ПрИ, 1 семестр 2026/27.</p>
       <p><b>Разбор.</b> Берётся шапка с кодами групп, дни недели и пары; из ячейки выделяются дисциплина, аудитория и преподаватель.</p>
-      <p><b>Замена.</b> Каждый импорт заменяет все занятия в базе — расписание всегда соответствует последнему файлу.</p>
+      <p><b>Замена.</b> Повторная загрузка файла того же института заменяет его занятия. Файлы разных институтов живут одновременно; при конфликте слота показывается занятие из самого свежего файла, старые остаются в базе.</p>
     </div>
   </section>
 </div>
