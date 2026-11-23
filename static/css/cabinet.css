@@ -1531,7 +1531,7 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   --tl-guide: color-mix(in oklab, var(--brand-ink) 62%, transparent);
   --tl-guide-now: color-mix(in oklab, var(--accent) 82%, transparent);
   --tl-guide-now-soft: color-mix(in oklab, var(--accent) 62%, transparent);
-  --tl-now-band: color-mix(in oklab, var(--accent) 10%, transparent);
+  --tl-now-band: color-mix(in oklab, var(--accent) 17%, transparent);
 }
 .semester-panel__lead { margin: 4px 0 16px; font-size: 0.875rem; max-width: 64ch; }
 .tl-scroll { overflow-x: auto; }
