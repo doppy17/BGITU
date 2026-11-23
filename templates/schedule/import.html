@@ -46,7 +46,7 @@
   </header>
   <div class="table-wrap">
     <table class="data-table">
-      <thead><tr><th>Файл</th><th>Когда</th><th>Занятий</th><th>Групп</th><th>Кто</th><th></th></tr></thead>
+      <thead><tr><th>Файл</th><th>Когда</th><th>Занятий</th><th>Групп</th><th>Кто</th><th></th>{% if request.user.is_staff or request.user.profile.role.is_developer %}<th>ИИ</th>{% endif %}</tr></thead>
       <tbody>
         {% for item in imports %}
           <tr>
@@ -56,12 +56,180 @@
             <td>{{ item.groups_count }}</td>
             <td>{{ item.imported_by|default:"—" }}</td>
             <td class="ta-r"><a class="mono dim" href="{{ item.file.url }}" target="_blank" rel="noopener">файл ↗</a></td>
+            {% if request.user.is_staff or request.user.profile.role.is_developer %}
+              <td class="ta-r"><button class="mono dim js-ai-review" type="button" data-url="{% url 'schedule:ai_review' item.pk %}">разбор</button></td>
+            {% endif %}
           </tr>
         {% empty %}
-          <tr><td colspan="6" class="muted">Импортов ещё не было.</td></tr>
+          <tr><td colspan="{% if request.user.is_staff or request.user.profile.role.is_developer %}7{% else %}6{% endif %}" class="muted">Импортов ещё не было.</td></tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
 </section>
+
+{% if imports %}{% if request.user.is_staff or request.user.profile.role.is_developer %}
+<section class="panel" id="aiReview" data-url="{% url 'schedule:ai_review' imports.0.pk %}">
+  <header class="panel__head">
+    <div class="panel__title"><span class="panel__num mono">04</span><h2>ИИ-разбор</h2></div>
+    <span class="mono dim" id="aiReviewState">считаем факты…</span>
+  </header>
+  <div class="ai-review" id="aiReviewBody" aria-live="polite" data-state="loading">
+    <p class="muted">Считаем занятия, группы, пересечения и подозрительные строки…</p>
+  </div>
+</section>
+
+<style>
+  .ai-review { display: grid; gap: 18px; }
+  .ai-review__head { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: baseline; justify-content: space-between; }
+  .ai-review__head p { margin: 0; }
+  .ai-review__summary ul { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 6px; }
+  .ai-review__summary h3, .ai-review__issues h3, .ai-review__facts-title { margin: 0; font-size: .8125rem; letter-spacing: .08em; text-transform: uppercase; color: var(--text-faint); }
+  .ai-review__facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1px; margin: 0; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius-s); overflow: hidden; }
+  .ai-fact { background: var(--bg-panel); padding: 12px 14px; display: grid; gap: 4px; }
+  .ai-fact dt { margin: 0; color: var(--text-faint); font: 500 .6875rem/1.3 var(--font-mono); text-transform: uppercase; letter-spacing: .07em; }
+  .ai-fact dd { margin: 0; font-size: .9375rem; line-height: 1.4; }
+  .ai-review__issues { display: grid; gap: 14px; }
+  .ai-issue { border-top: 1px solid var(--line); padding-top: 12px; display: grid; gap: 6px; }
+  .ai-issue__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 14px; }
+  .ai-issue__head h4 { margin: 0; font-size: .9375rem; }
+  .ai-issue__count { color: var(--accent); font: 600 .8125rem/1 var(--font-mono); }
+  .ai-issue ul { margin: 0; padding-left: 20px; display: grid; gap: 4px; color: var(--text-muted); font-size: .875rem; }
+  .ai-issue__note { margin: 0; color: var(--text-faint); font-size: .8125rem; }
+  .ai-review__clean { color: var(--text-muted); }
+  .ai-review[data-state="error"] { color: var(--text-muted); }
+  .ai-review__retry { justify-self: start; }
+</style>
+
+<script>
+(() => {
+  const block = document.getElementById('aiReview');
+  if (!block) return;
+  const body = document.getElementById('aiReviewBody');
+  const state = document.getElementById('aiReviewState');
+  const token = document.querySelector('input[name="csrfmiddlewaretoken"]')?.value || '';
+  let requestId = 0;
+
+  function node(tag, className, text) {
+    const element = document.createElement(tag);
+    if (className) element.className = className;
+    if (text !== undefined && text !== null) element.textContent = text;
+    return element;
+  }
+
+  function setLoading(text) {
+    body.dataset.state = 'loading';
+    body.setAttribute('aria-busy', 'true');
+    body.replaceChildren(node('p', 'muted', text || 'Считаем факты и запускаем локальную модель…'));
+    state.textContent = 'работаем…';
+  }
+
+  function setError(message, url) {
+    body.dataset.state = 'error';
+    body.removeAttribute('aria-busy');
+    body.replaceChildren(node('p', 'muted', message));
+    const retry = node('button', 'btn btn--ghost btn--sm ai-review__retry', 'Повторить');
+    retry.type = 'button';
+    retry.addEventListener('click', () => load(url));
+    body.append(retry);
+    state.textContent = 'ошибка';
+  }
+
+  function render(data) {
+    body.dataset.state = 'ready';
+    body.removeAttribute('aria-busy');
+    body.replaceChildren();
+
+    const head = node('div', 'ai-review__head');
+    const meta = node('p', 'mono dim', `${data.file} · ${(data.source_note || '')}`);
+    head.append(meta);
+    head.append(node('span', `badge ${data.llm.available ? 'badge--accent' : 'badge--soft'}`,
+      data.llm.available ? 'резюме локальной модели' : 'без резюме'));
+    body.append(head);
+
+    if (data.summary_points && data.summary_points.length) {
+      const summary = node('div', 'ai-review__summary');
+      summary.append(node('h3', null, 'Резюме'));
+      const list = document.createElement('ul');
+      for (const point of data.summary_points) list.append(node('li', null, point));
+      summary.append(list);
+      body.append(summary);
+    } else {
+      const reason = data.llm.note === 'резюме отключено'
+        ? 'Резюме отключено при запуске.'
+        : `Резюме не сформировано: ${data.llm.note || 'локальная модель недоступна'}.`;
+      body.append(node('p', 'ai-issue__note',
+        `${reason} Факты посчитаны кодом — числам ниже можно доверять.`));
+    }
+
+    const facts = document.createElement('dl');
+    facts.className = 'ai-review__facts';
+    body.append(node('h3', 'ai-review__facts-title', 'Факты'));
+    for (const item of data.highlights) {
+      const cell = node('div', 'ai-fact');
+      cell.append(node('dt', null, item.label));
+      cell.append(node('dd', null, item.value));
+      facts.append(cell);
+    }
+    body.append(facts);
+
+    const issues = (data.issues || []).filter((item) => item.count > 0);
+    if (issues.length) {
+      const section = node('div', 'ai-review__issues');
+      section.append(node('h3', null, 'Требует внимания'));
+      for (const issue of issues) {
+        const item = node('div', 'ai-issue');
+        const row = node('div', 'ai-issue__head');
+        row.append(node('h4', null, issue.title));
+        row.append(node('span', 'ai-issue__count', String(issue.count)));
+        item.append(row);
+        if (issue.note) item.append(node('p', 'ai-issue__note', issue.note));
+        if (issue.examples && issue.examples.length) {
+          const list = document.createElement('ul');
+          for (const example of issue.examples) list.append(node('li', null, example));
+          item.append(list);
+        }
+        section.append(item);
+      }
+      body.append(section);
+    } else {
+      body.append(node('p', 'ai-review__clean', 'Критичных проблем не найдено.'));
+    }
+    state.textContent = 'готово';
+  }
+
+  async function load(url) {
+    if (!url) return;
+    const current = ++requestId;
+    setLoading();
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': token, 'Accept': 'application/json' },
+        credentials: 'same-origin',
+      });
+      const data = await response.json().catch(() => ({}));
+      if (current !== requestId) return;
+      if (!response.ok || !data.ok) {
+        setError(data.error || `Не удалось получить разбор (HTTP ${response.status}).`, url);
+        return;
+      }
+      render(data);
+    } catch (error) {
+      if (current !== requestId) return;
+      setError('Сервер не ответил. Проверьте соединение и повторите.', url);
+    }
+  }
+
+  document.querySelectorAll('.js-ai-review').forEach((button) => {
+    button.addEventListener('click', () => {
+      load(button.dataset.url);
+      block.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  load(block.dataset.url);
+})();
+</script>
+{% endif %}{% endif %}
 {% endblock %}
