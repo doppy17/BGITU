@@ -70,18 +70,38 @@ kbd { font: 500 0.6875rem/1 var(--font-mono); padding: 0.3em 0.55em; border: 1px
    Высота шапки живёт в --head-h: заголовки страниц и рельс кабинета отступают
    на неё в calc(), поэтому переменную пересчитываем вместе с переносом.
    Правило дублируется в scripts/build_static_site.py (MOBILE_HEAD_CSS). */
+/* Крупный шрифт: поля пилюли симметричны на всех ширинах — бренд слева и
+   последняя кнопка справа отступают от края одинаково. */
+html.a11y-fs1 .head-pill,
+html.a11y-fs2 .head-pill { padding-inline: clamp(14px, 2vw, 28px); }
+/* бренд занимает полную высоту строки (44px, как кнопки и пункты меню):
+   его верхний отступ от края пилюли совпадает с нижним отступом последней
+   строки, а зона нажатия становится не меньше 44px */
+html.a11y-fs1 .brand,
+html.a11y-fs2 .brand { min-height: 44px; }
 @media (min-width: 1181px) {
-  /* на 118% и 136% пилюля шире контейнера (до 1521px при 1238px): меню и кнопки
-     переносим в две строки, --head-h 150px — высота шапки при 136%; заголовки
-     и рельс отступают на неё в calc(), занижать нельзя — меню налезет на контент */
+  /* на 118% и 136% содержимое шире пилюли (до 1566px при 1240px): две строки.
+     --head-h = 134px — высота пилюли: 2×44 строки + 10 row-gap + 2×16 padding
+     + 2px рамка + 2px запас на a11y-sp (line-height 1.9 в пунктах меню).
+     Меньше нельзя — меню налезет на контент. */
   html.a11y-fs1,
-  html.a11y-fs2 { --head-h: 150px; }
+  html.a11y-fs2 { --head-h: 134px; }
   html.a11y-fs1 .head-pill,
   html.a11y-fs2 .head-pill {
-    height: auto; min-height: var(--head-h); flex-wrap: wrap; row-gap: 6px; padding-block: 6px;
+    height: auto; min-height: var(--head-h); flex-wrap: wrap;
+    align-items: center; align-content: center; justify-content: space-between;
+    row-gap: 10px; column-gap: 12px; padding: 16px clamp(14px, 2vw, 28px);
   }
-  html.a11y-fs1 .nav,
-  html.a11y-fs2 .nav { flex-shrink: 0; margin-inline: auto 0; }
+  /* Две строки: первая — бренд слева + утилиты справа, вторая — меню по центру.
+     Так ничто не прижато к краю, а меню стоит ровно по центру пилюли. */
+  html.a11y-fs1 .brand,
+  html.a11y-fs2 .brand { order: 1; }
   html.a11y-fs1 .head-actions,
-  html.a11y-fs2 .head-actions { flex-shrink: 0; margin-left: auto; }
+  html.a11y-fs2 .head-actions { order: 2; flex: 0 0 auto; margin-left: auto; justify-content: flex-end; }
+  html.a11y-fs1 .nav,
+  html.a11y-fs2 .nav { order: 3; flex: 1 1 100%; margin: 0; display: flex; justify-content: center; }
+  html.a11y-fs1 .nav ul,
+  html.a11y-fs2 .nav ul { justify-content: center; width: 100%; }
+  html.a11y-fs1 .head-actions > .btn,
+  html.a11y-fs2 .head-actions > .btn { margin-left: 0; }
 }
