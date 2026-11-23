@@ -3,6 +3,7 @@ import shutil
 import tempfile
 from datetime import date
 from pathlib import Path
+from urllib.parse import quote
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -293,14 +294,18 @@ class PlanImportTests(TestCase):
         self.assertContains(response, 'Индустриальная разработка: 1–8 семестры')
         self.assertContains(response, 'ИСТ-201')
 
-    def test_demo_entries_hidden_but_not_deleted_after_upload(self):
+    def test_demo_entries_hidden_and_kept_in_db(self):
+        """Демо-строки не показываются ни до, ни после загрузки; в БД остаются."""
         demo = CurriculumEntry.objects.create(code='ist', subject='Демо-дисциплина', semester_from=1, semester_to=1)
+        self.assertNotIn('Демо-дисциплина', {row['subject'] for row in resolve_curriculum('ist')})
         self.upload(('09.03.02-ist-2026.xlsx', plan_bytes([('Математика', [1])])))
         self.assertTrue(CurriculumEntry.objects.filter(pk=demo.pk).exists())
-        self.assertNotIn('Демо-дисциплина', {row['subject'] for row in resolve_curriculum('ist')})
+        self.assertEqual({row['subject'] for row in resolve_curriculum('ist')}, {'Математика'})
         self.client.force_login(self.dean)
         self.client.post(reverse('education:plan_source_delete', args=[PlanSource.objects.get().pk]), follow=True)
-        self.assertIn('Демо-дисциплина', {row['subject'] for row in resolve_curriculum('ist')})
+        # Без загруженного плана блок пуст — демо-строка не возвращается.
+        self.assertEqual(resolve_curriculum('ist'), [])
+        self.assertTrue(CurriculumEntry.objects.filter(pk=demo.pk).exists())
 
     def test_page_has_plan_modal_files_and_delete(self):
         self.upload(('09.03.02-ist-2026.xlsx', plan_bytes([('Математика', [1])])))
@@ -441,3 +446,196 @@ class PlanParserTests(TestCase):
                 self.assertEqual(sorted(semesters['Базы данных']), [1, 2, 3, 4])
                 return
         self.skipTest('нет файла плана в fixtures/plan')
+
+
+@override_settings(MEDIA_ROOT=tempfile.mkdtemp(prefix='bgitu-plan-download-'))
+class PlanDownloadTests(TestCase):
+    """Скачивание загруженных файлов плана: вложение, исходное имя и права."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.dean_role = Role.objects.create(code='pdl_dean', name='Деканат', can_manage_schedule=True)
+        cls.student_role = Role.objects.create(code='pdl_student', name='Студент', can_upload_works=True)
+        cls.group = Group.objects.create(
+            code='ИСТ-201', course=2, program='09.03.02 «Информационные системы и технологии»',
+        )
+        cls.owner = User.objects.create_user('pdl_owner', password='demo12345')
+        cls.owner.profile.role = cls.dean_role
+        cls.owner.profile.save()
+        cls.other_dean = User.objects.create_user('pdl_other', password='demo12345')
+        cls.other_dean.profile.role = cls.dean_role
+        cls.other_dean.profile.save()
+        cls.staff_dean = User.objects.create_user('pdl_staff', password='demo12345', is_staff=True)
+        cls.staff_dean.profile.role = cls.dean_role
+        cls.staff_dean.profile.save()
+        cls.student = User.objects.create_user('pdl_student_user', password='demo12345')
+        cls.student.profile.role = cls.student_role
+        cls.student.profile.save()
+
+    def setUp(self):
+        self.payload = b'plan-bytes-for-download'
+        self.record = PlanSource.objects.create(
+            file=SimpleUploadedFile('plan-ist.xlsx', self.payload),
+            original_name='plan-ist.xlsx',
+            direction='09.03.02',
+            direction_code='ist',
+            size=len(self.payload),
+            uploaded_by=self.owner,
+        )
+
+    def file_url(self):
+        return reverse('education:plan_source_file', args=[self.record.pk])
+
+    def test_owner_gets_attachment_with_original_name(self):
+        self.client.force_login(self.owner)
+        response = self.client.get(self.file_url())
+        self.assertEqual(response.status_code, 200)
+        disposition = response['Content-Disposition']
+        self.assertIn('attachment', disposition)
+        self.assertIn('filename="plan-ist.xlsx"', disposition)
+        self.assertEqual(b''.join(response.streaming_content), self.payload)
+
+    def test_cyrillic_name_is_preserved(self):
+        self.record.original_name = 'Учебный план 09.03.02 ИСТ.xlsx'
+        self.record.save(update_fields=['original_name'])
+        self.client.force_login(self.owner)
+        response = self.client.get(self.file_url())
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            "filename*=utf-8''" + quote('Учебный план 09.03.02 ИСТ.xlsx'),
+            response['Content-Disposition'],
+        )
+
+    def test_staff_can_download_foreign_file(self):
+        self.client.force_login(self.staff_dean)
+        self.assertEqual(self.client.get(self.file_url()).status_code, 200)
+
+    def test_other_dean_cannot_download_foreign_file(self):
+        self.client.force_login(self.other_dean)
+        self.assertEqual(self.client.get(self.file_url()).status_code, 403)
+
+    def test_student_cannot_download(self):
+        self.client.force_login(self.student)
+        self.assertEqual(self.client.get(self.file_url()).status_code, 403)
+
+    def test_anonymous_is_redirected_to_login(self):
+        response = self.client.get(self.file_url())
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/login/', response['Location'])
+
+    def test_plan_modal_has_drag_drop_zone_and_download_link(self):
+        self.client.force_login(self.owner)
+        response = self.client.get(reverse('schedule:schedule'), {'group': 'ИСТ-201'})
+        html = response.content.decode()
+        self.assertIn('data-import-ext=".xls,.xlsx,.docx,.pdf"', html)
+        self.assertIn('data-import-max-size="20971520"', html)
+        self.assertIn('data-import-error', html)
+        self.assertIn(self.file_url(), html)
+        self.assertIn('download="plan-ist.xlsx"', html)
+
+
+@override_settings(MEDIA_ROOT=tempfile.mkdtemp(prefix='bgitu-plan-scope-'))
+class CurriculumDirectionScopeTests(TestCase):
+    """План группы: только дисциплины её направления из загруженных файлов."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.dean_role = Role.objects.create(code='scope_dean', name='Деканат', can_manage_schedule=True)
+        cls.ist_group = Group.objects.create(
+            code='ИСТ-101', course=1, program='09.03.02 «Информационные системы и технологии»',
+        )
+        cls.ivt_group = Group.objects.create(
+            code='ИВТ-101', course=1, program='09.03.01 «Информатика и вычислительная техника»',
+        )
+        cls.dean = User.objects.create_user('scope_dean', password='demo12345')
+        cls.dean.profile.role = cls.dean_role
+        cls.dean.profile.save()
+
+    def make_plan(self, code, name, entries):
+        source = PlanSource.objects.create(
+            original_name=name, direction=code, direction_code=code, entries_count=len(entries),
+        )
+        for subject, start, end in entries:
+            CurriculumEntry.objects.create(
+                code=code, subject=subject, semester_from=start, semester_to=end, source=source,
+            )
+        return source
+
+    def open_group(self, group):
+        self.client.force_login(self.dean)
+        response = self.client.get(reverse('schedule:schedule'), {'group': group.code})
+        self.assertEqual(response.status_code, 200)
+        return response, response.content.decode()
+
+    def test_group_sees_only_its_direction_plan(self):
+        self.make_plan('ist', 'plan-ist.xlsx', [('Математика', 1, 2), ('Базы данных', 3, 3)])
+        self.make_plan('09-03-01', 'plan-ivt.xlsx', [('Информатика', 1, 1), ('Физика', 2, 2)])
+
+        response, html = self.open_group(self.ist_group)
+        self.assertContains(response, 'Математика')
+        self.assertContains(response, 'Базы данных')
+        self.assertNotContains(response, 'Информатика')
+        self.assertNotContains(response, 'Физика')
+        self.assertEqual(html.count('class="tl-row"'), 2)
+
+        response, html = self.open_group(self.ivt_group)
+        self.assertContains(response, 'Информатика')
+        self.assertContains(response, 'Физика')
+        self.assertNotContains(response, 'Математика')
+        self.assertNotContains(response, 'Базы данных')
+        self.assertEqual(html.count('class="tl-row"'), 2)
+
+    def test_group_without_plan_shows_empty_state_not_demo(self):
+        """Нет загруженного плана — пусто: демо-план миграции не показывается."""
+        self.assertTrue(CurriculumEntry.objects.filter(code='ist', source__isnull=True).exists())
+        response, html = self.open_group(self.ist_group)
+        self.assertContains(response, 'План для направления не загружен')
+        self.assertNotContains(response, 'Математический анализ')
+        self.assertNotContains(response, 'Иностранный язык')
+        self.assertEqual(html.count('class="tl-row"'), 0)
+
+    def test_foreign_and_orphan_entries_do_not_leak(self):
+        """Строка чужого файла и демо-строка не видны даже при совпадении кода."""
+        foreign = PlanSource.objects.create(
+            original_name='plan-ivt.xlsx', direction='09.03.01', direction_code='09-03-01',
+        )
+        CurriculumEntry.objects.create(
+            code='ist', subject='Чужая дисциплина', semester_from=1, semester_to=1, source=foreign,
+        )
+        no_direction = PlanSource.objects.create(original_name='plan-unknown.xlsx')
+        CurriculumEntry.objects.create(
+            code='ist', subject='Файл без направления', semester_from=1, semester_to=1, source=no_direction,
+        )
+        CurriculumEntry.objects.create(
+            code='ist', subject='Осиротевшая дисциплина', semester_from=2, semester_to=2,
+        )
+        response, html = self.open_group(self.ist_group)
+        self.assertNotContains(response, 'Чужая дисциплина')
+        self.assertNotContains(response, 'Файл без направления')
+        self.assertNotContains(response, 'Осиротевшая дисциплина')
+        self.assertContains(response, 'План для направления не загружен')
+        self.assertEqual(html.count('class="tl-row"'), 0)
+
+    def test_freshest_source_wins_for_each_group(self):
+        """Приоритет свежего файла работает для каждого направления, а не для одного."""
+        for code, name in (('ist', 'Математика'), ('09-03-01', 'Информатика')):
+            self.make_plan(code, f'{code}-old.xlsx', [(name, 3, 3)])
+        for code, name in (('ist', 'Математика'), ('09-03-01', 'Информатика')):
+            self.make_plan(code, f'{code}-new.xlsx', [(name, 3, 4)])
+
+        response, _ = self.open_group(self.ist_group)
+        self.assertContains(response, 'Математика: 3–4 семестры')
+        response, _ = self.open_group(self.ivt_group)
+        self.assertContains(response, 'Информатика: 3–4 семестры')
+
+    def test_plan_code_comes_from_program_then_group_prefix(self):
+        self.assertEqual(plan_code_for_group(self.ist_group), 'ist')
+        self.assertEqual(plan_code_for_group(self.ivt_group), '09-03-01')
+        # Шифр программы важнее названия группы: ИВТ-101 учится по 09.03.02.
+        self.assertEqual(plan_code_for_group(Group(code='ИВТ-101', program='09.03.02')), 'ist')
+        self.assertEqual(plan_code_for_group(Group(code='ИВТ-101')), 'ivt')
+        self.assertEqual(plan_code_for_group(None), '')
+
+    def test_unknown_or_empty_direction_has_no_plan(self):
+        self.assertEqual(resolve_curriculum(''), [])
+        self.assertEqual(resolve_curriculum('нет-такого'), [])
