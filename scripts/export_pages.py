@@ -174,7 +174,9 @@ def rewrite_search_index(html: str, depth: int) -> str:
 
     public_items = []
     for item in items:
-        url = item.get('url') if isinstance(item, dict) else None
+        if not isinstance(item, dict) or item.get('category') == 'Кабинет':
+            continue
+        url = item.get('url')
         if not isinstance(url, str) or not url.startswith('/'):
             continue
         path = urlsplit(url).path
