@@ -96,7 +96,7 @@
   text-decoration: none;
   transition: border-color var(--dur-fast), color var(--dur-fast), background var(--dur-fast);
 }
-.icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+.icon-btn:hover { border-color: var(--accent-text); color: var(--accent-text); }
 .icon-btn svg { width: 18px; height: 18px; }
 .icon-btn--dot { position: relative; }
 .icon-btn--dot::after {
@@ -248,7 +248,7 @@
   letter-spacing: -0.02em;
   text-decoration: none;
 }
-.menu__nav a[aria-current="page"] { color: var(--accent); }
+.menu__nav a[aria-current="page"] { color: var(--accent-text); }
 .menu__foot { margin-top: auto; color: var(--text-faint); }
 
 body.menu-open { overflow: hidden; }
@@ -287,7 +287,7 @@ body.menu-open { overflow: hidden; }
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
-.btn--ghost:hover { border-color: var(--accent); color: var(--accent); }
+.btn--ghost:hover { border-color: var(--accent-text); color: var(--accent-text); }
 .btn--sm { min-height: 44px; padding-inline: 1.2em; font-size: 0.875rem; }
 .btn--block { width: 100%; }
 
@@ -306,8 +306,8 @@ body.menu-open { overflow: hidden; }
   text-transform: uppercase;
   white-space: nowrap;
 }
-.badge--accent { border-color: color-mix(in oklab, var(--accent) 55%, transparent); color: var(--accent); }
-.badge--soft { background: var(--accent-soft); border-color: transparent; color: var(--accent); }
+.badge--accent { border-color: color-mix(in oklab, var(--accent) 55%, transparent); color: var(--accent-text); }
+.badge--soft { background: var(--accent-soft); border-color: transparent; color: var(--accent-text); }
 
 /* ---------- Формы ---------- */
 .field { display: grid; gap: 6px; align-content: start; }
@@ -333,7 +333,7 @@ body.menu-open { overflow: hidden; }
 .input:hover, .select:hover, .textarea:hover { border-color: color-mix(in oklab, var(--brand-ink) 38%, transparent); }
 .input:focus, .select:focus, .textarea:focus {
   outline: none;
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .input::placeholder { color: var(--text-faint); }
@@ -413,7 +413,7 @@ body.menu-open { overflow: hidden; }
   margin: 0 0 16px;
   padding-left: 10px;
   border-left: 2px solid var(--accent);
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 0.875rem;
   line-height: 1.5;
 }
@@ -478,7 +478,7 @@ body.menu-open { overflow: hidden; }
   background: transparent;
   cursor: pointer;
 }
-.dialog__close:hover { border-color: var(--accent); color: var(--accent); }
+.dialog__close:hover { border-color: var(--accent-text); color: var(--accent-text); }
 .dialog__close svg { width: 16px; height: 16px; }
 
 /* ---------- Тост ---------- */
@@ -530,7 +530,7 @@ body.menu-open { overflow: hidden; }
 /* Длинное слово в заголовке панели («Программирование») при 136% шире
    панели 320px — переносим, иначе заголовок наезжает на кнопку. */
 .panel__title h2 { font-size: clamp(1.125rem, 1rem + 0.5vw, 1.5rem); overflow-wrap: anywhere; }
-.panel__num { color: var(--accent); }
+.panel__num { color: var(--accent-text); }
 
 /* ---------- Крошки ---------- */
 .crumbs {
@@ -541,7 +541,7 @@ body.menu-open { overflow: hidden; }
   color: var(--text-faint);
 }
 .crumbs a { color: var(--text-muted); text-decoration: none; }
-.crumbs a:hover { color: var(--accent); }
+.crumbs a:hover { color: var(--accent-text); }
 .crumbs i { font-style: normal; color: var(--line-strong); }
 
 /* ---------- Подвал ---------- */
@@ -564,7 +564,7 @@ body.menu-open { overflow: hidden; }
 }
 .foot-grid p, .foot-grid a { color: var(--text-muted); font-size: 0.9375rem; line-height: 1.7; }
 .foot-grid a { text-decoration: none; }
-.foot-grid a:hover { color: var(--accent); }
+.foot-grid a:hover { color: var(--accent-text); }
 .foot-bottom {
   display: flex;
   flex-wrap: wrap;
@@ -643,11 +643,11 @@ body.menu-open { overflow: hidden; }
 .sel__btn:hover { border-color: color-mix(in oklab, var(--accent) 55%, transparent); }
 .sel__btn:focus-visible {
   outline: none;
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .sel.is-open .sel__btn {
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .sel__val {
@@ -662,7 +662,7 @@ body.menu-open { overflow: hidden; }
   transition: transform var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
 }
 .sel__chev svg { width: 16px; height: 16px; }
-.sel.is-open .sel__chev { transform: rotate(180deg); color: var(--accent); }
+.sel.is-open .sel__chev { transform: rotate(180deg); color: var(--accent-text); }
 .sel__panel {
   position: absolute;
   z-index: 80;

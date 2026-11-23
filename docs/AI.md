@@ -171,7 +171,7 @@ python manage.py ai_review_schedule \
 
 ### Проверка
 
-* `make test` — 195 тестов, включая 20 тестов разбора
+* `make test` — 196 тестов, включая 21 тест разбора
   (`apps/schedule/tests_ai_review.py`); `make check` без замечаний.
 * Файл `bgitu-2026-27-1semestr-IVT-IST-PI-PRI.xls`: 268 занятий, 12 групп,
   30 преподавателей, 32 аудитории, 45 дисциплин — сверено с БД.

@@ -12,7 +12,7 @@ THEME_FAVICON = {
     'paper': ('#b8322a', '#ffffff'),
     'surik': ('#ff5a2e', '#0d0d0d'),
     'latun': ('#d6b072', '#0d0d0d'),
-    'brass': ('#cf9f4f', '#1b1712'),
+    'brass': ('#d2a83c', '#1b1712'),
 }
 FAVICON_SVG = (
     "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\">"

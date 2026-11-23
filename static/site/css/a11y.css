@@ -35,7 +35,7 @@ html.a11y-sp :is(p, li, dd) { line-height: 1.9 !important; }
 html.a11y-gray { filter: grayscale(1); }
 /* поповеры живут в top layer и не наследуют фильтр html — гасим их отдельно */
 html.a11y-gray .theme-pop, html.a11y-gray #menu { filter: grayscale(1); }
-html.a11y-hc { --brand-base: #000 !important; --brand-ink: #fff !important; --brand-accent: #ffe14d !important; --brand-on-accent: #000 !important; --brand-aux: #ffe14d !important; }
+html.a11y-hc { --brand-base: #000 !important; --brand-ink: #fff !important; --brand-accent: #ffe14d !important; --brand-on-accent: #000 !important; --brand-aux: #ffe14d !important; --accent-text: #ffe14d !important; }
 html.a11y-im .trail, html.a11y-im img, html.a11y-im .ia, html.a11y-im :is(.tile, .card, .feature)::before, html.a11y-im .tile::after { display: none !important; }
 html.a11y-im *, html.a11y-im *::before, html.a11y-im *::after { animation: none !important; transition: none !important; }
 @media(max-width: 640px) {

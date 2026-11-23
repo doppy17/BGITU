@@ -1,28 +1,29 @@
 {% comment %}
-  Шапка блока «Расписание»: выбор группы · номер и заголовок · обновление.
-  Одна разметка на оба состояния (есть пары / занятий нет), чтобы селектор
-  группы оставался доступен всегда. Кнопка импорта — только для персонала.
+  Шапка блока «Расписание»: слева номер и заголовок, справа — кнопка
+  обновления и выбор группы (селектор — крайний правый). Одна разметка на
+  оба состояния (есть пары / занятий нет), чтобы селектор группы оставался
+  доступен всегда. Кнопка импорта — только для персонала.
 {% endcomment %}
 <div class="sched-panel__bar">
-  <div class="sched-panel__pick">
+  <div class="sched-panel__head">
     <span class="panel__num mono sched-panel__num">01</span>
-    {% if can_choose_group %}
-    <form method="get" class="group-switch">
-      <select class="input" name="group" aria-label="Группа" onchange="this.form.submit()">
-        {% for g in groups %}
-          <option value="{{ g.code }}" {% if group and g.id == group.id %}selected{% endif %}>{{ g.code }}</option>
-        {% endfor %}
-      </select>
-    </form>
-    {% endif %}
-  </div>
-  <div class="panel__title sched-panel__title">
-    <h2>Расписание</h2>
+    <div class="panel__title sched-panel__title">
+      <h2>Расписание</h2>
+    </div>
   </div>
   {% if can_import %}
   <button class="btn btn--accent btn--sm sched-import-btn" type="button" id="scheduleImportOpen" aria-haspopup="dialog" aria-controls="scheduleImport">
     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v11m0-11 4 4m-4-4-4 4"/><path d="M4 17v3h16v-3"/></svg>
     Обновить расписание
   </button>
+  {% endif %}
+  {% if can_choose_group %}
+  <form method="get" class="group-switch sched-panel__pick">
+    <select class="input" name="group" aria-label="Группа" onchange="this.form.submit()">
+      {% for g in groups %}
+        <option value="{{ g.code }}" {% if group and g.id == group.id %}selected{% endif %}>{{ g.code }}</option>
+      {% endfor %}
+    </select>
+  </form>
   {% endif %}
 </div>
