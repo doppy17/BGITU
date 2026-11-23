@@ -63,24 +63,27 @@ html.a11y-fs2 .head-pill { padding-inline: clamp(14px, 2vw, 28px); }
 html.a11y-fs1 .brand,
 html.a11y-fs2 .brand { min-height: 44px; }
 @media (min-width: 1181px) {
-  /* на 118% и 136% содержимое шире пилюли: две строки. --head-h 134px —
-     высота пилюли: 2×44 строки + 10 row-gap + 2×16 padding + 2px рамка
-     + 2px запас на a11y-sp. */
+  /* на 118% и 136% содержимое шире пилюли: две строки. Сетка 2×2: бренд
+     на обе строки (центр по вертикали всей пилюли), утилиты справа сверху,
+     меню справа снизу. --head-h 134px = 2×44 строки + 10 row-gap + 2×16
+     padding + 2px рамка + 2px запас на a11y-sp. */
   html.a11y-fs1,
   html.a11y-fs2 { --head-h: 134px; }
   html.a11y-fs1 .head-pill,
   html.a11y-fs2 .head-pill {
-    height: auto; min-height: var(--head-h); flex-wrap: wrap;
-    align-items: center; align-content: center; justify-content: space-between;
+    height: auto; min-height: var(--head-h); display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    grid-template-areas: "brand actions" "brand nav";
+    align-items: center; align-content: center; justify-content: stretch;
     row-gap: 10px; column-gap: 12px; padding: 16px clamp(14px, 2vw, 28px);
   }
-  /* Две строки: первая — бренд слева + утилиты справа, вторая — меню по центру. */
   html.a11y-fs1 .brand,
-  html.a11y-fs2 .brand { order: 1; }
+  html.a11y-fs2 .brand { grid-area: brand; align-self: center; order: 0; }
   html.a11y-fs1 .head-actions,
-  html.a11y-fs2 .head-actions { order: 2; flex: 0 0 auto; margin-left: auto; justify-content: flex-end; }
+  html.a11y-fs2 .head-actions { grid-area: actions; justify-self: end; align-self: center; flex: 0 0 auto; margin-left: 0; justify-content: flex-end; }
   html.a11y-fs1 .nav,
-  html.a11y-fs2 .nav { order: 3; flex: 1 1 100%; margin: 0; display: flex; justify-content: center; }
+  html.a11y-fs2 .nav { grid-column: 1 / -1; grid-row: 2; justify-self: center; align-self: center; width: max-content; max-width: 100%; min-width: 0; margin: 0; display: flex; justify-content: center; }
   html.a11y-fs1 .nav ul,
   html.a11y-fs2 .nav ul { justify-content: center; width: 100%; }
   html.a11y-fs1 .head-actions > .btn,
