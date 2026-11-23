@@ -17,4 +17,5 @@ urlpatterns = [
     path('works/', views.my_works, name='works'),
     path('plan/import/', plan_views.plan_import, name='plan_import'),
     path('plan/source/<int:pk>/delete/', plan_views.plan_source_delete, name='plan_source_delete'),
+    path('plan/source/<int:pk>/file/', plan_views.plan_source_download, name='plan_source_file'),
 ]

@@ -267,7 +267,7 @@ class WeekParityTests(TestCase):
         self.assertTrue({'а', 'б'} & codes, f'ожидались подгруппы а/б, есть {codes}')
 
     def test_parity_follows_selected_week(self):
-        """Оба недельных варианта видны в таблице, неделя меняет только бейдж/даты."""
+        """На выбранной неделе видна только её пара: нечётная — odd и общая, чётная — even."""
         from .models import Lesson
 
         Lesson.objects.create(group=self.group, weekday=2, pair=1, week='odd', subject='Только нечёт')
@@ -276,19 +276,23 @@ class WeekParityTests(TestCase):
         # неделя 13 семестра: 23–29.11.2026 — 13-я, нечётная
         odd = self.client.get(reverse('schedule:schedule'), {'week': '13'})
         self.assertContains(odd, '<b>Только нечёт</b>')
-        self.assertContains(odd, '<b>Только чёт</b>')
-        self.assertContains(odd, '1-я неделя')
+        self.assertNotContains(odd, '<b>Только чёт</b>')
+        self.assertNotContains(odd, '1-я неделя')
+        self.assertNotContains(odd, '2-я неделя')
         # неделя 12: 16–22.11.2026 — 12-я, чётная
         even = self.client.get(reverse('schedule:schedule'), {'week': '12'})
         self.assertContains(even, '<b>Только чёт</b>')
-        self.assertContains(even, '<b>Только нечёт</b>')
-        self.assertContains(even, '2-я неделя')
+        self.assertNotContains(even, '<b>Только нечёт</b>')
         # предмет «каждую неделю» виден в таблице в обеих
         self.assertContains(odd, '<b>Философия</b>')
         self.assertContains(even, '<b>Философия</b>')
+        # деления ячейки по неделям больше нет
+        for response in (odd, even):
+            self.assertNotContains(response, 'sched-cell--weeks')
+            self.assertNotContains(response, 'sched-half')
 
-    def test_same_slot_odd_even_shows_two_halves(self):
-        """Один слот: верхняя половина — 1-я неделя, нижняя — 2-я, со своими деталями."""
+    def test_same_slot_shows_only_selected_week(self):
+        """Один слот с парами разных недель: на выбранной неделе — одна карточка со своими деталями."""
         from .models import Bell, Lesson
 
         Bell.objects.create(building='1', pair=6, start='15:45', end='17:20')
@@ -304,21 +308,40 @@ class WeekParityTests(TestCase):
         self.client.force_login(self.student)
         odd = self.client.get(reverse('schedule:schedule'), {'week': '13'})
         html = odd.content.decode()
-        self.assertContains(odd, 'sched-cell--weeks')
-        self.assertGreater(html.index('Слот-нечёт'), 0)
-        self.assertLess(html.index('Слот-нечёт'), html.index('Слот-чёт'))
-        self.assertIn('<span class="sched-half__label mono">1-я неделя</span>', html)
-        self.assertIn('<span class="sched-half__label mono">2-я неделя</span>', html)
-        # У каждой половины — своя аудитория, преподаватель и время по корпусу.
+        self.assertNotIn('sched-cell--weeks', html)
+        self.assertNotIn('sched-half__label', html)
+        self.assertIn('<b>Слот-нечёт</b>', html)
+        # карточка чётной недели в этом слоте не рисуется вовсе
+        self.assertNotIn('Слот-чёт', html)
+        self.assertNotIn('ауд. 202', html)
+        self.assertNotIn('Иванов И.И.', html)
+        self.assertNotIn('16:15–17:50', html)
+        # у оставшейся карточки — свои аудитория, преподаватель и время по корпусу
         self.assertIn('ауд. 101', html)
         self.assertIn('Петров П.П.', html)
         self.assertIn('15:45–17:20', html)
-        self.assertIn('ауд. 202', html)
-        self.assertIn('Иванов И.И.', html)
-        self.assertIn('16:15–17:50', html)
         even = self.client.get(reverse('schedule:schedule'), {'week': '12'})
-        self.assertContains(even, '<b>Слот-чёт</b>')
-        self.assertContains(even, '<b>Слот-нечёт</b>')
+        html = even.content.decode()
+        self.assertIn('<b>Слот-чёт</b>', html)
+        self.assertNotIn('Слот-нечёт', html)
+        self.assertNotIn('ауд. 101', html)
+        self.assertIn('ауд. 202', html)
+        self.assertIn('16:15–17:50', html)
+
+    def test_other_week_lessons_do_not_fill_table(self):
+        """Пары только другой недели не заполняют таблицу — честное «занятий нет»."""
+        from apps.education.models import Group
+        from .models import Lesson
+
+        other = Group.objects.create(code='ИСТ-299', course=2)
+        Lesson.objects.create(group=other, weekday=1, pair=1, week='even', subject='Только-чётная')
+        self.student.profile.group = other
+        self.student.profile.save()
+        self.client.force_login(self.student)
+        page = self.client.get(reverse('schedule:schedule'), {'week': '13'})  # нечётная
+        self.assertContains(page, 'занятий нет')
+        self.assertNotContains(page, 'Только-чётная')
+        self.assertNotContains(page, 'class="sched-table"')
 
     def test_subgroup_filter(self):
         """?sub=б показывает занятия второй подгруппы."""
@@ -399,6 +422,25 @@ class SubgroupSplitCellTests(TestCase):
         self.assertContains(response, '<b>Подгруппа-один</b>')
         self.assertContains(response, '<b>Подгруппа-два</b>')
         self.assertContains(response, 'sched-cell--split')
+
+    def test_split_is_by_subgroups_not_weeks(self):
+        """Ячейка делится пополам только по подгруппам: половин недель и подписей нет."""
+        self.client.force_login(self.student)
+        response = self.client.get(reverse('schedule:schedule'), {'week': '12'})
+        html = response.content.decode()
+        self.assertNotIn('sched-cell--weeks', html)
+        self.assertNotIn('sched-half', html)
+        self.assertNotIn('1-я неделя', html)
+        self.assertNotIn('2-я неделя', html)
+        cells = html.split('<div class="sched-cell sched-cell--body')
+        split_cells = [chunk for chunk in cells if 'sched-cell--split' in chunk]
+        self.assertTrue(split_cells)
+        self.assertTrue(
+            any('Подгруппа-один' in chunk and 'Подгруппа-два' in chunk for chunk in split_cells),
+            'обе карточки подгрупп должны быть в одной ячейке с классом split',
+        )
+        self.assertIn('подгр. а', html)
+        self.assertIn('подгр. б', html)
 
     def test_common_pair_is_single_card_without_subgroup(self):
         self.client.force_login(self.student)
@@ -513,14 +555,17 @@ class SubgroupVisibilityTests(TestCase):
         self.assertContains(page, '<b>Обычная-пара</b>')
 
     def test_subgroups_on_different_weeks_still_division(self):
-        """Обе метки подгрупп в данных — деление есть; недели показаны половинами."""
+        """Обе метки подгрупп в данных — деление есть; видна пара только выбранной недели."""
         self._login_as_student(self.parity)
         page = self.client.get(reverse('schedule:schedule'), {'week': '13'})
         self.assertEqual(page.context['subgroups'], ['а', 'б'])
         self.assertContains(page, 'sub-pill')
-        self.assertContains(page, 'sched-cell--weeks')
+        self.assertNotContains(page, 'sched-cell--weeks')
         self.assertContains(page, '<b>Нечёт-подгруппа</b>')
-        self.assertContains(page, '<b>Чёт-подгруппа</b>')
+        self.assertNotContains(page, '<b>Чёт-подгруппа</b>')
+        even = self.client.get(reverse('schedule:schedule'), {'week': '12'})
+        self.assertContains(even, '<b>Чёт-подгруппа</b>')
+        self.assertNotContains(even, '<b>Нечёт-подгруппа</b>')
 
     def test_saved_subgroup_ignored_for_group_without_division(self):
         """Сохранённая в профиле подгруппа не фильтрует группу без деления."""
@@ -566,7 +611,7 @@ class ParityByCalendarTests(TestCase):
         Lesson.objects.create(group=cls.group, weekday=1, pair=2, week='even', subject='Чёт-предмет')
 
     def test_parity_flips_with_week_number(self):
-        """Соседние недели — противоположная чётность; оба варианта пары на месте."""
+        """Соседние недели — противоположная чётность; видна только пара своей недели."""
         from .views import parity_of_monday, semester_monday
 
         self.client.force_login(self.student)
@@ -576,10 +621,12 @@ class ParityByCalendarTests(TestCase):
             parity = parity_of_monday(semester_monday(week))
             seen[week] = parity
             label = 'нечётная' if parity == 'odd' else 'чётная'
+            shown = 'Нечёт-предмет' if parity == 'odd' else 'Чёт-предмет'
+            hidden = 'Чёт-предмет' if parity == 'odd' else 'Нечёт-предмет'
             self.assertContains(response, f'parity-badge parity-badge--{parity}')
             self.assertContains(response, f'<b>{label}</b>')
-            self.assertContains(response, '<b>Нечёт-предмет</b>')
-            self.assertContains(response, '<b>Чёт-предмет</b>')
+            self.assertContains(response, f'<b>{shown}</b>')
+            self.assertNotContains(response, f'<b>{hidden}</b>')
         self.assertNotEqual(seen[12], seen[13], 'соседние недели должны быть разной чётности')
 
     def test_week_page_shows_no_lessons_state(self):
@@ -618,13 +665,14 @@ class WeekParityQueryTests(TestCase):
         Lesson.objects.create(group=cls.group, weekday=5, pair=1, week=Lesson.WEEK_ALL, subject='Каждую-неделю')
 
     def test_week_query_param_selects_parity(self):
-        """?week=odd и ?week=even меняют неделю, но ячейка показывает оба варианта."""
+        """?week=odd и ?week=even: в ячейке только пара выбранной чётности и общая."""
         self.client.force_login(self.student)
         odd = self.client.get(reverse('schedule:schedule'), {'week': 'odd'})
         even = self.client.get(reverse('schedule:schedule'), {'week': 'even'})
-        for response in (odd, even):
-            self.assertContains(response, '<b>Только-нечёт</b>')
-            self.assertContains(response, '<b>Только-чёт</b>')
+        self.assertContains(odd, '<b>Только-нечёт</b>')
+        self.assertNotContains(odd, '<b>Только-чёт</b>')
+        self.assertContains(even, '<b>Только-чёт</b>')
+        self.assertNotContains(even, '<b>Только-нечёт</b>')
         # «каждую неделю» — в обеих
         self.assertContains(odd, '<b>Каждую-неделю</b>')
         self.assertContains(even, '<b>Каждую-неделю</b>')
@@ -1143,6 +1191,16 @@ class ScheduleRowCountTests(TestCase):
         response = self.client.get(reverse('schedule:schedule'), {'week': '12'})  # чётная
         html = response.content.decode()
         self.assertEqual(self.pair_rows(html), [1, 2, 3, 4, 5])
+        self.assertNotIn('<b>6</b>', html)
+
+    def test_own_pair_of_other_week_does_not_add_row(self):
+        """Пара 6 своей группы только в нечётной неделе тоже не создаёт строку в чётной."""
+        Lesson.objects.create(group=self.group, weekday=4, pair=6, week='odd', subject='Информатика')
+        self.client.force_login(self.student)
+        response = self.client.get(reverse('schedule:schedule'), {'week': '12'})  # чётная
+        html = response.content.decode()
+        self.assertEqual(self.pair_rows(html), [1, 2, 3, 4, 5])
+        self.assertEqual(response.context['max_pair'], 5)
         self.assertNotIn('<b>6</b>', html)
 
     def test_no_data_renders_empty_state_without_table(self):

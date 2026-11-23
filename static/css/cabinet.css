@@ -1210,34 +1210,15 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
 .sched-cell--body:hover { background: var(--accent-soft); }
 .sched-cell--body.is-today { background: color-mix(in oklab, var(--accent) 6%, transparent); }
 .sched-cell--body.is-today:hover { background: color-mix(in oklab, var(--accent) 12%, transparent); }
-/* Разные пары подгрупп «а»/«б» в одном слоте: половина недели делится
-   пополам по вертикали. Верх/низ ячейки — 1-я и 2-я недели. */
-.sched-half {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex: 1 1 auto;
-  min-height: 0;
-}
-.sched-half--split {
+/* Разные пары подгрупп «а»/«б» в одном слоте: две карточки рядом —
+   слева «а», справа «б». Ячейка делится пополам по горизонтали. */
+.sched-cell--body.sched-cell--split {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 6px;
   align-items: stretch;
 }
-.sched-cell--weeks .sched-half + .sched-half {
-  padding-top: 7px;
-  border-top: 1px dashed var(--line-strong);
-}
-.sched-half__label {
-  color: var(--text-muted);
-  font-size: 0.625rem;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-.sched-half--split .sched-half__label { grid-column: 1 / -1; }
-.sched-half.is-current .sched-half__label { color: var(--accent); }
-.sched-half--split .sched-lesson { min-width: 0; }
+.sched-cell--split .sched-lesson { min-width: 0; }
 .sched-cell--split .sched-lesson + .sched-lesson { border-left-color: var(--line-strong); }
 .sched-lesson {
   display: flex;
@@ -1327,16 +1308,6 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   white-space: nowrap;
 }
 .sched-building--2 { border-color: var(--accent); color: var(--accent); }
-.sched-week {
-  align-self: flex-start;
-  padding: 1px 6px;
-  border-radius: var(--radius-pill);
-  background: var(--accent-soft);
-  color: var(--accent);
-  font-size: 0.5625rem;
-  letter-spacing: 0.04em;
-  white-space: nowrap;
-}
 
 /* ---------- Модальное окно «Обновить расписание» ---------- */
 .sched-import { width: min(560px, calc(100% - 32px)); }
@@ -1354,7 +1325,24 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
 }
 .sched-import__drop:hover,
 .sched-import__drop:focus-within { border-color: var(--accent); background: var(--accent-soft); }
+/* Подсветка зоны, пока над модалкой держат файл (drag&drop). */
+.sched-import.is-dragover .sched-import__drop,
+.sched-import__drop.is-dragover {
+  border-style: solid;
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
 .sched-import.has-file .sched-import__drop { border-style: solid; border-color: var(--accent); }
+.sched-import__error {
+  margin: 10px 0 0;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in oklab, var(--accent) 55%, transparent);
+  border-radius: var(--radius-s);
+  background: var(--accent-soft);
+  color: var(--text);
+  font-size: 0.8125rem;
+}
 .sched-import .file-input {
   position: absolute;
   width: 1px; height: 1px;
@@ -1446,7 +1434,8 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   overflow-wrap: anywhere;
 }
 .sched-file__body small.dim { color: var(--text-faint); }
-.sched-file__del {
+.sched-file__del,
+.sched-file__dl {
   display: inline-flex;
   align-items: center;
   flex: none;
@@ -1459,11 +1448,14 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   font: inherit;
   font-size: 0.6875rem;
   letter-spacing: 0.02em;
+  text-decoration: none;
   cursor: pointer;
   transition: color var(--dur-fast), border-color var(--dur-fast), background var(--dur-fast);
 }
 .sched-file__del:hover,
-.sched-file__del:focus-visible {
+.sched-file__del:focus-visible,
+.sched-file__dl:hover,
+.sched-file__dl:focus-visible {
   border-color: var(--accent);
   background: var(--accent-soft);
   color: var(--accent);
@@ -1473,7 +1465,8 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   .dialog__body { padding: 18px; }
   .dialog__head, .dialog__foot { padding: 14px 18px; }
   .sched-import__drop { padding: 14px; }
-  .sched-file__del span { display: none; }
+  .sched-file__del span,
+  .sched-file__dl span { display: none; }
 }
 .sched-empty {
   display: block;

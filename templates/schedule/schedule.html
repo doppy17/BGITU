@@ -22,7 +22,7 @@
 
 {% if can_import %}
 <!-- Обновление расписания: файл с bgitu.ru подгружается из модального окна -->
-<dialog class="dialog sched-import" id="scheduleImport" aria-labelledby="scheduleImportTitle" data-import-confirm="Удалить файл и все его занятия?">
+<dialog class="dialog sched-import" id="scheduleImport" aria-labelledby="scheduleImportTitle" data-import-confirm="Удалить файл и все его занятия?" data-import-ext=".xls,.xlsx" data-import-max-size="15728640">
   <form method="post" action="{% url 'schedule:import' %}" enctype="multipart/form-data">
     {% csrf_token %}
     {% if group %}<input type="hidden" name="group" value="{{ group.code }}">{% endif %}
@@ -38,7 +38,7 @@
         (.xls или .xlsx). Каждый файл хранится отдельно: файлы разных институтов показываются
         вместе, а повторная загрузка файла того же института заменяет его занятия.
       </p>
-      <label class="sched-import__drop" for="scheduleImportFile">
+      <label class="sched-import__drop" for="scheduleImportFile" data-import-drop>
         <input id="scheduleImportFile" class="file-input" name="file" type="file" accept=".xls,.xlsx" required multiple data-import-file>
         <span class="sched-import__ico" aria-hidden="true">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0 4 4m-4-4-4 4"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
@@ -48,6 +48,7 @@
           <small class="mono">.xls · .xlsx · до 15 МБ каждый · можно несколько</small>
         </span>
       </label>
+      <p class="sched-import__error" data-import-error role="alert" hidden></p>
       <p class="muted sched-import__note">
         Если два файла дают занятие одной группе в один день и пару, показывается занятие
         из самого свежего файла; остальные остаются в базе и вернутся, если свежий файл удалить.
@@ -70,6 +71,12 @@
               </small>
               <small class="mono dim">{{ source.imported_at|date:"d.m.Y H:i" }}{% if source.imported_by %} · {{ source.imported_by.username }}{% endif %}</small>
             </span>
+            <a class="sched-file__dl" href="{% url 'schedule:source_file' source.pk %}"
+               download="{{ source.original_name }}"
+               aria-label="Скачать файл {{ source.original_name }}">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4"/><path d="M4 17v3h16v-3"/></svg>
+              <span>скачать</span>
+            </a>
             <button class="sched-file__del" type="submit"
                     formaction="{% url 'schedule:source_delete' source.pk %}" formmethod="post" formnovalidate
                     data-import-delete
@@ -181,28 +188,22 @@
           <b>{{ row.pair }}</b>
         </div>
         {% for cell in row.days %}
-        <div class="sched-cell sched-cell--body{% if cell.split %} sched-cell--split{% endif %}{% if cell.has_weeks %} sched-cell--weeks{% endif %}{% if cell.week != 'all' %} sched-cell--{{ cell.week }}{% endif %}{% if cell.is_today %} is-today{% endif %}">
-          {% for half in cell.rows %}
-          <div class="sched-half{% if half.split %} sched-half--split{% endif %}{% if half.week != 'all' %} sched-half--{{ half.week }}{% endif %}{% if half.is_current and cell.has_weeks %} is-current{% endif %}">
-            {% if cell.has_weeks %}<span class="sched-half__label mono">{% if half.week == 'odd' %}1-я неделя{% else %}2-я неделя{% endif %}</span>{% endif %}
-            {% for lesson in half.lessons %}
-            <article class="sched-lesson{% if lesson.kind == 'лаб' or lesson.kind == 'лаб.' or lesson.kind == 'практ' %} sched-lesson--lab{% endif %}">
-              <span class="sched-tags">
-                {% if lesson.kind %}<span class="sched-kind mono">{{ lesson.kind }}</span>{% endif %}
-                {% if lesson.subgroup and has_subgroups %}<span class="sched-sub mono" title="пара подгруппы {{ lesson.subgroup_label }}">подгр. {{ lesson.subgroup_label }}</span>{% endif %}
-                {% if lesson.week != 'all' and not cell.has_weeks %}<span class="sched-week mono">{{ lesson.week_label }}</span>{% endif %}
-              </span>
-              <b>{{ lesson.subject }}</b>
-              <small class="sched-meta">
-                {% if lesson.room %}ауд. {{ lesson.room }}{% endif %}
-                {% if lesson.room and lesson.building %} · {% endif %}
-                {% if lesson.building %}<span class="sched-build sched-build--{{ lesson.building }}" title="{{ lesson.building_label }}">{{ lesson.building }} корп.</span>{% endif %}
-                {% if lesson.teacher_name %}{% if lesson.room or lesson.building %} · {% endif %}{{ lesson.teacher_name }}{% endif %}
-              </small>
-              {% if lesson.time_label %}<span class="sched-time mono">{{ lesson.time_label }}</span>{% endif %}
-            </article>
-            {% endfor %}
-          </div>
+        <div class="sched-cell sched-cell--body{% if cell.split %} sched-cell--split{% endif %}{% if cell.is_today %} is-today{% endif %}">
+          {% for lesson in cell.lessons %}
+          <article class="sched-lesson{% if lesson.kind == 'лаб' or lesson.kind == 'лаб.' or lesson.kind == 'практ' %} sched-lesson--lab{% endif %}">
+            <span class="sched-tags">
+              {% if lesson.kind %}<span class="sched-kind mono">{{ lesson.kind }}</span>{% endif %}
+              {% if lesson.subgroup and has_subgroups %}<span class="sched-sub mono" title="пара подгруппы {{ lesson.subgroup_label }}">подгр. {{ lesson.subgroup_label }}</span>{% endif %}
+            </span>
+            <b>{{ lesson.subject }}</b>
+            <small class="sched-meta">
+              {% if lesson.room %}ауд. {{ lesson.room }}{% endif %}
+              {% if lesson.room and lesson.building %} · {% endif %}
+              {% if lesson.building %}<span class="sched-build sched-build--{{ lesson.building }}" title="{{ lesson.building_label }}">{{ lesson.building }} корп.</span>{% endif %}
+              {% if lesson.teacher_name %}{% if lesson.room or lesson.building %} · {% endif %}{{ lesson.teacher_name }}{% endif %}
+            </small>
+            {% if lesson.time_label %}<span class="sched-time mono">{{ lesson.time_label }}</span>{% endif %}
+          </article>
           {% empty %}
           <span class="sched-empty" aria-hidden="true"></span>
           {% endfor %}
@@ -232,7 +233,7 @@
 
   {% if can_import %}
   <!-- Обновление учебного плана: несколько файлов сразу, каждый — отдельный источник -->
-  <dialog class="dialog sched-import" id="planImport" aria-labelledby="planImportTitle" data-import-confirm="Удалить файл плана и все его дисциплины?">
+  <dialog class="dialog sched-import" id="planImport" aria-labelledby="planImportTitle" data-import-confirm="Удалить файл плана и все его дисциплины?" data-import-ext=".xls,.xlsx,.docx,.pdf" data-import-max-size="20971520">
     <form method="post" action="{% url 'education:plan_import' %}" enctype="multipart/form-data">
       {% csrf_token %}
       {% if group %}<input type="hidden" name="group" value="{{ group.code }}">{% endif %}
@@ -248,7 +249,7 @@
           в том числе разных направлений. При совпадении дисциплины в семестре показывается
           запись из самого свежего файла.
         </p>
-        <label class="sched-import__drop" for="planImportFile">
+        <label class="sched-import__drop" for="planImportFile" data-import-drop>
           <input id="planImportFile" class="file-input" name="file" type="file" accept=".xls,.xlsx,.docx,.pdf" required multiple data-import-file>
           <span class="sched-import__ico" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0 4 4m-4-4-4 4"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
@@ -258,6 +259,7 @@
             <small class="mono">.xls · .xlsx · .docx · .pdf · до 20 МБ каждый · можно несколько</small>
           </span>
         </label>
+        <p class="sched-import__error" data-import-error role="alert" hidden></p>
 
         {% if plan_sources %}
         <div class="sched-import__files">
@@ -276,6 +278,12 @@
                 </small>
                 <small class="mono dim">{{ source.uploaded_at|date:"d.m.Y H:i" }}{% if source.uploaded_by %} · {{ source.uploaded_by.username }}{% endif %}</small>
               </span>
+              <a class="sched-file__dl" href="{% url 'education:plan_source_file' source.pk %}"
+                 download="{{ source.original_name }}"
+                 aria-label="Скачать файл {{ source.original_name }}">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4"/><path d="M4 17v3h16v-3"/></svg>
+                <span>скачать</span>
+              </a>
               <button class="sched-file__del" type="submit"
                       formaction="{% url 'education:plan_source_delete' source.pk %}" formmethod="post" formnovalidate
                       data-import-delete

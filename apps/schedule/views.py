@@ -4,8 +4,10 @@ from datetime import date, timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.core.files import File
 from django.db import transaction
+from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
@@ -134,9 +136,9 @@ def schedule_view(request):
         # сохранённый выбор профиля игнорируется — показываем всю группу.
         if sub not in subgroups:
             sub = saved_sub if saved_sub in subgroups else ''
-        # В ячейке показываем оба недельных варианта пары, поэтому фильтр
-        # по чётности здесь не применяется: он нужен только для шапки/дат.
-        lessons = list(all_lessons)
+        # В таблице — только занятия выбранной недели: общие (week=all) и её
+        # чётности. Пары другой недели не показываются и не занимают место.
+        lessons = [item for item in all_lessons if item.week in (Lesson.WEEK_ALL, parity)]
         if sub:
             lessons = [item for item in lessons if subgroup_code(item.subgroup) in ('', sub)]
         if has_subgroups:
@@ -148,19 +150,18 @@ def schedule_view(request):
     # Звонки по корпусам: время пары зависит от корпуса занятия (1-й/2-й).
     bells = {(bell.building, bell.pair): bell for bell in Bell.objects.all()}
 
-    # Таблица: строки — пары, колонки — дни недели. Ячейка показывает ОБА
-    # варианта пары: верхняя половина — 1-я неделя, нижняя — 2-я. Общая
-    # (объединённая) ячейка — одна карточка без деления. Если у «а» и «б»
-    # РАЗНЫЕ пары, половина недели делится ещё и пополам: слева «а», справа «б».
+    # Таблица: строки — пары, колонки — дни недели. В ячейке — занятия только
+    # выбранной недели: одна карточка, а если у «а» и «б» РАЗНЫЕ пары —
+    # две карточки рядом: слева «а», справа «б».
     by_cell = {}
     for lesson in lessons:
         by_cell.setdefault((lesson.weekday, lesson.pair), []).append(lesson)
 
-    def row_lessons(week, items):
-        """Карточки одной половины: общая — одна, иначе по подгруппам."""
+    def row_lessons(items):
+        """Карточки ячейки: общая — одна, иначе по подгруппам."""
         common = [item for item in items if not subgroup_code(item.subgroup)]
         if common:
-            exact = next((item for item in common if item.week == week), None)
+            exact = next((item for item in common if item.week == parity), None)
             return [exact or common[0]]
         by_subgroup = {}
         for item in items:
@@ -173,30 +174,12 @@ def schedule_view(request):
 
     def build_cell(items):
         if not items:
-            return {'rows': [], 'split': False, 'has_weeks': False, 'week': Lesson.WEEK_ALL}
-        specific = sorted({item.week for item in items if item.week != Lesson.WEEK_ALL})
-        if not specific:
-            rows = [{'week': Lesson.WEEK_ALL, 'lessons': row_lessons(Lesson.WEEK_ALL, items)}]
-        elif len(specific) == 1:
-            rows = [{'week': specific[0], 'lessons': row_lessons(specific[0], items)}]
-        else:
-            rows = [
-                {'week': week, 'lessons': row_lessons(week, items)}
-                for week in (Lesson.WEEK_ODD, Lesson.WEEK_EVEN)
-            ]
-        for half in rows:
-            half['split'] = len(half['lessons']) > 1
-            half['is_current'] = half['week'] == parity
-        return {
-            'rows': rows,
-            'split': any(half['split'] for half in rows),
-            'has_weeks': len(rows) > 1,
-            'week': rows[0]['week'] if len(rows) == 1 else Lesson.WEEK_ALL,
-        }
+            return {'lessons': [], 'split': False}
+        cards = row_lessons(items)
+        return {'lessons': cards, 'split': len(cards) > 1}
 
-    # Число строк таблицы — из данных: последняя пара, на которой есть занятие
-    # у любой группы в выбранную неделю, плюс пары выбранной группы из второй
-    # недели (её ячейки показывают оба варианта). Приоритет источников тот же.
+    # Число строк таблицы — из данных выбранной недели: последняя пара, на
+    # которой есть занятие у любой группы в эту неделю. Пустых строк нет.
     week_pool = resolve_lessons(
         Lesson.objects.select_related('source').filter(week__in=[Lesson.WEEK_ALL, parity])
     )
@@ -210,10 +193,9 @@ def schedule_view(request):
         days = []
         for weekday in range(1, 7):
             cell = build_cell(by_cell.get((weekday, pair), []))
-            for half in cell['rows']:
-                for item in half['lessons']:
-                    bell = bells.get((item.building or '2', pair)) or bells.get(('2', pair))
-                    item.time_label = f'{bell.start}–{bell.end}' if bell else ''
+            for item in cell['lessons']:
+                bell = bells.get((item.building or '2', pair)) or bells.get(('2', pair))
+                item.time_label = f'{bell.start}–{bell.end}' if bell else ''
             cell['is_today'] = monday + timedelta(days=weekday - 1) == date.today()
             days.append(cell)
         grid.append({'pair': pair, 'days': days})
@@ -417,3 +399,29 @@ def import_from_server_file(request):
         return redirect('schedule:import')
     messages.success(request, f'Импортировано занятий: {record.lessons_count}.')
     return redirect('schedule:schedule')
+
+
+def can_download_source(user, record):
+    """Скачивание источника: нужно право импорта и авторство файла (staff — любой).
+
+    Файл расписания — исходник импорта, поэтому отдаём его только тем, кто
+    вправе менять расписание, и только авторам загрузки; staff и superuser
+    видят все источники.
+    """
+    if not role_can(user, 'can_manage_schedule'):
+        return False
+    if user.is_superuser or user.is_staff:
+        return True
+    return record.imported_by_id is not None and record.imported_by_id == user.pk
+
+
+@login_required
+def download_source(request, pk):
+    """Отдать загруженный файл расписания как вложение с исходным именем."""
+    record = get_object_or_404(ScheduleImport, pk=pk)
+    if not can_download_source(request.user, record):
+        raise PermissionDenied
+    if not record.file or not record.file.storage.exists(record.file.name):
+        raise Http404('Файл расписания не найден на диске.')
+    filename = record.original_name or os.path.basename(record.file.name)
+    return FileResponse(record.file.open('rb'), as_attachment=True, filename=filename)

@@ -215,8 +215,33 @@
     var open = document.getElementById(openId);
     var file = dialog.querySelector('[data-import-file]');
     var name = dialog.querySelector('[data-import-name]');
+    var drop = dialog.querySelector('[data-import-drop]') || dialog;
+    var error = dialog.querySelector('[data-import-error]');
     var nameDefault = name ? name.textContent : '';
     var confirmText = dialog.getAttribute('data-import-confirm') || 'Удалить файл?';
+    var extensions = (dialog.getAttribute('data-import-ext') || (file && file.getAttribute('accept')) || '')
+      .split(',')
+      .map(function (item) { return item.trim().toLowerCase(); })
+      .filter(Boolean);
+    var maxSize = parseInt(dialog.getAttribute('data-import-max-size'), 10) || 0;
+
+    function showError(text) {
+      if (!error) {
+        error = document.createElement('p');
+        error.className = 'sched-import__error';
+        error.setAttribute('role', 'alert');
+        error.setAttribute('data-import-error', '');
+        if (drop && drop.parentNode) drop.parentNode.insertBefore(error, drop.nextSibling);
+      }
+      error.textContent = text;
+      error.hidden = false;
+    }
+
+    function clearError() {
+      if (!error) return;
+      error.textContent = '';
+      error.hidden = true;
+    }
 
     if (open && typeof dialog.showModal === 'function') {
       open.addEventListener('click', function () { dialog.showModal(); });
@@ -244,8 +269,105 @@
         dialog.classList.toggle('has-file', files.length > 0);
         if (submit) submit.disabled = files.length === 0;
       };
-      file.addEventListener('change', syncFiles);
+
+      // Файлы, выбранные через input и брошенные мышью, живут в одном input.files,
+      // поэтому список и кнопка отправки обновляются одинаково.
+      var setInputFiles = function (items) {
+        try {
+          var transfer = new window.DataTransfer();
+          items.forEach(function (item) { transfer.items.add(item); });
+          file.files = transfer.files;
+          return true;
+        } catch (err) {
+          return false;
+        }
+      };
+
+      var extensionOf = function (item) {
+        var fileName = item.name || '';
+        var dot = fileName.lastIndexOf('.');
+        return dot > -1 ? fileName.slice(dot).toLowerCase() : '';
+      };
+
+      var addFiles = function (incoming) {
+        var accepted = [];
+        var rejected = [];
+        incoming.forEach(function (item) {
+          var extension = extensionOf(item);
+          if (extensions.length && extensions.indexOf(extension) === -1) {
+            rejected.push(item.name + ' — формат не поддерживается');
+          } else if (maxSize && item.size > maxSize) {
+            rejected.push(item.name + ' — больше ' + Math.round(maxSize / (1024 * 1024)) + ' МБ');
+          } else {
+            accepted.push(item);
+          }
+        });
+        if (rejected.length) {
+          showError('Не добавлены: ' + rejected.join('; '));
+        } else {
+          clearError();
+        }
+        if (!accepted.length) return;
+        var existing = file.files ? Array.prototype.slice.call(file.files) : [];
+        var seen = {};
+        var merged = [];
+        existing.concat(accepted).forEach(function (item) {
+          var key = [item.name, item.size, item.lastModified].join(':');
+          if (seen[key]) return;
+          seen[key] = true;
+          merged.push(item);
+        });
+        if (!setInputFiles(merged)) {
+          // Без DataTransfer браузер не даёт дополнить выбор — показываем только брошенные.
+          setInputFiles(accepted);
+        }
+        syncFiles();
+      };
+
+      file.addEventListener('change', function () {
+        clearError();
+        syncFiles();
+      });
       syncFiles();
+
+      // Drag & drop: подсветка зоны, сброс при уходе, приём файлов на всей модалке.
+      if (drop) {
+        var dragDepth = 0;
+        var setDragging = function (on) {
+          dialog.classList.toggle('is-dragover', on);
+          drop.classList.toggle('is-dragover', on);
+        };
+        var hasFiles = function (event) {
+          var types = event.dataTransfer && event.dataTransfer.types;
+          return !!types && Array.prototype.indexOf.call(types, 'Files') !== -1;
+        };
+        dialog.addEventListener('dragenter', function (event) {
+          if (!hasFiles(event)) return;
+          event.preventDefault();
+          dragDepth += 1;
+          setDragging(true);
+        });
+        dialog.addEventListener('dragover', function (event) {
+          if (!hasFiles(event)) return;
+          event.preventDefault();
+          if (event.dataTransfer) event.dataTransfer.dropEffect = 'copy';
+          setDragging(true);
+        });
+        dialog.addEventListener('dragleave', function (event) {
+          if (!hasFiles(event)) return;
+          dragDepth = Math.max(0, dragDepth - 1);
+          if (!dragDepth) setDragging(false);
+        });
+        // Слушатель на dialog, а не на документе: бросок мимо пунктирной зоны,
+        // но внутри модалки, тоже принимается; остальная страница не перехвачена.
+        dialog.addEventListener('drop', function (event) {
+          if (!hasFiles(event)) return;
+          event.preventDefault();
+          dragDepth = 0;
+          setDragging(false);
+          addFiles(Array.prototype.slice.call(event.dataTransfer.files || []));
+        });
+      }
     }
     // Удаление загруженного файла: кнопка в списке шлёт форму на отдельный URL.
     dialog.querySelectorAll('[data-import-delete]').forEach(function (button) {

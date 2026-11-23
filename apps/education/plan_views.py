@@ -9,12 +9,14 @@ import os
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.db import transaction
+from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 
-from apps.accounts.permissions import role_required
+from apps.accounts.permissions import role_can, role_required
 
 from .models import CurriculumEntry, PlanSource
 from .plan_import import (
@@ -129,3 +131,24 @@ def plan_source_delete(request, pk):
     label = f'Направление {direction}' if direction else 'Файл'
     messages.success(request, f'{label}: «{name}» удалён вместе с дисциплинами.')
     return redirect(plan_redirect(request.POST.get('group', '')))
+
+
+def can_download_plan_source(user, record):
+    """Скачивание файла плана: право импорта + авторство (staff/superuser — любой)."""
+    if not role_can(user, 'can_manage_schedule'):
+        return False
+    if user.is_superuser or user.is_staff:
+        return True
+    return record.uploaded_by_id is not None and record.uploaded_by_id == user.pk
+
+
+@login_required
+def plan_source_download(request, pk):
+    """Отдать загруженный файл плана как вложение с исходным именем."""
+    record = get_object_or_404(PlanSource, pk=pk)
+    if not can_download_plan_source(request.user, record):
+        raise PermissionDenied
+    if not record.file or not record.file.storage.exists(record.file.name):
+        raise Http404('Файл учебного плана не найден на диске.')
+    filename = record.original_name or os.path.basename(record.file.name)
+    return FileResponse(record.file.open('rb'), as_attachment=True, filename=filename)
