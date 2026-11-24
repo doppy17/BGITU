@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Ключ доступа{% endblock %}
+{% block content %}
+<header class="page-head">
+  <p class="mono dim">доступ и права</p>
+  <h1>Ввести ключ доступа</h1>
+  <p>Одноразовый ключ выдаёт роль с полным доступом. Ключ срабатывает один раз и после этого сгорает.</p>
+</header>
+
+<section class="panel">
+  <form method="post" class="auth-form" autocomplete="off">
+    {% csrf_token %}
+    <div class="field">
+      <label for="accessKey">Ключ доступа</label>
+      <input class="input" id="accessKey" name="code" type="text" required autofocus
+             autocomplete="one-time-code" spellcheck="false" autocapitalize="off"
+             placeholder="вставьте выданный код">
+      <p class="field__hint">Код выдаёт администратор проекта; в базе хранится только его хеш.</p>
+    </div>
+    <div class="action-row">
+      <button class="btn btn--accent" type="submit">Активировать</button>
+      <a class="btn btn--ghost" href="{% url 'portal:profile' %}">В профиль</a>
+    </div>
+  </form>
+
+  {% if current_role.is_developer %}
+    <p class="panel-note">У вашей роли уже есть полный доступ — повторный ключ не нужен.</p>
+  {% endif %}
+</section>
+{% endblock %}

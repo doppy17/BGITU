@@ -1,0 +1,55 @@
+{% comment %}
+  Блок 03 — расписание преподавателя: выбор ФИО и его таблица на неделю.
+
+  Обёртка #sched-block-teacher — стабильная точка замены для AJAX-слоя
+  (static/js/schedule-ajax.js). Если блока на странице нет, скрипт просто
+  пропускает его: блок 01 продолжает работать сам по себе.
+{% endcomment %}
+<div id="sched-block-teacher">
+<section class="panel sched-panel sched-panel--teacher">
+  <div class="sched-panel__bar">
+    <div class="sched-panel__head">
+      <span class="panel__num mono sched-panel__num">{{ teacher_block_num|default:'03' }}</span>
+      <div class="panel__title sched-panel__title">
+        <h2>Расписание преподавателя</h2>
+      </div>
+    </div>
+    {% if teachers %}
+    <form method="get" class="group-switch sched-panel__pick sched-teacher-pick" data-searchable>
+      <input type="hidden" name="week" value="{{ week }}">
+      {% if group %}<input type="hidden" name="group" value="{{ group.code }}">{% endif %}
+      {% if sub %}<input type="hidden" name="sub" value="{{ sub }}">{% endif %}
+      <select class="input" name="teacher" aria-label="Преподаватель" data-searchable onchange="this.form.submit()">
+        {% for name in teachers %}
+        <option value="{{ name }}" {% if name == teacher %}selected{% endif %}>{{ name }}</option>
+        {% endfor %}
+      </select>
+      {# Без JS инлайновый onchange не работает — форма отправляется кнопкой. #}
+      <noscript><button class="btn btn--ghost btn--sm" type="submit">Показать</button></noscript>
+    </form>
+    {% endif %}
+  </div>
+
+  {% if teacher_default.is_self %}
+  <p class="sched-teacher-hint mono dim">ваше расписание · ФИО из профиля</p>
+  {% elif teacher_default.is_current_week and teacher_default.reason == 'now' %}
+  <p class="sched-teacher-hint mono dim">сейчас идёт пара · {{ teacher_default.weekday_name }}, {{ teacher_default.pair }} пара · {{ teacher_default.group_code }}</p>
+  {% elif teacher_default.is_current_week and teacher_default.reason == 'next' %}
+  <p class="sched-teacher-hint mono dim">ближайшая пара · {{ teacher_default.weekday_name }}, {{ teacher_default.pair }} пара · {{ teacher_default.group_code }}</p>
+  {% endif %}
+
+  {% if teacher_grid %}
+  {% include 'schedule/_sched_table.html' with grid=teacher_grid mode='teacher' %}
+  {% elif teachers %}
+  <div class="empty">
+    <b>У преподавателя {{ teacher }} на {{ week_label_prep }} неделе занятий нет</b>
+    <p>В загруженных файлах у этого преподавателя нет пар на {{ monday|date:"d.m.Y" }} — {{ sunday|date:"d.m.Y" }}.</p>
+  </div>
+  {% else %}
+  <div class="empty">
+    <b>Расписание преподавателей не загружено</b>
+    <p>ФИО преподавателей берутся из файлов расписания БГИТУ — загрузите файл, и список появится здесь.</p>
+  </div>
+  {% endif %}
+</section>
+</div>

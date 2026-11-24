@@ -1,0 +1,55 @@
+{% load bgitu %}
+{% if sem_list %}
+<div class="profile-table-wrap">
+  <table class="profile-table">
+    <caption class="visually-hidden">Успеваемость по семестрам</caption>
+    <thead>
+      <tr>
+        <th scope="col">Дисциплина</th>
+        <th scope="col" class="profile-table__grade">Оценка</th>
+      </tr>
+    </thead>
+    {% for s in sem_list %}
+    <tbody class="profile-semester{% if s.has_debt %} is-debt{% endif %}">
+      <tr class="profile-semester__head">
+        <td colspan="2">
+          <div class="profile-semester__bar">
+            <span class="profile-semester__num">{{ s.semester|default:'—' }}</span>
+            <span class="profile-semester__cap mono">семестр</span>
+            <span class="profile-semester__meta mono dim">
+              <span>{{ s.courses|length }} дисц.</span>
+              {% if s.credits %}<span>{{ s.credits }} зачт.</span>{% endif %}
+              {% if s.exams %}<span>{{ s.exams }} экз.</span>{% endif %}
+            </span>
+            <span class="profile-semester__avg">
+              <b>{{ s.average|ru_num }}</b>
+              <span class="mono">средний</span>
+            </span>
+            {% if s.has_debt %}<span class="profile-debt">долг</span>{% endif %}
+          </div>
+        </td>
+      </tr>
+      {% for c in s.courses %}
+      <tr class="profile-course{% if c.value == '2' or c.value == 'не зачтено' %} is-debt{% endif %}">
+        <td class="profile-course__title">
+          <b>{{ c.title|default:'—' }}</b>
+          <span class="profile-course__meta mono dim">
+            {% if c.kind == 'exam' %}экзамен{% elif c.kind == 'credit' %}зачёт{% elif c.kind == 'coursework' %}курсовая{% elif c.kind == 'test' %}контрольная{% else %}{{ c.kind }}{% endif %}{% if c.teacher %} · {{ c.teacher }}{% endif %}
+          </span>
+        </td>
+        <td class="profile-course__value">
+          <span class="profile-grade{% if c.value == '2' or c.value == 'не зачтено' %} profile-grade--debt{% endif %}">{{ c.value|default:'—' }}</span>
+          {% if c.date %}<span class="profile-grade__date mono dim">{{ c.date|date:'d.m.Y'|default:'—' }}</span>{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    {% endfor %}
+  </table>
+</div>
+{% else %}
+<div class="profile-empty">
+  <b>Оценок пока нет</b>
+  <p>Ведомость заполнится после первой аттестации.</p>
+</div>
+{% endif %}

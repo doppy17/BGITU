@@ -1,0 +1,91 @@
+{% comment %}
+Блок 01 «Данные студента»: просмотр и редактирование на месте.
+
+Просмотр — обычный список «подпись — значение». Кнопка «Изменить» без JS
+ведёт на страницу /cabinet/profile/edit/, с JS — раскрывает форму внутри
+блока (static/js/profile-inline.js). Институт, группа, подгруппа и курс —
+выпадающие списки, год поступления — числовое поле; год окончания только
+показывается и вычисляется из года поступления и уровня образования.
+
+Ожидает в контексте: profile (p), facts_form (ProfileFactsForm).
+Ответ AJAX-сохранения — этот же шаблон целиком, поэтому разметка блока
+одна и та же при первой загрузке и после подмены.
+{% endcomment %}
+{% with p=profile|default:user.profile %}
+<section class="panel profile-panel profile-facts-panel" id="profileFacts" data-profile-facts data-study-term="{{ p.study_term_years }}" aria-labelledby="profileFactsTitle">
+  <header class="panel__head profile-panel__head">
+    <span class="panel__num mono">01</span>
+    <div class="panel__title">
+      <h2 id="profileFactsTitle">Данные студента</h2>
+    </div>
+    <a class="btn btn--ghost btn--sm profile-facts-panel__edit" href="{% url 'accounts:profile_edit' %}" data-profile-edit-open aria-controls="profileFactsBody" aria-expanded="false">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4l10-10-4-4L4 16v4Z"/><path d="m13 5 4 4"/></svg>
+      Изменить
+    </a>
+  </header>
+
+  <div class="profile-facts-panel__body" id="profileFactsBody">
+    <dl class="profile-spec" data-profile-view>
+      <div class="profile-spec__row">
+        <dt class="profile-spec__key mono">Институт</dt>
+        <dd class="profile-spec__val" data-fact="institute">{{ p.institute|default:'—' }}</dd>
+      </div>
+      <div class="profile-spec__row">
+        <dt class="profile-spec__key mono">Группа</dt>
+        <dd class="profile-spec__val" data-fact="group">{{ p.group.code|default:'—' }}</dd>
+      </div>
+      <div class="profile-spec__row">
+        <dt class="profile-spec__key mono">Подгруппа</dt>
+        <dd class="profile-spec__val" data-fact="subgroup">{% if p.subgroup == 'а' %}«а»{% elif p.subgroup == 'б' %}«б»{% else %}{{ p.subgroup|default:'—' }}{% endif %}</dd>
+      </div>
+      <div class="profile-spec__row">
+        <dt class="profile-spec__key mono">Курс</dt>
+        <dd class="profile-spec__val" data-fact="course">{{ p.course|default:'—' }}</dd>
+      </div>
+      <div class="profile-spec__row">
+        <dt class="profile-spec__key mono">Год поступления</dt>
+        <dd class="profile-spec__val" data-fact="enrollment_year">{{ p.enrollment_year|default:'—' }}</dd>
+      </div>
+      <div class="profile-spec__row">
+        <dt class="profile-spec__key mono">Год окончания</dt>
+        <dd class="profile-spec__val" data-fact="graduation_year">{{ p.graduation_year|default:'—' }}</dd>
+      </div>
+    </dl>
+
+    <p class="profile-facts-panel__saved" data-profile-note role="status"></p>
+
+    <form class="profile-edit-inline" method="post" action="{% url 'accounts:profile_edit' %}" data-profile-form novalidate hidden>
+      {% csrf_token %}
+      <input type="hidden" name="scope" value="profile-facts">
+
+      <div class="profile-edit-inline__grid">
+        {% for field in facts_form %}
+        <div class="profile-edit-inline__row">
+          <label class="profile-edit-inline__key mono" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          <div class="profile-edit-inline__control">
+            {{ field }}
+            <p class="profile-edit-inline__error" data-profile-error="{{ field.name }}" role="alert"{% if not field.errors %} hidden{% endif %}>{% for error in field.errors %}{{ error }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</p>
+          </div>
+        </div>
+        {% endfor %}
+
+        <div class="profile-edit-inline__row profile-edit-inline__row--static">
+          <span class="profile-edit-inline__key mono">Год окончания</span>
+          <div class="profile-edit-inline__control">
+            <output class="profile-edit-inline__static" data-profile-graduation for="id_enrollment_year">{{ p.graduation_year|default:'—' }}</output>
+            <span class="profile-edit-inline__note mono">рассчитывается автоматически</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-edit-inline__foot">
+        <p class="profile-edit-inline__status" data-profile-status role="status" aria-live="polite"></p>
+        <div class="profile-edit-inline__actions">
+          <button class="btn btn--ghost btn--sm" type="button" data-profile-cancel>Отмена</button>
+          <button class="btn btn--accent btn--sm" type="submit">Сохранить</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+{% endwith %}

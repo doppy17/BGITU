@@ -1,0 +1,47 @@
+{% load bgitu %}{% comment %}
+  Блок расписания группы: подгруппы, таблица пар и пустое состояние.
+
+  Обёртка #sched-block-group — стабильная точка замены для AJAX-слоя
+  (static/js/schedule-ajax.js): сервер отдаёт её вместе с навигацией недели
+  и блоком преподавателя. Номер блока приходит из контекста (group_block_num):
+  у студента это 01, у преподавателя — 03.
+{% endcomment %}
+<div id="sched-block-group">
+{% if not group %}
+<section class="panel">
+  {% include 'schedule/_schedule_head.html' %}
+  <div class="empty">
+    <b>Группа не выбрана</b>
+    <p>Выберите группу в селекторе — появится её расписание.</p>
+  </div>
+</section>
+{% else %}
+{% if has_subgroups %}
+<div class="sub-line">
+  <span class="sub-pills__lbl mono">подгруппа</span>
+  <div class="sub-pills">
+    <a class="sub-pill{% if not sub %} is-active{% endif %}" href="{{ sub_links.all }}">все</a>
+    {% for item in subgroups %}
+    <a class="sub-pill{% if sub == item %} is-active{% endif %}" href="{{ sub_links|get_item:item }}">{{ item }}</a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- Таблица расписания -->
+{% if no_lessons %}
+<section class="panel">
+  {% include 'schedule/_schedule_head.html' %}
+  <div class="empty">
+    <b>На {{ week_label_prep }} неделе занятий нет</b>
+    <p>В файле БГИТУ для группы {{ group.code }} на {{ monday|date:"d.m.Y" }} — {{ sunday|date:"d.m.Y" }} пар нет{% if has_subgroups %} для выбранной подгруппы{% endif %}.</p>
+  </div>
+</section>
+{% else %}
+<section class="panel sched-panel{% if direction == 'next' %} sched-in-next{% elif direction == 'prev' %} sched-in-prev{% endif %}">
+  {% include 'schedule/_schedule_head.html' %}
+  {% include 'schedule/_sched_table.html' with grid=grid mode='group' %}
+</section>
+{% endif %}
+{% endif %}
+</div>

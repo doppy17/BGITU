@@ -5,19 +5,26 @@ import re
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.views import PasswordChangeView
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from django.db.models import Count
+from django.db import IntegrityError, transaction
+from django.db.models import Count, Max
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
 from apps.education.models import Group
 
-from .models import Profile, Role, RoleRequest
+from .forms import ContactForm, ProfileEditForm, ProfileFactsForm, TicketForm
+from .models import Contact, Profile, Role, RoleRequest
 from .permissions import get_role, role_can, role_required
 
 def username_from_email(email):
@@ -32,6 +39,17 @@ def username_from_email(email):
     if len(candidate) > 150:
         digest = hashlib.sha256(candidate.encode()).hexdigest()[:10]
         candidate = candidate[:139] + '-' + digest
+    return candidate
+
+
+def unique_username(base):
+    """Логин из почты должен быть уникальным: при совпадении добавляем -2, -3…"""
+    candidate = base
+    suffix = 1
+    while User.objects.filter(username__iexact=candidate).exists():
+        suffix += 1
+        tail = f'-{suffix}'
+        candidate = f'{base[:150 - len(tail)]}{tail}'
     return candidate
 
 
@@ -60,22 +78,24 @@ def login_view(request):
 
 
 def register_view(request):
-    """Самостоятельная регистрация: профиль создаётся сразу, роль — «Студент»."""
+    """Самостоятельная регистрация: профиль создаётся сразу, роль — «Студент».
+
+    Группу при регистрации не спрашиваем: её назначают позже в кабинете,
+    поэтому profile.group остаётся пустой. Присланное поле group игнорируем.
+    """
     if request.user.is_authenticated:
         return redirect('portal:dashboard')
 
-    groups = Group.objects.order_by('course', 'code')
     if request.method == 'POST':
         data = {
             field: request.POST.get(field, '').strip()
-            for field in ('last_name', 'first_name', 'email', 'group')
+            for field in ('last_name', 'first_name', 'email')
         }
         password1 = request.POST.get('password1', '')
         password2 = request.POST.get('password2', '')
         errors = []
 
-        if not data['last_name'] or not data['first_name']:
-            errors.append('Укажите фамилию и имя.')
+        # Имя и фамилия необязательны — их можно добавить позже в профиле.
         try:
             validate_email(data['email'])
         except ValidationError:
@@ -84,11 +104,7 @@ def register_view(request):
             if User.objects.filter(email__iexact=data['email']).exists():
                 errors.append('На этот e-mail уже зарегистрирован кабинет.')
 
-        group = None
-        if data['group']:
-            group = Group.objects.filter(pk=data['group']).first()
-            if group is None:
-                errors.append('Выбранная группа не найдена.')
+        group = None  # группу на регистрации не указывают — POST-поле group игнорируем
 
         if len(password1) < 8:
             errors.append('Пароль должен быть не короче 8 символов.')
@@ -101,28 +117,33 @@ def register_view(request):
                 errors.extend(error.messages)
 
         if not errors:
-            user = User.objects.create_user(
-                username=username_from_email(data['email']),
-                email=data['email'],
-                password=password1,
-                first_name=data['first_name'],
-                last_name=data['last_name'],
-            )
-            profile = getattr(user, 'profile', None) or Profile.objects.create(user=user)
-            profile.group = group
-            profile.role = Role.objects.filter(code='student').first() or Role.objects.filter(is_system=True).first()
-            profile.save(update_fields=['group', 'role'])
-            login(request, user)
-            messages.success(request, 'Кабинет создан. Добро пожаловать!')
-            return redirect('portal:dashboard')
+            try:
+                with transaction.atomic():
+                    user = User.objects.create_user(
+                        username=unique_username(username_from_email(data['email'])),
+                        email=data['email'],
+                        password=password1,
+                        first_name=data['first_name'],
+                        last_name=data['last_name'],
+                    )
+                    # Профиль создаётся всегда — даже если сигнал почему-то не сработал.
+                    profile, _ = Profile.objects.get_or_create(user=user)
+                    profile.role = Role.objects.filter(code='student').first()
+                    profile.group = group
+                    profile.save(update_fields=['role', 'group'])
+            except IntegrityError:
+                errors.append('Не удалось создать аккаунт: такой e-mail уже используется.')
+            else:
+                login(request, user)
+                messages.success(request, 'Аккаунт создан.')
+                return redirect('portal:dashboard')
 
         return render(request, 'accounts/register.html', {
-            'groups': groups,
             'form_data': data,
             'errors': errors,
         })
 
-    return render(request, 'accounts/register.html', {'groups': groups, 'form_data': {}, 'errors': []})
+    return render(request, 'accounts/register.html', {'form_data': {}, 'errors': []})
 
 
 @require_POST
@@ -300,6 +321,96 @@ def manage_student_update(request, user_id):
 # Допустимые темы оформления сайта.
 THEMES = ('paper', 'surik', 'latun', 'brass')
 
+# --- Профиль: блок 01 «Данные студента» редактируется прямо на странице -----
+INLINE_PROFILE_SCOPE = 'profile-facts'
+
+
+def profile_facts_payload(profile):
+    """Данные блока 01 для JSON-ответа — с учётом вычисленных свойств."""
+    return {
+        'institute': profile.institute,
+        'institute_override': profile.institute_override,
+        'group': profile.group.code if profile.group_id else '',
+        'group_id': profile.group_id,
+        'subgroup': profile.subgroup,
+        'course': profile.course,
+        'enrollment_year': profile.enrollment_year,
+        'graduation_year': profile.graduation_year,
+        'direction': profile.direction_display,
+    }
+
+
+def render_profile_facts(request, profile):
+    """HTML блока 01 в режиме просмотра — им JS заменяет блок после сохранения."""
+    return render_to_string(
+        'portal/_profile_facts.html',
+        {
+            'profile': profile,
+            'p': profile,
+            'facts_form': ProfileFactsForm(instance=profile, user=request.user),
+        },
+        request=request,
+    )
+
+
+@login_required
+def profile_edit(request):
+    """Редактирование собственного профиля: фото, группа и контакты.
+
+    Пользователь меняет только свои данные; ФИО и почта живут в ``User``,
+    остальное — в ``Profile``. Обе записи сохраняются в одной транзакции,
+    чтобы не осталось полу-обновлённого профиля. Смена группы попадает в
+    ``ProfileHistory`` через сигнал ``pre_save`` (apps/accounts/signals.py).
+
+    Блок 01 профиля редактируется на месте: та же вьюха принимает POST с
+    ``scope=profile-facts`` (только пять полей) и на AJAX отвечает JSON с
+    готовым HTML блока, а без JS — обычным переходом в профиль.
+    """
+    profile, _ = Profile.objects.get_or_create(user=request.user)
+    inline = (request.POST.get('scope') or '').strip() == INLINE_PROFILE_SCOPE
+    if request.method == 'POST':
+        form_class = ProfileFactsForm if inline else ProfileEditForm
+        form = form_class(request.POST, request.FILES, instance=profile, user=request.user)
+        if form.is_valid():
+            with transaction.atomic():
+                if not inline:
+                    form.save_user()
+                profile = form.save()
+            message = 'Данные студента обновлены.' if inline else 'Профиль обновлён.'
+            if inline:
+                if wants_json(request):
+                    return JsonResponse({
+                        'ok': True,
+                        'message': message,
+                        'profile': profile_facts_payload(profile),
+                        'html': render_profile_facts(request, profile),
+                    })
+                messages.success(request, message)
+                return redirect('portal:profile')
+            messages.success(request, message)
+            return redirect('portal:profile')
+
+        errors = form_error_messages(form)
+        if inline:
+            # AJAX получает ошибки по полям и остаётся в режиме правки;
+            # без JS (fallback) — обычный переход с сообщениями.
+            if wants_json(request):
+                return JsonResponse({
+                    'ok': False,
+                    'message': errors[0] if errors else 'Не удалось сохранить данные.',
+                    'errors': errors,
+                    'fields': {
+                        name: [str(error) for error in field_errors]
+                        for name, field_errors in form.errors.items()
+                    },
+                }, status=400)
+            for error in errors:
+                messages.error(request, error)
+            return redirect('portal:profile')
+    else:
+        form = ProfileEditForm(instance=profile, user=request.user)
+    return render(request, 'accounts/profile_edit.html', {'form': form, 'profile': profile})
+
 
 @login_required
 @require_POST
@@ -316,3 +427,195 @@ def theme_set(request):
     response = JsonResponse({'ok': True, 'theme': theme})
     response.set_cookie('bgitu-theme', theme, max_age=365 * 24 * 3600, samesite='Lax')
     return response
+
+
+# --- Вкладки профиля: «Доп. контакты» и «Безопасность» ----------------------
+
+@login_required
+def profile_contacts(request):
+    """Вкладка «Доп. контакты»: телефон и почта для чтения.
+
+    Значения меняются только на форме редактирования профиля
+    (``accounts:profile_edit``), здесь они показываются как есть.
+    """
+    profile, _ = Profile.objects.get_or_create(user=request.user)
+    return render(request, 'accounts/profile_contacts.html', {'profile': profile})
+
+
+class ProfilePasswordChangeForm(PasswordChangeForm):
+    """Пароль профиля: валидаторы Django и оформление полей кабинета."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'input'
+
+
+class ProfileSecurityView(PasswordChangeView):
+    """Вкладка «Безопасность»: смена своего пароля и последний вход.
+
+    ``PasswordChangeView`` уже закрыт ``login_required`` и берёт пользователя
+    только из ``request.user``, поэтому чужой пароль сменить нельзя. После
+    успешной смены сессия остаётся живой (``update_session_auth_hash`` внутри
+    базовой вьюхи), а остальные сессии пользователя разлогиниваются.
+    """
+
+    template_name = 'accounts/profile_security.html'
+    form_class = ProfilePasswordChangeForm
+    success_url = reverse_lazy('portal:profile')
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, 'Пароль изменён')
+        return response
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['profile'] = getattr(self.request.user, 'profile', None)
+        return context
+
+
+# --- Контакты пользователя и студенческий билет -----------------------------
+# Контакты живут в модели ``Contact``: их число не ограничено, один из них
+# может быть основным. Вьюхи работают только со своими записями — чужие
+# контакты не находятся (queryset фильтруется по ``request.user``), поэтому
+# попытка удалить или сделать основной чужую запись даёт 404.
+
+def wants_json(request):
+    """Ответ JSON — когда запрос пришёл из JS (X-Requested-With) или просит JSON."""
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return True
+    return 'application/json' in request.headers.get('Accept', '')
+
+
+def redirect_back(request, fallback='portal:profile'):
+    """Возврат на страницу, откуда пришла форма (``next``), иначе — в профиль."""
+    target = (request.POST.get('next') or '').strip()
+    if target and url_has_allowed_host_and_scheme(
+        target,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return redirect(target)
+    return redirect(fallback)
+
+
+def contact_payload(contact):
+    """Данные контакта для JSON-ответа — те же поля, что рисует партиал."""
+    return {
+        'id': contact.pk,
+        'kind': contact.kind,
+        'kind_label': contact.get_kind_display(),
+        'value': contact.value,
+        'label': contact.label,
+        'is_primary': contact.is_primary,
+        'order': contact.order,
+    }
+
+
+def form_error_messages(form):
+    """Плоский список текстов ошибок формы — для messages и JSON."""
+    errors = []
+    for field_errors in form.errors.values():
+        errors.extend(str(error) for error in field_errors)
+    return errors
+
+
+@login_required
+@require_POST
+def contact_add(request):
+    """Добавляет контакт текущего пользователя; число контактов не ограничено."""
+    form = ContactForm(request.POST)
+    if not form.is_valid():
+        errors = form_error_messages(form)
+        if wants_json(request):
+            return JsonResponse(
+                {'ok': False, 'errors': errors, 'fields': form.errors.get_json_data()},
+                status=400,
+            )
+        for error in errors:
+            messages.error(request, error)
+        return redirect_back(request)
+
+    with transaction.atomic():
+        # Основной контакт у пользователя один: снимаем флаг у прежнего.
+        if form.cleaned_data['is_primary']:
+            Contact.objects.filter(user=request.user, is_primary=True).update(is_primary=False)
+        last_order = Contact.objects.filter(user=request.user).aggregate(
+            last=Max('order')
+        )['last'] or 0
+        contact = form.save(commit=False)
+        contact.user = request.user
+        contact.order = last_order + 1
+        contact.save()
+
+    if wants_json(request):
+        return JsonResponse({'ok': True, 'contact': contact_payload(contact)}, status=201)
+    messages.success(request, f'Контакт «{contact.get_kind_display()}» добавлен.')
+    return redirect_back(request)
+
+
+@login_required
+@require_POST
+def contact_delete(request, pk):
+    """Удаляет свой контакт; чужой контакт не находится — 404."""
+    contact = get_object_or_404(Contact, pk=pk, user=request.user)
+    label = contact.get_kind_display()
+    contact.delete()
+    if wants_json(request):
+        return JsonResponse({'ok': True, 'deleted': pk})
+    messages.success(request, f'Контакт «{label}» удалён.')
+    return redirect_back(request)
+
+
+@login_required
+@require_POST
+def contact_primary(request, pk):
+    """Делает контакт основным, снимая признак с остальных (в транзакции)."""
+    contact = get_object_or_404(Contact, pk=pk, user=request.user)
+    with transaction.atomic():
+        Contact.objects.filter(user=request.user, is_primary=True).exclude(
+            pk=contact.pk
+        ).update(is_primary=False)
+        if not contact.is_primary:
+            contact.is_primary = True
+            contact.save(update_fields=['is_primary'])
+
+    if wants_json(request):
+        return JsonResponse({'ok': True, 'contact': contact_payload(contact)})
+    messages.success(request, f'Контакт «{contact.get_kind_display()}» теперь основной.')
+    return redirect_back(request)
+
+
+@login_required
+@require_POST
+def ticket_save(request):
+    """Сохраняет поля студенческого билета, которые студент заполняет сам.
+
+    Билет — необязательные данные: пустая форма допустима и просто очищает
+    поля. Номер билета и зачётную книжку вьюха не трогает.
+    """
+    profile, _ = Profile.objects.get_or_create(user=request.user)
+    form = TicketForm(request.POST, instance=profile)
+    if not form.is_valid():
+        errors = form_error_messages(form)
+        if wants_json(request):
+            return JsonResponse(
+                {'ok': False, 'errors': errors, 'fields': form.errors.get_json_data()},
+                status=400,
+            )
+        for error in errors:
+            messages.error(request, error)
+        return redirect_back(request)
+
+    form.save()
+    if wants_json(request):
+        return JsonResponse({'ok': True, 'ticket': {
+            'ticket_order': profile.ticket_order,
+            'ticket_issue_date': profile.ticket_issue_date.isoformat() if profile.ticket_issue_date else '',
+            'education_level': profile.education_level,
+            'study_form': profile.study_form,
+            'direction': profile.direction,
+        }})
+    messages.success(request, 'Данные студенческого билета сохранены.')
+    return redirect_back(request)

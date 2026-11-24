@@ -1,15 +1,177 @@
 {% extends 'base.html' %}
+{% load bgitu %}
+{% load static %}
+
 {% block title %}Профиль{% endblock %}
+
 {% block content %}
-<header class="page-head">
-  <p class="mono dim">личный кабинет</p>
-  <h1>Профиль</h1>
-  <p>Личные данные, группа и настройки кабинета.</p>
-</header>
-<section class="panel">
-  <div class="empty">
-    <b>Раздел в разработке</b>
-    <p>Здесь появится наполнение — пока пусто.</p>
-  </div>
-</section>
+{% with p=profile|default:user.profile %}
+<div class="profile-page">
+
+  <!-- ============ Шапка: фото, ФИО, роль, группа · курс · институт ============ -->
+  <section class="panel profile-hero" aria-labelledby="profileName">
+    <div class="profile-avatar">
+      {% if p.photo %}<img class="profile-avatar__img" src="{{ p.photo.url }}" alt="Фото профиля">
+      {% elif user.last_name or user.first_name %}<span class="profile-avatar__initials" aria-hidden="true">{{ user.last_name|slice:":1" }}{{ user.first_name|slice:":1" }}</span>
+      {% else %}<svg class="profile-avatar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8.5" r="3.5"/><path d="M4.5 20c1.5-3.5 4.2-5 7.5-5s6 1.5 7.5 5"/></svg>{% endif %}
+    </div>
+
+    <div class="profile-hero__main">
+      <p class="profile-hero__kicker mono">личный кабинет · профиль</p>
+      <h1 class="profile-hero__name" id="profileName">{{ p.full_name|default:'Профиль' }}</h1>
+      <p class="profile-hero__tags">
+        <span class="badge badge--accent">{% firstof role.name p.role.name current_role.name 'Студент' %}</span>
+      </p>
+      <p class="profile-hero__meta">
+        <span class="profile-hero__meta-item" data-hero-group>{{ p.group.code|default:'' }}</span>
+        <span class="profile-hero__meta-item" data-hero-course>{% if p.course %}{{ p.course }} курс{% endif %}</span>
+        <span class="profile-hero__meta-item" data-hero-institute>{{ p.institute|default:'' }}</span>
+      </p>
+    </div>
+
+    <a class="btn btn--ghost btn--sm profile-hero__edit" href="{% url 'accounts:profile_edit' %}">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4l10-10-4-4L4 16v4Z"/><path d="m13 5 4 4"/></svg>
+      Изменить
+    </a>
+  </section>
+
+  <!-- ============ 01 · Данные студента ============ -->
+  {% include 'portal/_profile_facts.html' with profile=p facts_form=facts_form %}
+
+  <!-- ============ 02 · Студенческий билет ============ -->
+  <section class="panel profile-panel profile-ticket" aria-labelledby="profileTicketTitle">
+    <details class="profile-ticket__box" open>
+      <summary class="panel__head profile-panel__head profile-ticket__summary">
+        <h2 class="profile-ticket__h2" id="profileTicketTitle">
+          <span class="panel__num mono">02</span>
+          <span class="profile-ticket__caption">Студенческий билет</span>
+          <span class="profile-ticket__num mono dim">№ {{ p.ticket_number|default:'—' }}</span>
+          <svg class="profile-ticket__chev" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </h2>
+      </summary>
+
+      <div class="profile-ticket__card">
+        <div class="profile-ticket__top">
+          <p class="profile-ticket__org">ФГБОУ ВО «Брянский государственный инженерно-технический университет»</p>
+          <p class="profile-ticket__kind mono">студенческий билет</p>
+        </div>
+
+        <div class="profile-ticket__id">
+          <p class="profile-ticket__name">{{ p.full_name|default:'—' }}</p>
+          <p class="profile-ticket__serial">
+            <span class="profile-ticket__serial-cap mono">№</span>
+            <b class="profile-ticket__serial-num mono">{{ p.ticket_number|default:'—' }}</b>
+          </p>
+        </div>
+
+        <dl class="profile-ticket__grid">
+          <div class="profile-ticket__cell profile-ticket__cell--wide">
+            <dt class="mono">Направление подготовки</dt>
+            <dd data-ticket-direction>{{ p.direction_display|default:'—' }}</dd>
+          </div>
+          <div class="profile-ticket__cell">
+            <dt class="mono">Курс</dt>
+            <dd data-ticket-course>{{ p.course|default:'—' }}</dd>
+          </div>
+          <div class="profile-ticket__cell">
+            <dt class="mono">Уровень образования</dt>
+            <dd>{{ p.get_education_level_display|default:'—' }}</dd>
+          </div>
+          <div class="profile-ticket__cell">
+            <dt class="mono">Форма обучения</dt>
+            <dd>{{ p.get_study_form_display|default:'—' }}</dd>
+          </div>
+          <div class="profile-ticket__cell">
+            <dt class="mono">Дата выдачи</dt>
+            <dd>{{ p.ticket_issue_date|date:'d.m.Y'|default:'—' }}</dd>
+          </div>
+          <div class="profile-ticket__cell profile-ticket__cell--wide">
+            <dt class="mono">Приказ о зачислении</dt>
+            <dd>{{ p.ticket_order|default:'—' }}</dd>
+          </div>
+        </dl>
+      </div>
+    </details>
+
+    {% include 'accounts/_profile_ticket_form.html' with p=p %}
+  </section>
+
+  <!-- ============ 03 · Контакты ============ -->
+  <section class="panel profile-panel" aria-labelledby="profileContactsTitle">
+    <header class="panel__head profile-panel__head">
+      <span class="panel__num mono">03</span>
+      <div class="panel__title">
+        <h2 id="profileContactsTitle">Контакты</h2>
+      </div>
+      <a class="btn btn--ghost btn--sm" href="{% url 'accounts:profile_edit' %}">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        Добавить
+      </a>
+    </header>
+
+    {% include 'accounts/_profile_contacts.html' with contacts=user.contacts.all profile=p %}
+  </section>
+
+  <!-- ============ 04 · Успеваемость ============ -->
+  <section class="panel profile-panel" aria-labelledby="profilePerfTitle">
+    {% firstof total_average average as total %}
+    <header class="panel__head profile-panel__head">
+      <span class="panel__num mono">04</span>
+      <div class="panel__title">
+        <h2 id="profilePerfTitle">Успеваемость</h2>
+      </div>
+      {% if total %}
+      <p class="profile-total">
+        <span class="profile-total__value">{{ total|ru_num }}</span>
+        <span class="profile-total__label mono">итоговый средний</span>
+      </p>
+      {% endif %}
+    </header>
+
+    {% if performance %}{% include 'portal/_profile_performance.html' with sem_list=performance %}
+    {% elif semesters %}{% include 'portal/_profile_performance.html' with sem_list=semesters %}
+    {% else %}{% include 'portal/_profile_performance.html' %}{% endif %}
+  </section>
+
+  <!-- ============ 05 · История перемещений ============ -->
+  <section class="panel profile-panel" aria-labelledby="profileHistoryTitle">
+    <header class="panel__head profile-panel__head">
+      <span class="panel__num mono">05</span>
+      <div class="panel__title">
+        <h2 id="profileHistoryTitle">История перемещений</h2>
+      </div>
+    </header>
+
+    {% if histories %}{% include 'portal/_profile_history.html' with moves=histories %}
+    {% elif history %}{% include 'portal/_profile_history.html' with moves=history %}
+    {% elif profile_history %}{% include 'portal/_profile_history.html' with moves=profile_history %}
+    {% else %}{% include 'portal/_profile_history.html' %}{% endif %}
+  </section>
+
+  <!-- ============ 06 · Доступ разработчика (временная функция) ============ -->
+  {% if dev_keys_enabled %}
+  <section class="panel profile-panel" aria-labelledby="profileDevKeyTitle">
+    <header class="panel__head profile-panel__head">
+      <span class="panel__num mono">06</span>
+      <div class="panel__title">
+        <h2 id="profileDevKeyTitle">Доступ разработчика</h2>
+      </div>
+    </header>
+    <p class="muted">Одноразовый ключ выдаёт роль с полным доступом. Пункт исчезнет, когда временная функция будет отключена.</p>
+    <p><a class="btn btn--ghost" href="{% url 'accounts:dev_key' %}">Ввести ключ доступа</a></p>
+  </section>
+  {% endif %}
+
+  <!-- ============ Выход — внизу страницы, вне блоков ============ -->
+  <form class="profile-logout" method="post" action="{% url 'accounts:logout' %}">
+    {% csrf_token %}
+    <button class="btn btn--ghost" type="submit">Выйти из учётной записи</button>
+  </form>
+
+</div>
+{% endwith %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/profile-inline.js' %}" defer></script>
 {% endblock %}

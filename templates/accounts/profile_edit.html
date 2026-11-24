@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Редактирование профиля{% endblock %}
+{% block content %}
+<div class="profile-edit">
+  <header class="page-head profile-edit__head">
+    <p class="mono dim">личный кабинет · профиль</p>
+    <h1>Редактирование профиля</h1>
+    <p class="profile-edit__lead">Фото, группа и контактные данные. Почта — логин в кабинете, поэтому адрес уникален.</p>
+  </header>
+
+  {% include 'accounts/_profile_tabs.html' %}
+
+  <form class="panel profile-edit__form" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="profile-edit__alert" role="alert">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <div class="profile-edit__section">
+      <h2 class="profile-edit__legend mono">Фото</h2>
+      <div class="profile-edit__photo">
+        <div class="profile-edit__avatar">
+          {% if form.instance.photo %}
+            <img class="profile-edit__avatar-img" src="{{ form.instance.photo.url }}" alt="Текущее фото профиля">
+          {% else %}
+            <span class="profile-edit__avatar-empty mono" aria-hidden="true">нет фото</span>
+          {% endif %}
+        </div>
+        <div class="profile-edit__photo-field">
+          {% include 'accounts/_profile_edit_field.html' with field=form.photo %}
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-edit__section">
+      <h2 class="profile-edit__legend mono">Личные данные</h2>
+      <div class="profile-edit__grid">
+        {% include 'accounts/_profile_edit_field.html' with field=form.last_name %}
+        {% include 'accounts/_profile_edit_field.html' with field=form.first_name %}
+        {% include 'accounts/_profile_edit_field.html' with field=form.email wide=1 %}
+        {% include 'accounts/_profile_edit_field.html' with field=form.phone %}
+      </div>
+    </div>
+
+    <div class="profile-edit__section">
+      <h2 class="profile-edit__legend mono">Учёба</h2>
+      <div class="profile-edit__grid">
+        {% include 'accounts/_profile_edit_field.html' with field=form.group wide=1 %}
+        {% include 'accounts/_profile_edit_field.html' with field=form.subgroup %}
+        {% include 'accounts/_profile_edit_field.html' with field=form.course %}
+        {% include 'accounts/_profile_edit_field.html' with field=form.enrollment_year %}
+        {% include 'accounts/_profile_edit_field.html' with field=form.institute %}
+        {% include 'accounts/_profile_edit_field.html' with field=form.department %}
+        {% include 'accounts/_profile_edit_field.html' with field=form.record_book %}
+      </div>
+    </div>
+
+    <div class="profile-edit__actions">
+      <a class="btn btn--ghost" href="{% url 'portal:profile' %}">Отмена</a>
+      <button class="btn btn--accent" type="submit">Сохранить</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

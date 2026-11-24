@@ -1,0 +1,25 @@
+{% if moves %}
+<ol class="profile-tl">
+  {% for h in moves %}
+  <li class="profile-tl__item">
+    <time class="profile-tl__date mono dim" datetime="{{ h.created_at|date:'Y-m-d' }}">{{ h.created_at|date:'d.m.Y' }}</time>
+    <div class="profile-tl__body">
+      <p class="profile-tl__kind mono">{% firstof h.get_kind_display h.kind 'изменение' %}</p>
+      <p class="profile-tl__change">
+        <span class="visually-hidden">было: </span>
+        <span class="profile-tl__from">{{ h.from_value|default:'—' }}</span>
+        <span class="profile-tl__arrow" aria-hidden="true"></span>
+        <span class="visually-hidden">стало: </span>
+        <span class="profile-tl__to">{{ h.to_value|default:'—' }}</span>
+      </p>
+      {% if h.comment %}<p class="profile-tl__note">{{ h.comment|linebreaksbr }}</p>{% endif %}
+    </div>
+  </li>
+  {% endfor %}
+</ol>
+{% else %}
+<div class="profile-empty">
+  <b>Перемещений не было</b>
+  <p>Здесь появится история смены группы, направления и института.</p>
+</div>
+{% endif %}

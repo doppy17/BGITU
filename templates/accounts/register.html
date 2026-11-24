@@ -16,26 +16,18 @@
   <div class="auth-form__row">
     <div class="field">
       <label for="last_name">Фамилия</label>
-      <input class="input" id="last_name" name="last_name" type="text" autocomplete="family-name" value="{{ form_data.last_name|default:'' }}" required>
+      <input class="input" id="last_name" name="last_name" type="text" autocomplete="family-name" value="{{ form_data.last_name|default:'' }}">
     </div>
     <div class="field">
       <label for="first_name">Имя</label>
-      <input class="input" id="first_name" name="first_name" type="text" autocomplete="given-name" value="{{ form_data.first_name|default:'' }}" required>
+      <input class="input" id="first_name" name="first_name" type="text" autocomplete="given-name" value="{{ form_data.first_name|default:'' }}">
     </div>
   </div>
+  <small class="field-hint">Имя и фамилию можно указать позже — в профиле.</small>
   <div class="field">
     <label for="email">E-mail</label>
     <input class="input" id="email" name="email" type="email" autocomplete="email" value="{{ form_data.email|default:'' }}" required>
     <small class="field-hint">Почта будет логином: отдельный логин придумывать не нужно.</small>
-  </div>
-  <div class="field">
-    <label for="group">Группа <span class="dim">(если учитесь)</span></label>
-    <select class="input" id="group" name="group">
-      <option value="">— не выбрана —</option>
-      {% for group in groups %}
-        <option value="{{ group.id }}" {% if form_data.group == group.id|stringformat:'s' %}selected{% endif %}>{{ group.code }} · {{ group.course }} курс</option>
-      {% endfor %}
-    </select>
   </div>
   <div class="auth-form__row">
     <div class="field">
@@ -52,4 +44,8 @@
 </form>
 
 <p class="auth-alt">Уже есть аккаунт? <a href="{% url 'accounts:login' %}">Войти</a></p>
+
+{% if dev_keys_enabled %}
+<p class="auth-alt">Есть ключ доступа? <a href="{% url 'accounts:dev_key' %}">Ввести ключ доступа →</a></p>
+{% endif %}
 {% endblock %}

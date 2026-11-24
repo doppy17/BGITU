@@ -169,10 +169,10 @@ class NavCompositionTests(TestCase):
         self.assertContains(response, 'cab-nav__user')
 
     def test_all_sections_are_wip(self):
-        """Разделы в режиме «в разработке». «Курсы» реализованы — проверяются отдельно."""
+        """Разделы-заглушки в режиме «в разработке»; курсы и профиль реализованы."""
         self.client.force_login(self.dev)
         for url in ('/cabinet/', '/cabinet/grades/', '/works/',
-                    '/roles/', '/cabinet/stipendia/', '/cabinet/profile/', '/manage/students/'):
+                    '/roles/', '/cabinet/stipendia/', '/manage/students/'):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200, url)
             self.assertContains(response, 'Раздел в разработке')
@@ -184,6 +184,13 @@ class NavCompositionTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'Раздел в разработке')
         self.assertContains(response, '<h1>Курсы</h1>')
+
+    def test_profile_section_is_implemented(self):
+        """Профиль (Гоша) тоже больше не заглушка."""
+        self.client.force_login(self.dev)
+        profile = self.client.get('/cabinet/profile/')
+        self.assertEqual(profile.status_code, 200)
+        self.assertNotContains(profile, 'Раздел в разработке')
 
     def test_student_does_not_see_students_link(self):
         self.client.force_login(self.student)

@@ -1,0 +1,12 @@
+{% comment %}
+Одно поле формы редактирования профиля: подпись, контрол, подсказка и ошибки.
+Параметры include: field (BoundField), wide (1 — на всю ширину сетки).
+{% endcomment %}
+<div class="field{% if wide %} field--wide{% endif %}">
+  <label for="{{ field.id_for_label }}">
+    {{ field.label }}{% if field.field.required %} <span class="profile-edit__req" aria-hidden="true">*</span>{% endif %}
+  </label>
+  {{ field }}
+  {% if field.help_text %}<small class="field-hint" id="{{ field.id_for_label }}-hint">{{ field.help_text }}</small>{% endif %}
+  {% if field.errors %}<div class="profile-edit__error" role="alert">{{ field.errors }}</div>{% endif %}
+</div>

@@ -6,7 +6,7 @@
 {% endcomment %}
 <div class="sched-panel__bar">
   <div class="sched-panel__head">
-    <span class="panel__num mono sched-panel__num">01</span>
+    <span class="panel__num mono sched-panel__num">{{ group_block_num|default:'01' }}</span>
     <div class="panel__title sched-panel__title">
       <h2>Расписание</h2>
     </div>
@@ -19,11 +19,20 @@
   {% endif %}
   {% if can_choose_group %}
   <form method="get" class="group-switch sched-panel__pick">
+    <input type="hidden" name="week" value="{{ week }}">
+    {% if sub %}<input type="hidden" name="sub" value="{{ sub }}">{% endif %}
+    {% comment %}
+      Преподаватель в форму НЕ кладётся: он запоминается для каждой группы
+      отдельно, и при смене группы блок 03 показывает преподавателя новой
+      группы (кто ведёт пару сейчас), а не прежней.
+    {% endcomment %}
     <select class="input" name="group" aria-label="Группа" onchange="this.form.submit()">
       {% for g in groups %}
         <option value="{{ g.code }}" {% if group and g.id == group.id %}selected{% endif %}>{{ g.code }}</option>
       {% endfor %}
     </select>
+    {# Без JS инлайновый onchange не работает — форма отправляется кнопкой. #}
+    <noscript><button class="btn btn--ghost btn--sm" type="submit">Показать</button></noscript>
   </form>
   {% endif %}
 </div>

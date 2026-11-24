@@ -212,3 +212,69 @@ def visible_lessons(group, parity=None):
     if parity:
         lessons = [item for item in lessons if item.week in (Lesson.WEEK_ALL, parity)]
     return lessons
+
+
+def time_minutes(value):
+    """«8:20» / «8.20» → минуты от полуночи; None, если время не разобрать."""
+    text = str(value or '').strip().replace('.', ':')
+    hours, _, minutes = text.partition(':')
+    try:
+        return int(hours) * 60 + int(minutes or 0)
+    except ValueError:
+        return None
+
+
+def bell_window(lesson, bells):
+    """Окно пары занятия по звонкам его корпуса (без корпуса — 2-й)."""
+    bell = bells.get((lesson.building or '2', lesson.pair)) or bells.get(('2', lesson.pair))
+    if bell is None:
+        return None
+    start, end = time_minutes(bell.start), time_minutes(bell.end)
+    if start is None or end is None:
+        return None
+    return start, end
+
+
+def nearest_lesson(lessons, now, bells):
+    """Занятие, которое идёт сейчас, или ближайшее следующее на неделе.
+
+    Порядок выбора: пара, идущая сейчас (по звонкам корпуса занятия) →
+    ближайшая следующая пара сегодня → ближайший следующий день недели →
+    первая пара недели (если всё уже прошло или сегодня воскресенье).
+    Возвращает (lesson, reason), reason: 'now' | 'next' | 'week-start' | ''.
+    Из нескольких занятий слота (подгруппы «а»/«б») берётся первое по порядку.
+    """
+    lessons = [item for item in lessons if (item.teacher_name or '').strip()]
+    if not lessons:
+        return None, ''
+
+    def order(item):
+        return (item.weekday, item.pair, _subgroup_key(item.subgroup), item.subject)
+
+    first = min(lessons, key=order)
+    weekday = now.isoweekday()
+    if weekday > 6:  # воскресенье — занятий нет, ближайшее в начале недели
+        return first, 'week-start'
+
+    minutes = now.hour * 60 + now.minute
+    today = [item for item in lessons if item.weekday == weekday]
+    windows = {item.pk: bell_window(item, bells) for item in today}
+
+    def running_now(item):
+        window = windows[item.pk]
+        return bool(window) and window[0] <= minutes <= window[1]
+
+    def started_before(item):
+        window = windows[item.pk]
+        return bool(window) and window[0] <= minutes
+
+    running = [item for item in today if running_now(item)]
+    if running:
+        return min(running, key=order), 'now'
+
+    started = [item.pair for item in today if started_before(item)]
+    after = max(started) if started else 0
+    upcoming = [item for item in lessons if (item.weekday, item.pair) > (weekday, after)]
+    if upcoming:
+        return min(upcoming, key=order), 'next'
+    return first, 'week-start'

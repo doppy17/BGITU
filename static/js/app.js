@@ -399,7 +399,10 @@
   // Чётные/нечётные недели: горизонтальный свайп по сетке дней — другая неделя.
   // Сервер отдаёт расписание для чётности выбранной недели (?week=N: N с чётным
   // ISO-номером → чётная), поэтому смена чётности = ссылка на соседнюю неделю.
-  (function () {
+  // Блоки расписания подменяются AJAX-ом (static/js/schedule-ajax.js), поэтому
+  // свайп инициализируется заново по событию schedule:updated: слушатели висят
+  // на элементах, которые заменяются вместе с блоками.
+  function initWeekSwipe() {
     var panel = document.querySelector('[data-week-panel]');
     if (!panel) return;
     var links = {
@@ -409,8 +412,13 @@
     var current = panel.getAttribute('data-parity');
     if (!links.odd || !links.even) return;
 
-    var dashboard = document.querySelector('.sched-panel');
+    // Блок 01 (группа). Блок 03 (преподаватель) — отдельная сетка: свайп
+    // недель к ней не относится, иначе при пустой неделе группы жест
+    // подменил бы её таблицу таблицей группы.
+    var dashboard = document.querySelector('.sched-panel:not(.sched-panel--teacher)');
     if (!dashboard) return;
+    if (dashboard.dataset.weekSwipe) return; // уже инициализирован — без дублей
+    dashboard.dataset.weekSwipe = '1';
     var grid = dashboard.querySelector('.sched-table');
     var dragOffset = 0;
     var pending = null;
@@ -453,7 +461,7 @@
         })
         .then(function (html) {
           var doc = new window.DOMParser().parseFromString(html, 'text/html');
-          var fresh = doc.querySelector('.sched-panel');
+          var fresh = doc.querySelector('.sched-panel:not(.sched-panel--teacher)');
           var freshPanel = doc.querySelector('[data-week-panel]');
           if (!fresh) {
             // У новой недели занятий нет — отдаём решение серверу.
@@ -553,5 +561,10 @@
       }
       goTo(next);
     }, { passive: true });
-  })();
+  }
+
+  initWeekSwipe();
+  document.addEventListener('schedule:updated', function () {
+    initWeekSwipe();
+  });
 })();

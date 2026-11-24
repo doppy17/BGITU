@@ -1,0 +1,38 @@
+{% comment %}
+  Таблица расписания: шапка дней (пн–сб) и строки пар.
+
+  Контекст: grid (строки пар), days_header (дни с датами), mode ('group' | 'teacher').
+  Одна разметка на блок 01 и блок 03: сетка, ячейки, split-ячейки и карточки
+  занятий (schedule/_sched_card.html) не дублируются. Drag/свайп недель
+  (data-week-grid) — только у блока группы: у преподавателя своя таблица,
+  и листать неделю жестом по ней не нужно.
+{% endcomment %}
+<div class="sched-scroll"{% if mode != 'teacher' %} data-week-grid{% endif %}>
+  <div class="sched-table" style="--pairs: {{ grid|length }}">
+    <div class="sched-head">
+      <div class="sched-cell sched-cell--time mono dim">пара</div>
+      {% for day in days_header %}
+      <div class="sched-cell sched-cell--head{% if day.is_today %} is-today{% endif %}">
+        <span class="sched-day">{{ day.short }}</span>
+        <span class="sched-date mono">{{ day.date|date:"d.m" }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% for row in grid %}
+    <div class="sched-row" style="--i: {{ forloop.counter }}">
+      <div class="sched-cell sched-cell--time mono dim">
+        <b>{{ row.pair }}</b>
+      </div>
+      {% for cell in row.days %}
+      <div class="sched-cell sched-cell--body{% if cell.split %} sched-cell--split{% endif %}{% if cell.is_today %} is-today{% endif %}">
+        {% for lesson in cell.lessons %}
+        {% include 'schedule/_sched_card.html' with lesson=lesson mode=mode %}
+        {% empty %}
+        <span class="sched-empty" aria-hidden="true"></span>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+</div>

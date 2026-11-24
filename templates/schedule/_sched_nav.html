@@ -1,0 +1,43 @@
+{% comment %}
+  Навигация недели: стрелки, даты и значок чётности.
+
+  Отдельный include нужен AJAX-слою (static/js/schedule-ajax.js): при смене
+  недели/группы/преподавателя сервер отдаёт только блоки, а не страницу.
+  Обёртка #sched-week-nav — стабильная точка замены, поэтому разметку блока
+  можно менять, не трогая скрипт.
+{% endcomment %}
+<div id="sched-week-nav">
+<section class="week-nav{% if direction %} week-nav--{{ direction }}{% endif %}" aria-label="Неделя"
+         data-week-panel data-week="{{ week }}" data-parity="{{ parity }}"
+         data-parity-odd="{{ parity_links.odd }}" data-parity-even="{{ parity_links.even }}">
+  {% if week_links.prev %}
+  <a class="week-nav__arrow" href="{{ week_links.prev }}" data-week-arrow="prev" aria-label="Предыдущая неделя">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+  </a>
+  {% else %}
+  <span class="week-nav__arrow is-disabled" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+  </span>
+  {% endif %}
+
+  <div class="week-nav__info">
+    <p class="week-nav__dates">
+      {{ monday|date:"d.m.Y" }} — {{ sunday|date:"d.m.Y" }}
+    </p>
+    <span class="parity-badge parity-badge--{{ parity }}" title="{% if parity == 'odd' %}Нечётная неделя по календарю — показано расписание нечётной недели{% else %}Чётная неделя по календарю — показано расписание чётной недели{% endif %}">
+      <i aria-hidden="true">{{ week }}</i>
+      <b>{% if parity == 'odd' %}нечётная{% else %}чётная{% endif %}</b>
+    </span>
+  </div>
+
+  {% if week_links.next %}
+  <a class="week-nav__arrow" href="{{ week_links.next }}" data-week-arrow="next" aria-label="Следующая неделя">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+  </a>
+  {% else %}
+  <span class="week-nav__arrow is-disabled" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+  </span>
+  {% endif %}
+</section>
+</div>
