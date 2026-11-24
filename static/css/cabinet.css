@@ -1159,6 +1159,48 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   pointer-events: none;
 }
 
+/* AJAX-подмена блоков расписания (static/js/schedule-ajax.js): пока идёт
+   запрос, внутри блока лёгкая полупрозрачность и спиннер; вёрстка страницы
+   не сдвигается, остальные блоки остаются доступными.
+   min-width: 0 обязателен: обёртки — grid-элементы .cab-main, и без него
+   их минимальная ширина равна min-content содержимого (таблица 53em,
+   даты недели) — колонка распирает страницу и появляется горизонтальный
+   скролл. Внутри таблицы свой overflow-x: auto. */
+#sched-week-nav, #sched-block-group, #sched-block-teacher {
+  position: relative;
+  min-width: 0;
+}
+/* Подгруппы и панель раньше были отдельными grid-элементами .cab-main
+   с зазором 16px — внутри общей обёртки зазор воспроизводим сами. */
+#sched-block-group {
+  display: grid;
+  gap: 16px;
+}
+#sched-block-group, #sched-block-teacher { transition: opacity .15s ease; }
+#sched-week-nav.is-sched-loading { opacity: .65; }
+#sched-block-group.is-sched-loading,
+#sched-block-teacher.is-sched-loading {
+  opacity: .55;
+  pointer-events: none;
+}
+#sched-block-group.is-sched-loading::after,
+#sched-block-teacher.is-sched-loading::after {
+  content: '';
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--line);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: sched-ajax-spin .7s linear infinite;
+  pointer-events: none;
+}
+@keyframes sched-ajax-spin {
+  to { transform: rotate(360deg); }
+}
+
 .sched-table {
   /* коробка таблицы не уже своей сетки: сумма минимумов колонок — 53em
      (5em времени + 6 × 8em дней). Иначе треки вылезают за border-box
@@ -1566,6 +1608,33 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
     repeating-linear-gradient(45deg, transparent 0 8px, color-mix(in oklab, var(--brand-ink) 4%, transparent) 8px 16px);
 }
 
+/* ---------- Блок 03: расписание преподавателя ---------- */
+/* В шапке блока нет кнопки обновления: селектор преподавателя сразу занимает
+   правую колонку и не даёт длинным ФИО сжать заголовок. */
+.sched-panel--teacher .sched-panel__bar {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "head pick";
+}
+.sched-panel--teacher .sched-panel__pick { min-width: min(240px, 60vw); }
+/* Группа в карточке занятия преподавателя — вместо ФИО (оно в шапке блока):
+   у преподавателя в одном слоте могут стоять пары нескольких групп. */
+.sched-teacher-group {
+  align-self: flex-start;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line-strong);
+  color: var(--accent-text);
+  font-size: 0.5625rem;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+/* Подпись, откуда взят преподаватель по умолчанию: «сейчас идёт пара · Пн, 2 пара». */
+.sched-teacher-hint {
+  margin: 10px 4px 0;
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+}
+
 /* ---------- Анимации таблицы ---------- */
 @keyframes sched-in-next {
   from { opacity: 0; transform: translateX(28px); }
@@ -1671,6 +1740,45 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* Текст названия — отдельный слой внутри обрезки: при переполнении JS
+   включает маркизу и сдвигает этот слой, а .tl-subject__clip остаётся
+   неподвижной маской шириной в колонку. */
+.tl-subject__text {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tl-subject__track {
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+  will-change: transform;
+}
+/* Односторонняя бегущая лента: в треке два одинаковых экземпляра текста
+   с зазором. Сдвиг на -50% равен ширине одного экземпляра вместе с зазором,
+   поэтому в конце цикла второй экземпляр стоит ровно там, где начинался
+   первый — сброс незаметен, движение никогда не идёт назад. */
+.tl-subject.is-marquee .tl-subject__track {
+  animation: tl-marquee var(--tl-marquee-dur, 15s) linear infinite normal;
+}
+.tl-subject.is-marquee .tl-subject__text {
+  flex: 0 0 auto;
+  width: max-content;
+  overflow: visible;
+  text-overflow: clip;
+  padding-right: var(--tl-marquee-gap, 24px);
+}
+.tl-subject.is-marquee:hover .tl-subject__track,
+.tl-subject.is-marquee:focus-within .tl-subject__track {
+  animation-play-state: paused;
+}
+/* 0 → -50%: ширина трека = 2 × (текст + зазор), поэтому -50% — ровно один
+   экземпляр. Скорость задаёт JS (18–25 px/с), без пауз и реверса. */
+@keyframes tl-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
 /* Ось: компактная строка с номерами; текущий семестр — только акцентная
    цифра и короткая риска, без заливки колонки. */
 .tl-axis .tl-subject {
@@ -1752,18 +1860,24 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
   line-height: 1;
   font-weight: 600;
   letter-spacing: 0.04em;
-  animation: tl-grow 0.5s var(--ease) both;
-  animation-delay: calc(140ms + var(--i) * 70ms);
+  /* Появление задаёт только .is-tl-revealed: анимация не перезапускается
+     при ресайзе и не мигает, если JS ещё не добавил класс. */
   transform-origin: left center;
-  /* Заливка — из палитры отрезков (--tl-seg-0…5, задаётся темой);
-     цифры не белые и не чёрные: заливка, сдвинутая на 24% к чернилам темы. */
+  /* Заливка — из палитры отрезков (--tl-seg-0…5, задаётся темой).
+     Цвет цифр — та же заливка, сдвинутая к чернилам темы: в светлых темах
+     темнее, в тёмных светлее. Вес смеси задают правила ниже; базовые 60%. */
   background: var(--tl-seg-fill, var(--tl-seg-0));
-  color: color-mix(in oklab, var(--tl-seg-fill, var(--tl-seg-0)), var(--brand-ink) 24%);
   /* тонкий контур: отрезки не сливаются с панелью в светлых темах */
   box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--brand-ink) 22%, transparent);
 }
+/* Плавное появление отрезков: один раз после загрузки, каскад по строкам
+   (--i), длительность 360 мс ≤ 400 мс. Класс ставит plan-marquee.js. */
+.tl-grid.is-tl-revealed .tl-seg {
+  animation: tl-grow 360ms var(--ease) both;
+  animation-delay: calc(60ms + var(--i) * 45ms);
+}
 @keyframes tl-grow {
-  from { transform: scaleX(0); opacity: 0; }
+  from { transform: scaleX(0.4); opacity: 0; }
   to { transform: scaleX(1); opacity: 1; }
 }
 
@@ -1797,12 +1911,12 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
 .sub-pill.is-active { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 
 /* ось учебного плана: 8 семестров */
-.tl-grid--semesters .tl-seg { font-size: 0.625rem; }
+.tl-grid--semesters .tl-seg { font-size: 0.6875rem; }
 
 /* Палитра отрезков. Заливка каждого варианта отличима от панели
    (контраст к --bg-raised ≥ 1.45:1 во всех темах), цифры — та же заливка,
-   сдвинутая на 24% к чернилам темы: не белые и не чёрные.
-   Светлые темы (бумага, бронза): заливки от акцента и охры к бумаге. */
+   сдвинутая к чернилам темы: в светлых темнее, в тёмных светлее.
+   Правила цвета подписей — ниже, после .tl-seg--N. */
 .semester-panel {
   --tl-seg-0: var(--accent);
   --tl-seg-1: color-mix(in oklab, var(--accent) 55%, var(--brand-aux));
@@ -1841,6 +1955,48 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
 .tl-seg--4 { --tl-seg-fill: var(--tl-seg-4); }
 .tl-seg--5 { --tl-seg-fill: var(--tl-seg-5); }
 
+/* Подписи отрезков: контраст к заливке ≥ 3:1. В светлых темах — затемнение
+   к чернилам, в тёмных — осветление. 60% достаточно для большинства заливок;
+   насыщенные тёмные (акцент, охра) требуют 80–100%, иначе даже чистые чернила
+   дают меньше 3:1 (например, paper--0: 3.04:1 при 100%). */
+.semester-panel .tl-seg {
+  color: color-mix(in oklab,
+    var(--tl-seg-fill, var(--tl-seg-0)),
+    var(--brand-ink) var(--tl-seg-label-mix, 60%));
+}
+[data-theme="paper"] .semester-panel .tl-seg--0 { --tl-seg-label-mix: 100%; }
+[data-theme="paper"] .semester-panel .tl-seg--1 { --tl-seg-label-mix: 95%; }
+[data-theme="paper"] .semester-panel .tl-seg--2 { --tl-seg-label-mix: 85%; }
+[data-theme="paper"] .semester-panel .tl-seg--5 { --tl-seg-label-mix: 70%; }
+[data-theme="surik"] .semester-panel .tl-seg--0 { --tl-seg-label-mix: 80%; }
+[data-theme="surik"] .semester-panel .tl-seg--5 { --tl-seg-label-mix: 65%; }
+[data-theme="latun"] .semester-panel .tl-seg--0 { --tl-seg-label-mix: 90%; }
+[data-theme="latun"] .semester-panel .tl-seg--1,
+[data-theme="latun"] .semester-panel .tl-seg--2 { --tl-seg-label-mix: 65%; }
+
+/* Ч/б режим: на paper заливки 0 и 1 после grayscale дают лишь 2.2–2.8:1
+   с тёмными цифрами — здесь переключаем подпись на светлую сторону заливки.
+   Это только режим доступности, обычная бумажная тема остаётся затемнённой. */
+html.a11y-gray:not(.a11y-hc)[data-theme="paper"] .semester-panel .tl-seg--0,
+html.a11y-gray:not(.a11y-hc)[data-theme="paper"] .semester-panel .tl-seg--1 {
+  color: color-mix(in oklab,
+    var(--tl-seg-fill, var(--tl-seg-0)),
+    var(--brand-base) 85%);
+}
+
+/* Высококонтрастная тема: чернила белые, поэтому затемняем к --brand-base.
+   Заливка --tl-seg-4 сама тёмная — для неё светлая сторона. */
+html.a11y-hc .semester-panel .tl-seg {
+  color: color-mix(in oklab,
+    var(--tl-seg-fill, var(--tl-seg-0)),
+    var(--brand-base) 70%);
+}
+html.a11y-hc .semester-panel .tl-seg--4 {
+  color: color-mix(in oklab,
+    var(--tl-seg-fill, var(--tl-seg-4)),
+    var(--brand-ink) 85%);
+}
+
 @media (max-width: 640px) {
   .week-nav { gap: 8px; }
   .week-nav__arrow { width: 42px; height: 42px; }
@@ -1861,7 +2017,23 @@ body.is-subview .cab-hero__meta { margin-top: 14px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sched-in-next, .sched-in-prev, .sched-row .sched-cell, .sched-head .sched-cell, .tl-seg { animation: none !important; }
+  .sched-in-next, .sched-in-prev, .sched-row .sched-cell, .sched-head .sched-cell, .tl-seg,
+  .tl-subject.is-marquee .tl-subject__track { animation: none !important; }
+  /* Если настройка включена уже после рендера: JS разбирает дубль, а на
+     случай гонки возвращаем многоточие вместо обрыва на середине буквы. */
+  .tl-subject.is-marquee .tl-subject__text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transform: none !important;
+  }
+}
+/* «Скрыть изображения и анимацию» в панели доступности: JS снимает маркизу;
+   это страховка, если класс успел появиться до пересчёта. */
+html.a11y-im .tl-subject.is-marquee .tl-subject__track { animation: none !important; }
+html.a11y-im .tl-subject.is-marquee .tl-subject__text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transform: none !important;
 }
 
 

@@ -1,6 +1,7 @@
 """Просмотр расписания и импорт файла с сайта БГИТУ."""
 import os
 from datetime import date, timedelta
+from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -10,6 +11,7 @@ from django.db import transaction
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from apps.accounts.permissions import role_can, role_required
@@ -20,6 +22,7 @@ from .models import Bell, Lesson, ScheduleImport
 from .services import (
     SEMESTER_WEEKS,
     detect_institute,
+    nearest_lesson,
     parity_of_monday,
     resolve_lessons,
     run_import,
@@ -33,6 +36,15 @@ DAY_SHORT = ['', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб']
 DAY_FULL = ['', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота']
 
 PROGRAM_SEMESTERS = 8  # семестров в программе бакалавриата
+
+
+def now_local():
+    """Текущие дата и время в часовом поясе проекта (МСК).
+
+    Отдельная функция — чтобы «сейчас» можно было подменить в тестах и чтобы
+    все решения «какая пара идёт» считались по одному моменту времени.
+    """
+    return timezone.localtime(timezone.now())
 
 
 def current_program_semester(course, today=None):
@@ -54,6 +66,47 @@ def subgroup_code(value):
     return SUBGROUP_ALIASES.get(value, value)
 
 
+def teacher_sort_key(name):
+    """Ключ сортировки ФИО по фамилии.
+
+    В файлах БГИТУ ФИО идут «Фамилия И.О.», поэтому фамилия — первое слово.
+    Регистр и «ё» не влияют на порядок: «Ёлкина» стоит рядом с «Елкиной».
+    """
+    parts = name.split()
+    surname = parts[0] if parts else name
+    return (surname.casefold().replace('ё', 'е'), name.casefold().replace('ё', 'е'))
+
+
+def teacher_name_key(value):
+    """ФИО для сравнения: ё→е, без регистра, точек и лишних пробелов."""
+    value = (value or '').replace('ё', 'е').replace('Ё', 'Е').casefold()
+    return ' '.join(value.replace('.', ' ').split())
+
+
+def same_teacher(profile_name, lesson_name):
+    """Похоже ли ФИО из профиля на ФИО в занятии.
+
+    В файлах БГИТУ ФИО сокращённые — «Иванов И.О.», а в профиле полные —
+    «Иванов Иван» (отчество в User не хранится). Поэтому сравниваем фамилию и
+    инициалы: точное совпадение нормализованных строк, иначе — фамилия плюс
+    инициалы, где сокращённая запись является префиксом полной.
+    """
+    left = teacher_name_key(profile_name).split()
+    right = teacher_name_key(lesson_name).split()
+    if not left or not right or left[0] != right[0]:
+        return False
+    left_initials = ''.join(part[:1] for part in left[1:])
+    right_initials = ''.join(part[:1] for part in right[1:])
+    if not left_initials or not right_initials:
+        return False
+    if left_initials == right_initials:
+        return True
+    # «Иванов Иван» (и) ↔ «Иванов И.О.» (ио): сравниваем по имени.
+    if len(left_initials) == 1 or len(right_initials) == 1:
+        return left_initials.startswith(right_initials) or right_initials.startswith(left_initials)
+    return False
+
+
 def division_subgroups(lessons):
     """Подгруппы группы, если в данных есть обе метки «а» и «б».
 
@@ -68,21 +121,52 @@ def division_subgroups(lessons):
     return present if len(present) >= 2 else []
 
 
-@login_required
-def schedule_view(request):
+def schedule_context(request):
+    """Контекст страницы расписания — общий для страницы и AJAX-фрагмента.
+
+    Выбор группы запоминается в сессии, выбор преподавателя — отдельно для
+    каждой группы (schedule_teacher_by_group): GET-параметр сильнее
+    сохранённого значения, сохранённое — сильнее «умного» дефолта. Поэтому
+    возврат на группу восстанавливает её преподавателя, а переход на другую
+    группу показывает преподавателя, который ведёт у неё пару сейчас.
+    """
     profile = getattr(request.user, 'profile', None)
+    role = getattr(profile, 'role', None) if profile else None
+    # Роль «преподаватель»: код роли teacher либо право создавать курсы без
+    # права менять расписание (деканат/разработчик остаются по ту сторону).
+    is_teacher_role = bool(role) and (
+        role.code == 'teacher'
+        or (role_can(request.user, 'can_create_courses')
+            and not role_can(request.user, 'can_manage_schedule'))
+    )
     can_choose = role_can(request.user, 'can_manage_schedule') or role_can(request.user, 'can_view_all')
+    # Преподавателю выбор группы нужен и без права менять расписание: блок 03
+    # показывает расписание выбранной группы.
+    if is_teacher_role:
+        can_choose = True
+    # Один момент «сейчас» на весь запрос: какая неделя текущая, какая пара
+    # идёт (для преподавателя по умолчанию) и где сегодняшняя колонка.
+    now = now_local()
+    today = now.date()
     groups = Group.objects.all()
     group = profile.group if profile else None
+    # Порядок выбора группы: ?group= → сохранённый в сессии → группа профиля →
+    # первая в списке. Сохранённый выбор не сильнее явного GET: ссылку с
+    # параметрами можно переслать, и она откроет именно эту группу.
+    saved_group = (request.session.get('schedule_group') or '').strip()
     if can_choose and request.GET.get('group'):
         group = groups.filter(code=request.GET['group']).first() or group
+    elif can_choose and saved_group:
+        group = groups.filter(code=saved_group).first() or group
     if group is None and can_choose:
         group = groups.first()
+    if can_choose and group:
+        request.session['schedule_group'] = group.code
 
     # Номер семестровой недели: ?week=N, зажатый в границы семестра.
     # ?week=odd|even — явная чётность (кнопки/скролл без пересчёта номера):
     # берём ближайшую неделю семестра нужной чётности относительно текущей.
-    current_week = semester_week_of(date.today())
+    current_week = semester_week_of(today)
     raw_week = (request.GET.get('week') or '').strip().lower()
     explicit_parity = raw_week if raw_week in (Lesson.WEEK_ODD, Lesson.WEEK_EVEN) else ''
     # ?parity= — то же самое для ссылок, которые сохраняют номер недели.
@@ -150,6 +234,78 @@ def schedule_view(request):
     # Звонки по корпусам: время пары зависит от корпуса занятия (1-й/2-й).
     bells = {(bell.building, bell.pair): bell for bell in Bell.objects.all()}
 
+    # Блок 03: расписание преподавателя — те же загруженные занятия, но фильтр
+    # по ФИО. Список ФИО — из данных (distinct, сортировка по фамилии);
+    # неизвестное ?teacher= не ошибка — работает выбор по умолчанию.
+    teacher_names = sorted(
+        {
+            name.strip()
+            for name in Lesson.objects.exclude(teacher_name='').values_list('teacher_name', flat=True)
+            if name.strip()
+        },
+        key=teacher_sort_key,
+    )
+    requested_teacher = (request.GET.get('teacher') or '').strip()
+    # Преподавателя помним ОТДЕЛЬНО ДЛЯ КАЖДОЙ ГРУППЫ: при переходе на другую
+    # группу показывается её «умный» дефолт (кто ведёт пару сейчас), а возврат
+    # на прежнюю восстанавливает выбранного ранее преподавателя.
+    saved_by_group = request.session.get('schedule_teacher_by_group')
+    if not isinstance(saved_by_group, dict):
+        saved_by_group = {}
+    legacy_teacher = (request.session.get('schedule_teacher') or '').strip()
+    if legacy_teacher:
+        # Старый формат — одно ФИО на всю сессию: привязываем его к группе,
+        # которая была выбрана, чтобы выбор не потерялся при обновлении кода.
+        request.session.pop('schedule_teacher', None)
+        if group and legacy_teacher in teacher_names:
+            saved_by_group[group.code] = legacy_teacher
+        request.session['schedule_teacher_by_group'] = saved_by_group
+    saved_teacher = saved_by_group.get(group.code, '') if group else ''
+    # Преподаватель по умолчанию — тот, кто ведёт у выбранной группы пару
+    # сейчас (или ближайшую следующую на этой неделе). Порядок: явный ?teacher=
+    # → сохранённый для этой группы → дефолт; первый по алфавиту — только если
+    # у группы на неделе занятий нет.
+    default_lesson, default_reason = nearest_lesson(lessons, now, bells)
+    default_teacher = (default_lesson.teacher_name or '').strip() if default_lesson else ''
+    # Свой преподаватель: ФИО из профиля сопоставляем с ФИО в занятиях —
+    # в файлах «Фамилия И.О.», в профиле полное имя без отчества.
+    self_teacher = ''
+    if is_teacher_role:
+        candidates = []
+        if profile:
+            candidates.append(profile.full_name)
+        candidates.append(f'{request.user.last_name} {request.user.first_name}'.strip())
+        for name in teacher_names:
+            if any(same_teacher(candidate, name) for candidate in candidates if candidate):
+                self_teacher = name
+                break
+    if requested_teacher in teacher_names:
+        teacher, teacher_source = requested_teacher, 'query'
+        if group:
+            saved_by_group[group.code] = teacher
+            request.session['schedule_teacher_by_group'] = saved_by_group
+    elif saved_teacher in teacher_names:
+        teacher, teacher_source = saved_teacher, 'group'
+    elif self_teacher:
+        teacher, teacher_source = self_teacher, 'self'
+    elif default_teacher in teacher_names:
+        teacher, teacher_source = default_teacher, default_reason
+    else:
+        teacher, teacher_source = (teacher_names[0] if teacher_names else ''), 'first'
+    # Откуда взят преподаватель по умолчанию — для подписи в блоке 03 и отладки.
+    teacher_default = {
+        'reason': teacher_source,
+        'teacher': teacher,
+        'now': now,
+        'is_current_week': week == current_week,
+        'weekday_name': DAY_FULL[default_lesson.weekday].lower() if default_lesson else '',
+        'pair': default_lesson.pair if default_lesson else None,
+        'subject': default_lesson.subject if default_lesson else '',
+        'group_code': group.code if group and default_lesson else '',
+        'is_self': teacher_source == 'self',
+    }
+    teacher_grid = []
+
     # Таблица: строки — пары, колонки — дни недели. В ячейке — занятия только
     # выбранной недели: одна карточка, а если у «а» и «б» РАЗНЫЕ пары —
     # две карточки рядом: слева «а», справа «б».
@@ -180,13 +336,57 @@ def schedule_view(request):
 
     # Число строк таблицы — из данных выбранной недели: последняя пара, на
     # которой есть занятие у любой группы в эту неделю. Пустых строк нет.
-    week_pool = resolve_lessons(
-        Lesson.objects.select_related('source').filter(week__in=[Lesson.WEEK_ALL, parity])
-    )
+    # Разрешаем конфликты источников по всей базе (без фильтра недели):
+    # в слоте побеждает самый свежий файл, и этот же набор использует блок 03.
+    resolved_pool = resolve_lessons(Lesson.objects.select_related('source', 'group'))
+    week_pool = [item for item in resolved_pool if item.week in (Lesson.WEEK_ALL, parity)]
     week_max = max((item.pair for item in week_pool), default=0)
     group_max = max((item.pair for item in lessons), default=0)
     max_pair = max(week_max, group_max)
     pairs = range(1, max_pair + 1) if max_pair else range(0)
+
+    # Блок 03: занятия выбранного преподавателя на этой неделе — из того же
+    # разрешённого набора, поэтому приоритет источников общий: если слот группы
+    # занял более свежий файл с другим преподавателем, старая пара в расписании
+    # преподавателя не показывается.
+    if teacher:
+        teacher_lessons = [
+            item for item in week_pool if item.teacher_name == teacher
+        ]
+
+        def teacher_cards(items):
+            """Карточки ячейки преподавателя: по одной на группу (и подгруппу).
+
+            У преподавателя в одном слоте могут стоять пары разных групп —
+            они показываются стопкой, поэтому группа указана в каждой карточке.
+            """
+            picked = {}
+            for item in items:
+                key = (item.group.code, subgroup_code(item.subgroup), item.subject)
+                current = picked.get(key)
+                # Точная неделя важнее «каждой недели» для той же пары.
+                if current is None or (current.week == Lesson.WEEK_ALL and item.week != Lesson.WEEK_ALL):
+                    picked[key] = item
+            return [picked[key] for key in sorted(picked)]
+
+        teacher_by_cell = {}
+        for lesson in teacher_lessons:
+            teacher_by_cell.setdefault((lesson.weekday, lesson.pair), []).append(lesson)
+        # Строки — только пары самого преподавателя: пустые строки не занимают место.
+        teacher_max = max((item.pair for item in teacher_lessons), default=0)
+        for pair in range(1, teacher_max + 1):
+            days = []
+            for weekday in range(1, 7):
+                cards = teacher_cards(teacher_by_cell.get((weekday, pair), []))
+                for item in cards:
+                    bell = bells.get((item.building or '2', pair)) or bells.get(('2', pair))
+                    item.time_label = f'{bell.start}–{bell.end}' if bell else ''
+                days.append({
+                    'lessons': cards,
+                    'split': len(cards) > 1,
+                    'is_today': monday + timedelta(days=weekday - 1) == today,
+                })
+            teacher_grid.append({'pair': pair, 'days': days})
 
     grid = []
     for pair in pairs:
@@ -196,7 +396,7 @@ def schedule_view(request):
             for item in cell['lessons']:
                 bell = bells.get((item.building or '2', pair)) or bells.get(('2', pair))
                 item.time_label = f'{bell.start}–{bell.end}' if bell else ''
-            cell['is_today'] = monday + timedelta(days=weekday - 1) == date.today()
+            cell['is_today'] = monday + timedelta(days=weekday - 1) == today
             days.append(cell)
         grid.append({'pair': pair, 'days': days})
 
@@ -207,7 +407,7 @@ def schedule_view(request):
             'short': DAY_SHORT[weekday],
             'full': DAY_FULL[weekday],
             'date': day,
-            'is_today': day == date.today(),
+            'is_today': day == today,
             'subgroups': subgroups_by_day.get(weekday, []),
         })
 
@@ -243,12 +443,30 @@ def schedule_view(request):
     latest = sources[0] if sources else None
     plan_sources = list(PlanSource.objects.select_related('uploaded_by').order_by('-uploaded_at'))
     latest_plan = plan_sources[0] if plan_sources else None
-    return render(request, 'schedule/schedule.html', {
+    # Канонический адрес состояния: его кладёт в history.pushState AJAX-слой,
+    # поэтому скопированная ссылка открывает тот же выбор группы и преподавателя.
+    query = [('group', group.code)] if can_choose and group else []
+    if teacher and teacher_source in ('query', 'group'):
+        query.append(('teacher', teacher))
+    query.append(('week', week))
+    if sub:
+        query.append(('sub', sub))
+    page_url = f"{reverse('schedule:schedule')}?{urlencode(query)}"
+    return {
+        'page_url': page_url,
+        'is_teacher_role': is_teacher_role,
+        'teacher_first': is_teacher_role,
+        # Номера блоков: у преподавателя первым идёт его расписание (01), блок
+        # группы — третьим (03); у студентов и сотрудников — наоборот.
+        'group_block_num': '03' if is_teacher_role else '01',
+        'teacher_block_num': '01' if is_teacher_role else '03',
         'group': group,
         'groups': groups,
         'can_choose_group': can_choose,
         'week': week,
         'week_label': week_label,
+        # «на нечётной неделе» — предложный падеж для подписей пустых состояний.
+        'week_label_prep': 'нечётной' if parity == 'odd' else 'чётной',
         'parity': parity,
         'has_parity': has_parity,
         'week_links': week_links,
@@ -266,6 +484,10 @@ def schedule_view(request):
         'grid': grid,
         'pairs': pairs,
         'max_pair': max_pair,
+        'teachers': teacher_names,
+        'teacher': teacher,
+        'teacher_grid': teacher_grid,
+        'teacher_default': teacher_default,
         'curriculum': curriculum,
         'latest_import': latest,
         'sources': sources,
@@ -277,7 +499,29 @@ def schedule_view(request):
         'sub_links': sub_links,
         'no_lessons': no_lessons,
         'can_import': role_can(request.user, 'can_manage_schedule') or role_can(request.user, 'can_view_all'),
-    })
+    }
+
+
+@login_required
+def schedule_view(request):
+    """Полная страница расписания (без JS работает как обычная форма)."""
+    return render(request, 'schedule/schedule.html', schedule_context(request))
+
+
+@login_required
+def schedule_fragment(request):
+    """Только блоки 01/03 и навигация недели — для подмены без перезагрузки.
+
+    Ответ — фрагмент без <html>/<head>/<footer>: AJAX-слой заменяет им
+    содержимое блоков на странице. Канонический адрес состояния (page_url уже
+    percent-encoded: в группе и ФИО кириллица) уезжает в заголовке
+    X-Schedule-Url — его и ставит history.pushState.
+    """
+    context = schedule_context(request)
+    response = render(request, 'schedule/_fragment.html', context)
+    response['X-Schedule-Url'] = context['page_url']
+    response['Cache-Control'] = 'no-store'
+    return response
 
 
 MAX_UPLOAD_SIZE = 15 * 1024 * 1024

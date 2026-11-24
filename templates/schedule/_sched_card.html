@@ -1,0 +1,26 @@
+{% comment %}
+  Карточка занятия — одна разметка для блока 01 (расписание группы) и блока 03
+  (расписание преподавателя).
+
+  Контекст: lesson, mode ('group' | 'teacher').
+  В режиме teacher вместо ФИО преподавателя (оно в шапке блока) показывается
+  студенческая группа — в одном слоте у преподавателя могут стоять пары
+  нескольких групп, и ячейка показывает их стопкой.
+{% endcomment %}
+<article class="sched-lesson{% if lesson.kind == 'лаб' or lesson.kind == 'лаб.' or lesson.kind == 'практ' %} sched-lesson--lab{% endif %}">
+  <span class="sched-tags">
+    {% if lesson.kind_label %}<span class="sched-kind mono">{{ lesson.kind_label }}</span>{% endif %}
+    {% if mode == 'teacher' %}
+      <span class="sched-teacher-group mono" title="группа {{ lesson.group.code }}">{{ lesson.group.code }}</span>
+      {% if lesson.subgroup %}<span class="sched-sub mono" title="пара подгруппы {{ lesson.subgroup_label }}">подгр. {{ lesson.subgroup_label }}</span>{% endif %}
+    {% elif lesson.subgroup and has_subgroups %}
+      <span class="sched-sub mono" title="пара подгруппы {{ lesson.subgroup_label }}">подгр. {{ lesson.subgroup_label }}</span>
+    {% endif %}
+  </span>
+  <b>{{ lesson.subject }}</b>
+  <small class="sched-meta">
+    {% if lesson.room or lesson.building %}<span class="sched-place">{% if lesson.room %}ауд. {{ lesson.room }}{% endif %}{% if lesson.room and lesson.building %} · {% endif %}{% if lesson.building %}<span class="sched-build sched-build--{{ lesson.building }}" title="{{ lesson.building_label }}">{{ lesson.building }} корп.</span>{% endif %}</span>{% endif %}
+    {% if mode != 'teacher' and lesson.teacher_name %}<span class="sched-teacher">{{ lesson.teacher_name }}</span>{% endif %}
+  </small>
+  {% if lesson.time_label %}<span class="sched-time mono">{{ lesson.time_label }}</span>{% endif %}
+</article>

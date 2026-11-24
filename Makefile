@@ -25,10 +25,10 @@ run:
 	./run.sh
 
 test:
-	$(PY) manage.py test
+	PYTHONPATH= $(PY) manage.py test
 
 check:
-	$(PY) manage.py check
+	PYTHONPATH= $(PY) manage.py check
 
 clean:
 	rm -f db.sqlite3

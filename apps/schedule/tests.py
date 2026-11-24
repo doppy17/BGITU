@@ -1,8 +1,9 @@
 """Тесты импорта и показа расписания."""
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from io import BytesIO
 from pathlib import Path
 import tempfile
+from unittest import mock
 from urllib.parse import quote
 
 from django.conf import settings
@@ -16,7 +17,7 @@ from django.utils import timezone
 from apps.accounts.models import Role
 from apps.education.models import Group
 
-from .models import Lesson, ScheduleImport
+from .models import Bell, Lesson, ScheduleImport
 from .services import detect_institute, run_import, visible_lessons
 
 FIXTURE = settings.BASE_DIR / 'fixtures/schedule/bgitu-2026-27-1semestr-IVT-IST-PI-PRI.xls'
@@ -130,6 +131,19 @@ class ScheduleImportTests(TestCase):
         self.assertContains(response, 'sched-build--2')
         self.assertContains(response, '2 корп.')
 
+    def test_teacher_block_lists_real_teachers(self):
+        """Блок 03: список преподавателей из загруженного файла, с известными ФИО."""
+        self.client.force_login(self.dean)
+        response = self.client.get(reverse('schedule:schedule'), {'group': 'ИСТ-201'})
+        teachers = response.context['teachers']
+        self.assertGreater(len(teachers), 20)
+        for name in ('Казаков О.Д.', 'Козлова И.Р.', 'Симохин С.П.'):
+            self.assertIn(name, teachers)
+        # по умолчанию выбран преподаватель из расписания группы, а не «первый в списке»
+        self.assertIn(response.context['teacher'], teachers)
+        self.assertContains(response, 'sched-panel--teacher')
+        self.assertContains(response, 'name="teacher"')
+
     def test_week_arrows_and_limits(self):
         """Стрелки листают недели; на границах семестра — выключены."""
         self.client.force_login(self.dean)
@@ -173,7 +187,8 @@ class ScheduleImportTests(TestCase):
 
         self.client.force_login(self.dean)
         response = self.client.get(reverse('schedule:schedule'), {'group': 'ИСТ-201'})
-        html = response.content.decode()
+        # Только блок 01: у блока 03 (преподаватель) своя таблица и своя колонка «сегодня».
+        html = response.content.decode().split('sched-panel--teacher')[0]
         today = date.today()
         short = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'][today.weekday()]
         self.assertRegex(
@@ -308,7 +323,8 @@ class WeekParityTests(TestCase):
         )
         self.client.force_login(self.student)
         odd = self.client.get(reverse('schedule:schedule'), {'week': '13'})
-        html = odd.content.decode()
+        # Только блок 01: в блоке 03 законно перечислены все преподаватели.
+        html = odd.content.decode().split('sched-panel--teacher')[0]
         self.assertNotIn('sched-cell--weeks', html)
         self.assertNotIn('sched-half__label', html)
         self.assertIn('<b>Слот-нечёт</b>', html)
@@ -322,7 +338,7 @@ class WeekParityTests(TestCase):
         self.assertIn('Петров П.П.', html)
         self.assertIn('15:45–17:20', html)
         even = self.client.get(reverse('schedule:schedule'), {'week': '12'})
-        html = even.content.decode()
+        html = even.content.decode().split('sched-panel--teacher')[0]
         self.assertIn('<b>Слот-чёт</b>', html)
         self.assertNotIn('Слот-нечёт', html)
         self.assertNotIn('ауд. 101', html)
@@ -1365,3 +1381,623 @@ class ScheduleKindBadgeTests(TestCase):
         html = self.page()
         self.assertIn('Лекция по философии', html)
         self.assertNotIn('sched-kind', html)
+
+
+class TeacherScheduleTests(TestCase):
+    """Блок 03: расписание преподавателя из уже загруженных занятий.
+
+    «Сейчас» подменяется фиксированным моментом: понедельник, 10:30 — идёт
+    2-я пара (10:05–11:40), значит по умолчанию должен открыться преподаватель
+    пары этой группы в текущем слоте, а не первый по алфавиту.
+    """
+
+    NOW = datetime(2026, 11, 23, 10, 30)  # понедельник, 2-я пара
+
+    @classmethod
+    def setUpTestData(cls):
+        role = Role.objects.create(code='teach_student', name='Студент', can_upload_works=True)
+        cls.group = Group.objects.create(code='ИСТ-201', course=2)
+        cls.other = Group.objects.create(code='ИСТ-202', course=2)
+        cls.student = User.objects.create_user('teach_student', password='demo12345')
+        cls.student.profile.role = role
+        cls.student.profile.group = cls.group
+        cls.student.profile.save()
+        for pair, (start, end) in enumerate(
+            (('8:20', '9:55'), ('10:05', '11:40'), ('11:50', '13:25'),
+             ('14:00', '15:35'), ('15:45', '17:20'), ('17:30', '19:05')),
+            start=1,
+        ):
+            Bell.objects.create(building='1', pair=pair, start=start, end=end)
+        # Петров ведёт две группы в одном слоте (пн, 2 пара) — ячейка стопкой.
+        Lesson.objects.create(group=cls.group, weekday=1, pair=2, week='all', building='1',
+                              subject='Базы данных', teacher_name='Петров П.П.', room='307')
+        Lesson.objects.create(group=cls.other, weekday=1, pair=2, week='all', building='1',
+                              subject='Информатика', teacher_name='Петров П.П.', room='228')
+        # Ближайшая следующая пара группы — вторник, 3 пара.
+        Lesson.objects.create(group=cls.group, weekday=2, pair=3, week='all', building='1',
+                              subject='Философия', teacher_name='Азаренко Н.Ю.', room='314')
+        # Третий преподаватель — только среда, 1 пара.
+        Lesson.objects.create(group=cls.group, weekday=3, pair=1, week='all', building='1',
+                              subject='Математика', teacher_name='Сидорова А.А.', room='101')
+
+    def setUp(self):
+        self.client.force_login(self.student)
+
+    def get(self, now=None, **params):
+        """GET расписания с подменённым «сейчас» (по умолчанию — NOW)."""
+        with mock.patch('apps.schedule.views.now_local', return_value=now or self.NOW):
+            return self.client.get(reverse('schedule:schedule'), params)
+
+    def teacher_html(self, response):
+        """HTML блока 03 (после заголовка блока 01 и плана)."""
+        html = response.content.decode()
+        return html[html.index('sched-panel--teacher'):]
+
+    def test_teacher_list_is_sorted_by_surname(self):
+        response = self.get()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['teachers'],
+            ['Азаренко Н.Ю.', 'Петров П.П.', 'Сидорова А.А.'],
+        )
+        html = response.content.decode()
+        self.assertIn('name="teacher"', html)
+        self.assertIn('data-searchable', html)
+        self.assertIn('selected>Петров П.П.', html)
+
+    def test_default_teacher_is_the_one_teaching_now(self):
+        """По умолчанию — преподаватель пары, которая идёт у группы сейчас."""
+        response = self.get()
+        self.assertEqual(response.context['teacher'], 'Петров П.П.')
+        default = response.context['teacher_default']
+        self.assertEqual(default['reason'], 'now')
+        self.assertEqual(default['pair'], 2)
+        self.assertEqual(default['weekday_name'], 'понедельник')
+        self.assertEqual(default['group_code'], 'ИСТ-201')
+        # его таблица содержит занятие этой группы в текущем слоте
+        monday = response.context['teacher_grid'][1]['days'][0]  # 2-я пара, понедельник
+        self.assertIn(
+            'Базы данных',
+            [item.subject for item in monday['lessons'] if item.group.code == 'ИСТ-201'],
+        )
+        self.assertContains(response, 'сейчас идёт пара · понедельник, 2 пара · ИСТ-201')
+
+    def test_default_teacher_falls_back_to_next_lesson(self):
+        """Пар больше нет — берётся ближайшая следующая пара группы на неделе."""
+        response = self.get(now=datetime(2026, 11, 23, 12, 0))  # после 2-й пары
+        self.assertEqual(response.context['teacher'], 'Азаренко Н.Ю.')
+        default = response.context['teacher_default']
+        self.assertEqual(default['reason'], 'next')
+        self.assertEqual((default['weekday_name'], default['pair']), ('вторник', 3))
+        self.assertContains(response, 'ближайшая пара · вторник, 3 пара · ИСТ-201')
+
+    def test_default_teacher_before_first_pair_uses_next(self):
+        """Утро до первой пары — ближайшая пара сегодняшнего дня."""
+        response = self.get(now=datetime(2026, 11, 23, 8, 0))
+        self.assertEqual(response.context['teacher'], 'Петров П.П.')
+        self.assertEqual(response.context['teacher_default']['reason'], 'next')
+
+    def test_explicit_teacher_overrides_default(self):
+        response = self.get(teacher='Сидорова А.А.')
+        self.assertEqual(response.context['teacher'], 'Сидорова А.А.')
+        self.assertEqual(response.context['teacher_default']['reason'], 'query')
+
+    def test_unknown_teacher_does_not_break_page(self):
+        response = self.get(teacher='Некто Неизвестный')
+        self.assertEqual(response.status_code, 200)
+        # неизвестное ФИО не роняет блок: показывается преподаватель по умолчанию
+        self.assertEqual(response.context['teacher'], 'Петров П.П.')
+
+    def test_week_without_lessons_falls_back_to_first_alphabetically(self):
+        """У группы на неделе занятий нет — только тогда первый по алфавиту."""
+        group = Group.objects.create(code='ИСТ-777', course=2)
+        user = User.objects.create_user('teach_no_week', password='demo12345')
+        user.profile.group = group
+        user.profile.save()
+        self.client.force_login(user)
+        response = self.get()
+        self.assertEqual(response.context['teacher_default']['reason'], 'first')
+        self.assertEqual(response.context['teacher'], 'Азаренко Н.Ю.')
+        self.assertEqual(response.context['teacher'], response.context['teachers'][0])
+        self.assertContains(response, 'sched-panel--teacher')
+
+    def test_teacher_only_lessons_in_his_cards(self):
+        response = self.get(teacher='Петров П.П.')
+        html = self.teacher_html(response)
+        cards = html[html.index('sched-table'):]
+        self.assertIn('Базы данных', cards)
+        self.assertIn('Информатика', cards)
+        self.assertNotIn('Философия', cards)
+        self.assertNotIn('Математика', cards)
+
+    def test_teacher_cell_stacks_two_groups(self):
+        """Две группы в одном слоте — стопкой, группа указана в каждой карточке."""
+        response = self.get(teacher='Петров П.П.')
+        monday = response.context['teacher_grid'][1]['days'][0]
+        self.assertTrue(monday['split'])
+        self.assertEqual([item.group.code for item in monday['lessons']], ['ИСТ-201', 'ИСТ-202'])
+        html = self.teacher_html(response)
+        self.assertIn('sched-cell--body sched-cell--split', html)
+        cards = html[html.index('sched-table'):]
+        self.assertIn('sched-teacher-group', cards)
+        self.assertIn('ИСТ-201', cards)
+        self.assertIn('ИСТ-202', cards)
+        # ФИО в шапке блока, в карточках не дублируется
+        self.assertNotIn('Петров П.П.', cards)
+
+    def test_teacher_schedule_follows_week_parity(self):
+        Lesson.objects.create(group=self.group, weekday=4, pair=1, week='even', building='1',
+                              subject='Только чётная', teacher_name='Сидорова А.А.')
+        odd = self.get(teacher='Сидорова А.А.', week='13')  # нечётная
+        self.assertContains(odd, '<b>Математика</b>')
+        self.assertNotContains(odd, '<b>Только чётная</b>')
+        even = self.get(teacher='Сидорова А.А.', week='12')  # чётная
+        self.assertContains(even, '<b>Только чётная</b>')
+        # пара «каждую неделю» видна в обе недели
+        self.assertContains(even, '<b>Математика</b>')
+
+    def test_block_03_markup_and_position(self):
+        """Блок 03 — после блока 02, с номером 03, заголовком и селектором справа."""
+        response = self.get()
+        html = response.content.decode()
+        self.assertIn('<section class="panel sched-panel sched-panel--teacher">', html)
+        self.assertIn('<span class="panel__num mono sched-panel__num">03</span>', html)
+        self.assertIn('<h2>Расписание преподавателя</h2>', html)
+        self.assertLess(html.index('semester-panel'), html.index('sched-panel--teacher'))
+        # селектор преподавателя — крайний правый в шапке блока
+        bar = html[html.index('sched-panel--teacher'):html.index('</form>', html.index('sched-panel--teacher'))]
+        self.assertLess(bar.index('sched-panel__head'), bar.index('sched-teacher-pick'))
+        self.assertIn('sched-panel__pick', bar)
+
+    def test_teacher_table_is_not_week_swipe_target(self):
+        """У таблицы преподавателя нет data-week-grid — жест недели остаётся блоку 01."""
+        response = self.get()
+        html = self.teacher_html(response)
+        self.assertNotIn('data-week-grid', html)
+        group_html = response.content.decode().split('sched-panel--teacher')[0]
+        self.assertIn('data-week-grid', group_html)
+
+
+class TeacherScheduleEmptyTests(TestCase):
+    """Занятий не загружено: блок 03 не падает и честно говорит, что данных нет."""
+
+    @classmethod
+    def setUpTestData(cls):
+        role = Role.objects.create(code='no_lessons_student', name='Студент', can_upload_works=True)
+        cls.group = Group.objects.create(code='ИСТ-000', course=1)
+        cls.student = User.objects.create_user('no_lessons_student', password='demo12345')
+        cls.student.profile.role = role
+        cls.student.profile.group = cls.group
+        cls.student.profile.save()
+
+    def test_block_03_without_teachers(self):
+        self.client.force_login(self.student)
+        response = self.client.get(reverse('schedule:schedule'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['teachers'], [])
+        self.assertEqual(response.context['teacher'], '')
+        self.assertContains(response, 'sched-panel--teacher')
+        self.assertContains(response, 'Расписание преподавателей не загружено')
+        self.assertNotContains(response, 'name="teacher"')
+
+    def test_unknown_teacher_without_lessons(self):
+        self.client.force_login(self.student)
+        response = self.client.get(reverse('schedule:schedule'), {'teacher': 'Некто Неизвестный'})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'sched-panel--teacher')
+
+
+class ScheduleFragmentTests(TestCase):
+    """Фрагментный эндпоинт: только блоки 01/03 и навигация недели.
+
+    AJAX-слой (static/js/schedule-ajax.js) меняет расписание без перезагрузки,
+    поэтому ответ не должен содержать страницу целиком — ни шапки сайта, ни
+    блока 02 с учебным планом.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        role = Role.objects.create(code='frag_dean', name='Деканат', can_manage_schedule=True)
+        cls.dean = User.objects.create_user('frag_dean', password='demo12345')
+        cls.dean.profile.role = role
+        cls.dean.profile.save()
+        cls.group = Group.objects.create(code='ИСТ-201', course=2)
+        cls.other = Group.objects.create(code='ИСТ-202', course=2)
+        for pair, (start, end) in enumerate(
+            (('8:20', '9:55'), ('10:05', '11:40'), ('11:50', '13:25'),
+             ('14:00', '15:35'), ('15:45', '17:20'), ('17:30', '19:05')),
+            start=1,
+        ):
+            Bell.objects.create(building='1', pair=pair, start=start, end=end)
+        Lesson.objects.create(group=cls.group, weekday=1, pair=1, week='all', building='1',
+                              subject='Базы данных', teacher_name='Петров П.П.', room='307')
+        Lesson.objects.create(group=cls.other, weekday=2, pair=2, week='all', building='1',
+                              subject='Философия', teacher_name='Сидорова А.А.', room='314')
+        Lesson.objects.create(group=cls.group, weekday=3, pair=1, week='all', building='1',
+                              subject='Математика', teacher_name='Сидорова А.А.', room='101')
+
+    def setUp(self):
+        self.client.force_login(self.dean)
+
+    def get(self, **params):
+        return self.client.get(reverse('schedule:fragment'), params)
+
+    def test_fragment_has_only_blocks(self):
+        response = self.get(group='ИСТ-201', partial='1')
+        self.assertEqual(response.status_code, 200)
+        html = response.content.decode()
+        for block in ('sched-week-nav', 'sched-block-group', 'sched-block-teacher'):
+            self.assertIn('id="%s"' % block, html)
+        for marker in ('<!DOCTYPE', '<html', '<body', '</html>', 'site-foot', 'semester-panel'):
+            self.assertNotIn(marker, html)
+        self.assertIn('class="week-nav', html)
+        self.assertIn('sched-table', html)
+
+    def group_html(self, html):
+        """Только блок 01: блок 03 показывает занятия преподавателя по всем группам."""
+        start = html.index('<div id="sched-block-group">')
+        end = html.index('<div id="sched-block-teacher">', start)
+        return html[start:end]
+
+    def test_fragment_keeps_group_filter(self):
+        html = self.get(group='ИСТ-202', partial='1').content.decode()
+        block = self.group_html(html)
+        self.assertIn('Философия', block)
+        self.assertNotIn('Базы данных', block)
+        self.assertNotIn('Математика', block)
+
+    def test_fragment_keeps_teacher_filter(self):
+        response = self.get(group='ИСТ-201', teacher='Сидорова А.А.', partial='1')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['teacher'], 'Сидорова А.А.')
+        html = response.content.decode()
+        self.assertIn('value="Сидорова А.А." selected', html)
+        self.assertIn('Математика', html)
+
+    def test_fragment_keeps_week_filter(self):
+        first = self.get(group='ИСТ-201', week=1, partial='1')
+        second = self.get(group='ИСТ-201', week=2, partial='1')
+        self.assertEqual(first.context['week'], 1)
+        self.assertEqual(second.context['week'], 2)
+        self.assertNotEqual(first.context['monday'], second.context['monday'])
+        self.assertIn(second.context['monday'].strftime('%d.%m.%Y'),
+                      second.content.decode())
+
+    def test_fragment_header_has_canonical_url(self):
+        from urllib.parse import unquote_plus
+
+        response = self.get(group='ИСТ-201', teacher='Сидорова А.А.', week=3, partial='1')
+        canonical = unquote_plus(response['X-Schedule-Url'])
+        self.assertTrue(canonical.startswith('/schedule/?'))
+        self.assertIn('group=ИСТ-201', canonical)
+        self.assertIn('teacher=Сидорова А.А.', canonical)
+        self.assertIn('week=3', canonical)
+
+    def test_fragment_requires_login(self):
+        self.client.logout()
+        response = self.get(group='ИСТ-201', partial='1')
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/login/', response['Location'])
+
+    def test_fragment_remembers_group_in_session(self):
+        self.get(group='ИСТ-202', partial='1')
+        self.assertEqual(self.client.session['schedule_group'], 'ИСТ-202')
+
+    def test_full_page_still_has_blocks_and_forms(self):
+        """Без JS: та же страница с обычными формами и id блоков."""
+        response = self.client.get(reverse('schedule:schedule'), {'group': 'ИСТ-201'})
+        self.assertEqual(response.status_code, 200)
+        html = response.content.decode()
+        self.assertIn('id="sched-block-group"', html)
+        self.assertIn('id="sched-block-teacher"', html)
+        self.assertIn('form method="get" class="group-switch', html)
+        self.assertIn('name="group"', html)
+
+
+class ScheduleChoiceSessionTests(TestCase):
+    """Выбор группы и преподавателя запоминается в сессии.
+
+    Порядок: GET-параметр → сессия → «умный» дефолт. Ссылка с параметрами
+    остаётся копируемой: явный GET всегда сильнее сохранённого выбора.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        role = Role.objects.create(code='sess_dean', name='Деканат', can_manage_schedule=True)
+        cls.dean = User.objects.create_user('sess_dean', password='demo12345')
+        cls.dean.profile.role = role
+        cls.dean.profile.save()
+        cls.group = Group.objects.create(code='ИСТ-201', course=2)
+        cls.other = Group.objects.create(code='ИСТ-202', course=2)
+        for pair, (start, end) in enumerate(
+            (('8:20', '9:55'), ('10:05', '11:40'), ('11:50', '13:25'),
+             ('14:00', '15:35'), ('15:45', '17:20'), ('17:30', '19:05')),
+            start=1,
+        ):
+            Bell.objects.create(building='1', pair=pair, start=start, end=end)
+        Lesson.objects.create(group=cls.group, weekday=1, pair=1, week='all', building='1',
+                              subject='Базы данных', teacher_name='Петров П.П.', room='307')
+        Lesson.objects.create(group=cls.group, weekday=2, pair=1, week='all', building='1',
+                              subject='Математика', teacher_name='Сидорова А.А.', room='101')
+        Lesson.objects.create(group=cls.other, weekday=2, pair=2, week='all', building='1',
+                              subject='Философия', teacher_name='Сидорова А.А.', room='314')
+
+    def setUp(self):
+        self.client.force_login(self.dean)
+
+    def test_group_choice_is_remembered(self):
+        first = self.client.get(reverse('schedule:schedule'), {'group': 'ИСТ-202'})
+        self.assertEqual(first.context['group'].code, 'ИСТ-202')
+        self.assertEqual(self.client.session['schedule_group'], 'ИСТ-202')
+        # Второй запрос без параметров — тот же выбор, а не первая группа.
+        second = self.client.get(reverse('schedule:schedule'))
+        self.assertEqual(second.context['group'].code, 'ИСТ-202')
+
+    def test_explicit_group_beats_session(self):
+        self.client.get(reverse('schedule:schedule'), {'group': 'ИСТ-202'})
+        response = self.client.get(reverse('schedule:schedule'), {'group': 'ИСТ-201'})
+        self.assertEqual(response.context['group'].code, 'ИСТ-201')
+        self.assertEqual(self.client.session['schedule_group'], 'ИСТ-201')
+
+    def test_teacher_choice_is_remembered(self):
+        first = self.client.get(reverse('schedule:schedule'),
+                                {'group': 'ИСТ-201', 'teacher': 'Сидорова А.А.'})
+        self.assertEqual(first.context['teacher'], 'Сидорова А.А.')
+        self.assertEqual(first.context['teacher_default']['reason'], 'query')
+        self.assertEqual(self.client.session['schedule_teacher_by_group']['ИСТ-201'], 'Сидорова А.А.')
+        second = self.client.get(reverse('schedule:schedule'), {'group': 'ИСТ-201'})
+        self.assertEqual(second.context['teacher'], 'Сидорова А.А.')
+        self.assertEqual(second.context['teacher_default']['reason'], 'group')
+
+    def test_unknown_teacher_is_not_saved(self):
+        response = self.client.get(reverse('schedule:schedule'),
+                                   {'group': 'ИСТ-201', 'teacher': 'Некто Неизвестный'})
+        self.assertNotEqual(response.context['teacher'], 'Некто Неизвестный')
+        self.assertNotIn('Некто Неизвестный',
+                         self.client.session.get('schedule_teacher_by_group', {}).values())
+        self.assertNotIn('schedule_teacher', self.client.session)
+
+    def test_student_group_is_not_overridden_by_session(self):
+        """Студенту группу назначает деканат: сессия её не подменяет."""
+        role = Role.objects.create(code='sess_student', name='Студент', can_upload_works=True)
+        student = User.objects.create_user('sess_student', password='demo12345')
+        student.profile.role = role
+        student.profile.group = self.group
+        student.profile.save()
+        self.client.force_login(student)
+        self.client.get(reverse('schedule:schedule'), {'group': 'ИСТ-202'})
+        response = self.client.get(reverse('schedule:schedule'), {'group': 'ИСТ-202'})
+        self.assertEqual(response.context['group'].code, 'ИСТ-201')
+
+
+class ScheduleTeacherMemoryTests(TestCase):
+    """Преподаватель запоминается отдельно для каждой группы.
+
+    Выбрал преподавателя для группы A → перешёл на B без ?teacher= → видно
+    преподавателя, который ведёт пару у B сейчас; вернулся на A → снова свой
+    сохранённый. Явный ?teacher= всегда сильнее памяти.
+    """
+
+    NOW = datetime(2026, 11, 23, 10, 30)  # понедельник, идёт 2-я пара
+
+    @classmethod
+    def setUpTestData(cls):
+        role = Role.objects.create(code='mem_dean', name='Деканат', can_manage_schedule=True)
+        cls.dean = User.objects.create_user('mem_dean', password='demo12345')
+        cls.dean.profile.role = role
+        cls.dean.profile.save()
+        cls.group = Group.objects.create(code='ИСТ-301', course=3)
+        cls.other = Group.objects.create(code='ПРИ-301', course=3)
+        for pair, (start, end) in enumerate(
+            (('8:20', '9:55'), ('10:05', '11:40'), ('11:50', '13:25'),
+             ('14:00', '15:35'), ('15:45', '17:20'), ('17:30', '19:05')),
+            start=1,
+        ):
+            Bell.objects.create(building='1', pair=pair, start=start, end=end)
+        # У каждой группы в текущем слоте свой преподаватель — это и есть дефолт.
+        Lesson.objects.create(group=cls.group, weekday=1, pair=2, week='all', building='1',
+                              subject='Базы данных', teacher_name='Петров П.П.', room='307')
+        Lesson.objects.create(group=cls.other, weekday=1, pair=2, week='all', building='1',
+                              subject='Философия', teacher_name='Кузнецов К.К.', room='314')
+        # Третий преподаватель — только у группы A, чтобы явный выбор отличался
+        # и от дефолта A, и от дефолта B.
+        Lesson.objects.create(group=cls.group, weekday=2, pair=1, week='all', building='1',
+                              subject='Математика', teacher_name='Сидорова А.А.', room='101')
+
+    def setUp(self):
+        self.client.force_login(self.dean)
+
+    def get(self, **params):
+        with mock.patch('apps.schedule.views.now_local', return_value=self.NOW):
+            return self.client.get(reverse('schedule:schedule'), params)
+
+    def test_default_teacher_of_group(self):
+        self.assertEqual(self.get(group='ИСТ-301').context['teacher'], 'Петров П.П.')
+        self.assertEqual(self.get(group='ПРИ-301').context['teacher'], 'Кузнецов К.К.')
+
+    def test_teacher_memory_follows_group(self):
+        chosen = self.get(group='ИСТ-301', teacher='Сидорова А.А.')
+        self.assertEqual(chosen.context['teacher'], 'Сидорова А.А.')
+        self.assertEqual(chosen.context['teacher_default']['reason'], 'query')
+
+        # Другая группа без ?teacher= — её «умный» дефолт, а не прежний выбор.
+        other = self.get(group='ПРИ-301')
+        self.assertEqual(other.context['teacher'], 'Кузнецов К.К.')
+        self.assertEqual(other.context['teacher_default']['reason'], 'now')
+
+        # Возврат на первую — сохранённый для неё преподаватель.
+        back = self.get(group='ИСТ-301')
+        self.assertEqual(back.context['teacher'], 'Сидорова А.А.')
+        self.assertEqual(back.context['teacher_default']['reason'], 'group')
+
+        # У второй группы ничего не появилось: снова дефолт.
+        self.assertEqual(self.get(group='ПРИ-301').context['teacher'], 'Кузнецов К.К.')
+
+    def test_memory_is_stored_per_group_in_session(self):
+        self.get(group='ИСТ-301', teacher='Сидорова А.А.')
+        self.assertEqual(
+            self.client.session['schedule_teacher_by_group'],
+            {'ИСТ-301': 'Сидорова А.А.'},
+        )
+
+    def test_explicit_teacher_beats_group_memory(self):
+        self.get(group='ИСТ-301', teacher='Сидорова А.А.')
+        response = self.get(group='ИСТ-301', teacher='Петров П.П.')
+        self.assertEqual(response.context['teacher'], 'Петров П.П.')
+        self.assertEqual(response.context['teacher_default']['reason'], 'query')
+        # Явный выбор заменил сохранённый для этой же группы.
+        self.assertEqual(
+            self.client.session['schedule_teacher_by_group']['ИСТ-301'], 'Петров П.П.'
+        )
+
+    def test_session_memory_works_without_query(self):
+        self.get(group='ИСТ-301', teacher='Сидорова А.А.')
+        with mock.patch('apps.schedule.views.now_local', return_value=self.NOW):
+            response = self.client.get(reverse('schedule:schedule'))
+        self.assertEqual(response.context['group'].code, 'ИСТ-301')
+        self.assertEqual(response.context['teacher'], 'Сидорова А.А.')
+
+    def test_legacy_single_teacher_is_migrated_to_group(self):
+        """Старое значение schedule_teacher привязывается к выбранной группе."""
+        session = self.client.session
+        session['schedule_group'] = 'ИСТ-301'
+        session['schedule_teacher'] = 'Сидорова А.А.'
+        session.save()
+        response = self.get()
+        self.assertEqual(response.context['teacher'], 'Сидорова А.А.')
+        self.assertEqual(response.context['teacher_default']['reason'], 'group')
+        self.assertNotIn('schedule_teacher', self.client.session)
+        self.assertEqual(
+            self.client.session['schedule_teacher_by_group']['ИСТ-301'], 'Сидорова А.А.'
+        )
+
+    def test_fragment_remembers_teacher_for_group(self):
+        with mock.patch('apps.schedule.views.now_local', return_value=self.NOW):
+            response = self.client.get(reverse('schedule:fragment'), {
+                'group': 'ПРИ-301', 'teacher': 'Сидорова А.А.', 'partial': '1',
+            })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            self.client.session['schedule_teacher_by_group']['ПРИ-301'], 'Сидорова А.А.'
+        )
+
+    def test_page_url_does_not_carry_foreign_teacher(self):
+        """При дефолтном преподавателе (не выбор пользователя) ?teacher= не нужен."""
+        response = self.get(group='ПРИ-301')
+        self.assertNotIn('teacher=', response.context['page_url'])
+
+
+class TeacherRoleLayoutTests(TestCase):
+    """Роль «преподаватель»: первым блоком — своё расписание (01), группа — 03.
+
+    Студент и сотрудники видят прежний порядок: 01 группа, 02 план, 03 препод.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        teacher_role = Role.objects.create(
+            code='teacher', name='Преподаватель', can_create_courses=True, can_upload_works=False,
+        )
+        student_role = Role.objects.create(code='layout_student', name='Студент', can_upload_works=True)
+        cls.group = Group.objects.create(code='ИСТ-401', course=4)
+        cls.other = Group.objects.create(code='ИСТ-402', course=4)
+        for pair, (start, end) in enumerate(
+            (('8:20', '9:55'), ('10:05', '11:40'), ('11:50', '13:25'),
+             ('14:00', '15:35'), ('15:45', '17:20'), ('17:30', '19:05')),
+            start=1,
+        ):
+            Bell.objects.create(building='1', pair=pair, start=start, end=end)
+        Lesson.objects.create(group=cls.group, weekday=1, pair=2, week='all', building='1',
+                              subject='Базы данных', teacher_name='Иванов И.О.', room='307')
+        Lesson.objects.create(group=cls.other, weekday=2, pair=1, week='all', building='1',
+                              subject='Философия', teacher_name='Петров П.П.', room='314')
+
+        cls.teacher_user = User.objects.create_user('layout_teacher', password='demo12345',
+                                                    last_name='Иванов', first_name='Иван')
+        cls.teacher_user.profile.role = teacher_role
+        cls.teacher_user.profile.save()
+        cls.student = User.objects.create_user('layout_student', password='demo12345')
+        cls.student.profile.role = student_role
+        cls.student.profile.group = cls.group
+        cls.student.profile.save()
+
+    def setUp(self):
+        self.client.force_login(self.teacher_user)
+
+    def block_order(self, html):
+        """Порядок блоков на странице: id блоков и номер в шапке."""
+        teacher_at = html.index('<div id="sched-block-teacher">')
+        plan_at = html.index('class="panel semester-panel"')
+        group_at = html.index('<div id="sched-block-group">')
+        return teacher_at, plan_at, group_at
+
+    def test_teacher_sees_own_schedule_first(self):
+        response = self.client.get(reverse('schedule:schedule'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context['is_teacher_role'])
+        self.assertEqual(response.context['teacher'], 'Иванов И.О.')
+        self.assertEqual(response.context['teacher_default']['reason'], 'self')
+
+        html = response.content.decode()
+        teacher_at, plan_at, group_at = self.block_order(html)
+        self.assertLess(teacher_at, plan_at, 'блок преподавателя должен быть первым')
+        self.assertLess(plan_at, group_at, 'блок группы — последним')
+
+        teacher_html = html[teacher_at:plan_at]
+        group_html = html[group_at:]
+        self.assertIn('sched-panel__num">01<', teacher_html)
+        self.assertIn('sched-panel__num">03<', group_html)
+        # Своё расписание не пустое: у преподавателя есть пара в загруженных файлах.
+        self.assertIn('Базы данных', teacher_html)
+        # Селектор позволяет посмотреть чужое расписание.
+        self.assertIn('name="teacher"', teacher_html)
+
+    def test_teacher_picker_lists_self_as_selected(self):
+        html = self.client.get(reverse('schedule:schedule')).content.decode()
+        self.assertIn('value="Иванов И.О." selected', html)
+
+    def test_teacher_name_matches_with_yo_and_case(self):
+        """Сопоставление ФИО: ё→е, регистр и лишние пробелы не мешают."""
+        user = User.objects.create_user('layout_teacher_yo', password='demo12345',
+                                        last_name='ПЕТРОВ', first_name='пётр')
+        user.profile.role = Role.objects.get(code='teacher')
+        user.profile.save()
+        self.client.force_login(user)
+        response = self.client.get(reverse('schedule:schedule'))
+        self.assertEqual(response.context['teacher'], 'Петров П.П.')
+        self.assertEqual(response.context['teacher_default']['reason'], 'self')
+
+    def test_teacher_explicit_choice_wins(self):
+        response = self.client.get(reverse('schedule:schedule'), {'teacher': 'Петров П.П.'})
+        self.assertEqual(response.context['teacher'], 'Петров П.П.')
+        self.assertEqual(response.context['teacher_default']['reason'], 'query')
+        self.assertFalse(response.context['teacher_default']['is_self'])
+
+    def test_teacher_without_group_can_pick_one(self):
+        """У преподавателя может не быть группы — селектор групп всё равно есть."""
+        self.teacher_user.profile.group = None
+        self.teacher_user.profile.save()
+        response = self.client.get(reverse('schedule:schedule'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context['can_choose_group'])
+        html = response.content.decode()
+        self.assertIn('name="group"', html)
+        self.assertIn('sched-panel--teacher', html)
+
+    def test_student_keeps_previous_order(self):
+        self.client.force_login(self.student)
+        response = self.client.get(reverse('schedule:schedule'))
+        self.assertFalse(response.context['is_teacher_role'])
+        self.assertEqual(response.context['group_block_num'], '01')
+        self.assertEqual(response.context['teacher_block_num'], '03')
+        html = response.content.decode()
+        teacher_at, plan_at, group_at = self.block_order(html)
+        self.assertLess(group_at, plan_at)
+        self.assertLess(plan_at, teacher_at)
+
+    def test_fragment_uses_same_numbers_for_teacher(self):
+        response = self.client.get(reverse('schedule:fragment'), {'partial': '1'})
+        self.assertEqual(response.status_code, 200)
+        html = response.content.decode()
+        self.assertIn('sched-panel__num">01<', html)
+        self.assertIn('sched-panel__num">03<', html)

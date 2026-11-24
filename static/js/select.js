@@ -8,6 +8,10 @@
   const TARGETS = 'select.input, select.select';
   const SEARCH_FROM = 8; /* больше этого числа опций — поиск включается сам */
   let uid = 0;
+  /* Закрыватели открытых панелей: один слушатель клика на документ вместо
+     своего слушателя на каждый селект. После AJAX-подмены блока селекты
+     строятся заново, и старые замыкания не копятся. */
+  const closers = new Map();
   const CHEVRON =
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
     'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
@@ -236,16 +240,28 @@
 
     if (search) search.addEventListener('input', render);
 
-    document.addEventListener('click', (event) => {
-      if (!wrap.contains(event.target)) close();
-    });
+    /* Клик вне панели закрывает её. Слушатель один на документ (closers), а не
+       свой на каждый селект: после AJAX-подмены блоков селекты строятся заново
+       и старые замыкания не накапливаются. */
+    closers.set(wrap, close);
     select.addEventListener('change', sync);
 
     sync();
     wrap.append(btn, panel);
   }
 
+  document.addEventListener('click', (event) => {
+    closers.forEach((close, wrap) => {
+      // Отсоединённую панель (блок заменён AJAX-ом) закрывать незачем.
+      if (wrap.isConnected && !wrap.contains(event.target)) close();
+    });
+  });
+
   const init = () => document.querySelectorAll(TARGETS).forEach(build);
+  /* Публичный API: после AJAX-подмены блока новые <select> нужно построить
+     заново — schedule-ajax.js вызывает initSelects(). Повторный вызов для уже
+     готовых селектов безопасен: build() выходит по data-sel-ready. */
+  window.initSelects = init;
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {

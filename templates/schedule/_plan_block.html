@@ -1,0 +1,125 @@
+{# Блок 02 — учебный план: вся программа по семестрам. #}
+{% load static %}
+<!-- Учебный план: вся программа по семестрам -->
+<section class="panel semester-panel">
+  <header class="panel__head semester-panel__head">
+    <span class="panel__num mono">02</span>
+    <div class="panel__title">
+      <h2>Учебный план · вся программа обучения</h2>
+    </div>
+    {% if can_import %}
+    <button class="btn btn--accent btn--sm sched-import-btn" type="button" id="planImportOpen" aria-haspopup="dialog" aria-controls="planImport">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v11m0-11 4 4m-4-4-4 4"/><path d="M4 17v3h16v-3"/></svg>
+      Обновить план
+    </button>
+    {% endif %}
+  </header>
+
+  {% if can_import %}
+  <!-- Обновление учебного плана: несколько файлов сразу, каждый — отдельный источник -->
+  <dialog class="dialog sched-import" id="planImport" aria-labelledby="planImportTitle" data-import-confirm="Удалить файл плана и все его дисциплины?" data-import-ext=".xls,.xlsx,.docx,.pdf" data-import-max-size="20971520">
+    <form method="post" action="{% url 'education:plan_import' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% if group %}<input type="hidden" name="group" value="{{ group.code }}">{% endif %}
+      <header class="dialog__head">
+        <h2 id="planImportTitle">Обновить план обучения</h2>
+        <button class="dialog__close" type="button" data-import-close aria-label="Закрыть">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </header>
+      <div class="dialog__body">
+        <p class="muted sched-import__lead">
+          Загрузите учебные планы (.xls, .xlsx, .docx или .pdf) — можно сразу несколько,
+          в том числе разных направлений. При совпадении дисциплины в семестре показывается
+          запись из самого свежего файла.
+        </p>
+        <label class="sched-import__drop" for="planImportFile" data-import-drop>
+          <input id="planImportFile" class="file-input" name="file" type="file" accept=".xls,.xlsx,.docx,.pdf" required multiple data-import-file>
+          <span class="sched-import__ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0 4 4m-4-4-4 4"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+          </span>
+          <span class="sched-import__text">
+            <b data-import-name>Выберите файлы плана</b>
+            <small class="mono">.xls · .xlsx · .docx · .pdf · до 20 МБ каждый · можно несколько</small>
+          </span>
+        </label>
+        <p class="sched-import__error" data-import-error role="alert" hidden></p>
+
+        {% if plan_sources %}
+        <div class="sched-import__files">
+          <p class="mono dim sched-import__files-head">
+            <span>загруженные файлы · {{ plan_sources|length }}</span>
+            <span>свежий сверху</span>
+          </p>
+          <ul class="sched-filelist">
+            {% for source in plan_sources %}
+            <li class="sched-file{% if source.pk == latest_plan.pk %} is-latest{% endif %}">
+              <span class="sched-file__body">
+                <b title="{{ source.original_name }}">{{ source.original_name }}</b>
+                <small class="mono">
+                  {% if source.direction %}{{ source.direction }}{% else %}направление не определено{% endif %}
+                  · {{ source.entries_count }} дисц. · {{ source.size_label }}
+                </small>
+                <small class="mono dim">{{ source.uploaded_at|date:"d.m.Y H:i" }}{% if source.uploaded_by %} · {{ source.uploaded_by.username }}{% endif %}</small>
+              </span>
+              {% if source.uploaded_by_id == user.id or user.is_staff or user.is_superuser %}
+              <a class="sched-file__dl" href="{% url 'education:plan_source_file' source.pk %}"
+                 download="{{ source.original_name }}"
+                 aria-label="Скачать файл {{ source.original_name }}">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4"/><path d="M4 17v3h16v-3"/></svg>
+                <span>скачать</span>
+              </a>
+              {% endif %}
+              <button class="sched-file__del" type="submit"
+                      formaction="{% url 'education:plan_source_delete' source.pk %}" formmethod="post" formnovalidate
+                      data-import-delete
+                      aria-label="Удалить файл {{ source.original_name }} вместе с дисциплинами">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V5h6v2m-8 0 1 12h8l1-12"/><path d="M10 11v5m4-5v5"/></svg>
+                <span>удалить</span>
+              </button>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+      </div>
+      <footer class="dialog__foot">
+        <button class="btn btn--ghost" type="button" data-import-close>Отмена</button>
+        <button class="btn btn--accent" type="submit" data-import-submit disabled>Загрузить файлы</button>
+      </footer>
+    </form>
+  </dialog>
+  {% endif %}
+
+  <div class="tl-scroll">
+    <div class="tl-grid tl-grid--semesters" style="--weeks: {{ program_semesters|length }}">
+      <div class="tl-axis">
+        <span class="tl-subject mono dim">семестры</span>
+        <div class="tl-ticks">
+          {% for sem in program_semesters %}
+          <span class="tl-tick{% if sem == program_semester %} is-now{% endif %}" style="--w: {{ sem }}">
+            <b class="mono">{{ sem }}</b>
+          </span>
+          {% endfor %}
+        </div>
+      </div>
+      {% for item in curriculum %}
+      <div class="tl-row" style="--i: {{ forloop.counter }}">
+        <span class="tl-subject" title="{{ item.subject }}"><span class="tl-subject__clip"><span class="tl-subject__text">{{ item.subject }}</span></span></span>
+        <div class="tl-track">
+          {% for start, end in item.segments %}
+          <span class="tl-seg tl-seg--{{ item.color }}"
+                style="--from: {{ start }}; --to: {{ end }}"
+                title="{{ item.subject }}: {% if end == start %}{{ start }}-й семестр{% else %}{{ start }}–{{ end }} семестры{% endif %}">
+            {% if end != start %}{{ start }}–{{ end }}{% else %}{{ start }}{% endif %}
+          </span>
+          {% endfor %}
+        </div>
+      </div>
+      {% empty %}
+      <div class="empty"><b>План для направления не загружен</b><p>Загрузите файл учебного плана — дисциплины появятся здесь.</p></div>
+      {% endfor %}
+    </div>
+  </div>
+  <script src="{% static 'js/plan-marquee.js' %}" defer></script>
+</section>
