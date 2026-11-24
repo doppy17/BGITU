@@ -1,6 +1,7 @@
 """Тесты ролей, заявок и управления пользователями."""
 import hashlib
 import inspect
+import os
 import re
 import stat
 import tempfile
@@ -530,7 +531,8 @@ class AccessKeyTests(TestCase):
             self.assertEqual(key.code_hash, AccessKey.hash_code(code))
             self.assertIsNotNone(key.expires_at)
             self.assertEqual(path.read_text().strip(), code)
-            self.assertEqual(stat.S_IMODE(path.stat().st_mode), 0o600)
+            if os.name == 'posix':  # на Windows chmod не даёт 0600
+                self.assertEqual(stat.S_IMODE(path.stat().st_mode), 0o600)
             self.assertFalse(AccessKey.objects.filter(code_hash=code).exists())
 
     def test_command_list_and_revoke(self):
