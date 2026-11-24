@@ -6,7 +6,6 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import UploadedFile
 from django.core.validators import validate_email
-from django.utils import timezone
 
 from apps.education.models import Group
 
@@ -22,6 +21,16 @@ class ProfilePhotoInput(forms.ClearableFileInput):
     """ClearableFileInput со своей разметкой «текущее фото / удалить»."""
 
     template_name = 'accounts/widgets/clearable_file_input.html'
+
+
+# Выпадающие списки блока 01 «Данные студента»: подгруппа и курс.
+SUBGROUP_CHOICES = [('', '—'), ('а', '«а»'), ('б', '«б»')]
+COURSE_CHOICES = [('', '— как в группе —')] + [(str(value), f'{value} курс') for value in range(1, 7)]
+
+# Границы года поступления: числовое поле, а не выпадающий список.
+ENROLLMENT_YEAR_MIN = 2000
+ENROLLMENT_YEAR_MAX = 2100
+
 
 
 class ProfileEditForm(forms.ModelForm):
@@ -70,20 +79,30 @@ class ProfileEditForm(forms.ModelForm):
             'invalid_image': 'Загрузите изображение в формате JPEG, PNG или WebP.',
         },
     )
-    institute_override = forms.CharField(
-        label='Институт', required=False, max_length=120,
-        widget=forms.TextInput(attrs={'class': 'input'}),
-        help_text='если институт не совпадает с группой',
-        error_messages={'max_length': 'Название института слишком длинное (до 120 символов).'},
+    institute = forms.ChoiceField(
+        label='Институт', required=False, choices=(),
+        widget=forms.Select(attrs={'class': 'input'}),
+        help_text='выберите из списка; «как в группе» оставляет институт группы',
+        error_messages={'invalid_choice': 'Выберите институт из списка.'},
+    )
+    course = forms.ChoiceField(
+        label='Курс', required=False, choices=COURSE_CHOICES,
+        widget=forms.Select(attrs={'class': 'input'}),
+        help_text='«как в группе» — курс определяется группой',
+        error_messages={'invalid_choice': 'Выберите курс из списка.'},
     )
     enrollment_year = forms.IntegerField(
         label='Год поступления', required=False,
-        min_value=1990, max_value=timezone.now().year + 1,
-        widget=forms.NumberInput(attrs={'class': 'input', 'inputmode': 'numeric', 'placeholder': '2024'}),
+        min_value=ENROLLMENT_YEAR_MIN, max_value=ENROLLMENT_YEAR_MAX,
+        widget=forms.NumberInput(attrs={
+            'class': 'input', 'type': 'number', 'inputmode': 'numeric',
+            'min': ENROLLMENT_YEAR_MIN, 'max': ENROLLMENT_YEAR_MAX, 'step': 1,
+            'placeholder': '2024',
+        }),
         error_messages={
             'invalid': 'Укажите год цифрами, например 2024.',
-            'min_value': 'Год поступления не может быть раньше 1990.',
-            'max_value': 'Год поступления не может быть позже следующего года.',
+            'min_value': f'Год поступления не может быть раньше {ENROLLMENT_YEAR_MIN}.',
+            'max_value': f'Год поступления не может быть позже {ENROLLMENT_YEAR_MAX}.',
         },
     )
 
@@ -91,7 +110,7 @@ class ProfileEditForm(forms.ModelForm):
         model = Profile
         fields = (
             'photo', 'group', 'subgroup', 'phone', 'department',
-            'institute_override', 'record_book', 'enrollment_year',
+            'record_book', 'enrollment_year',
         )
         widgets = {
             'subgroup': forms.Select(attrs={'class': 'input'}),
@@ -115,8 +134,50 @@ class ProfileEditForm(forms.ModelForm):
         }
 
     def __init__(self, *args, user=None, **kwargs):
+        # Старые формы и ссылки присылали institute_override текстом: принимаем
+        # его как значение нового выпадающего списка, чтобы не терять данные.
+        data = kwargs.get('data')
+        if data is None and args:
+            data = args[0]
+        if data is not None and 'institute' not in data and 'institute_override' in data:
+            data = data.copy()
+            data['institute'] = data.get('institute_override', '')
+            if args:
+                args = (data,) + args[1:]
+            else:
+                kwargs['data'] = data
+
         self.user = user
         super().__init__(*args, **kwargs)
+
+        # Институт — уникальные значения из справочника групп плюс текущее
+        # значение override, даже если такой группы в справочнике уже нет.
+        institute_values = list(
+            Group.objects.exclude(institute='').order_by('institute')
+            .values_list('institute', flat=True).distinct()
+        )
+        current_institute = self.instance.institute_override or ''
+        if current_institute and current_institute not in institute_values:
+            institute_values.append(current_institute)
+        self.fields['institute'].choices = [('', '— как в группе —')] + [
+            (value, value) for value in institute_values
+        ]
+        self.fields['institute'].initial = current_institute
+
+        # Подгруппа: «—», «а», «б» — вместо длинных подписей модели.
+        subgroup_field = self.fields.get('subgroup')
+        if subgroup_field is not None:
+            subgroup_field.choices = SUBGROUP_CHOICES
+
+        # Курс пишется в course_override; пустое значение — «как в группе».
+        self.fields['course'].initial = (
+            str(self.instance.course_override) if self.instance.course_override is not None else ''
+        )
+
+        # Запоминаем группу до сохранения: по ней видно, надо ли обновлять
+        # автоматически заполненное направление.
+        self._old_group_program = self.instance.group.program if self.instance.group_id else ''
+
         if user is not None:
             if not self.is_bound:
                 self.fields['last_name'].initial = user.last_name
@@ -124,7 +185,7 @@ class ProfileEditForm(forms.ModelForm):
             self.fields['email'].initial = user.email
 
         # Поля, созданные из модели, получают тот же класс, что и объявленные.
-        for name in ('subgroup', 'phone', 'department', 'institute_override', 'record_book', 'enrollment_year'):
+        for name in ('subgroup', 'phone', 'department', 'record_book', 'enrollment_year'):
             field = self.fields.get(name)
             if field is not None:
                 classes = field.widget.attrs.get('class', '')
@@ -175,6 +236,56 @@ class ProfileEditForm(forms.ModelForm):
     def clean_first_name(self):
         return (self.cleaned_data.get('first_name') or '').strip()
 
+    def clean_course(self):
+        """Курс — 1…6, но не больше нормативного срока обучения уровня.
+
+        ``study_term_years`` — срок в годах; в семестрах это вдвое больше,
+        поэтому верхняя граница — ``study_term_years * 2``.
+        """
+        value = self.cleaned_data.get('course') or ''
+        if not value:
+            return ''
+        try:
+            course = int(value)
+        except (TypeError, ValueError):
+            raise forms.ValidationError('Выберите курс из списка.')
+        if course < 1:
+            raise forms.ValidationError('Курс не может быть меньше 1.')
+        limit = self.instance.study_term_years * 2
+        if course > limit:
+            raise forms.ValidationError(
+                f'Курс не может быть больше {limit} для вашего уровня обучения.'
+            )
+        return str(course)
+
+    def save(self, commit=True):
+        """Переносит выпадающие значения в поля профиля и сохраняет его.
+
+        ``institute`` пишется в ``institute_override``, ``course`` — в
+        ``course_override``. Если направление было заполнено автоматически
+        из прежней группы, при смене группы оно обновляется на новое.
+        """
+        profile = super().save(commit=False)
+
+        # Меняем только те поля, которые реально пришли в запросе: частичная
+        # форма (например, только фото) не должна стирать институт и курс.
+        if 'institute' in self.data:
+            profile.institute_override = self.cleaned_data.get('institute') or ''
+        if 'course' in self.data:
+            value = self.cleaned_data.get('course') or ''
+            profile.course_override = int(value) if value else None
+
+        if 'group' in self.cleaned_data:
+            new_program = profile.group.program if profile.group_id else ''
+            if new_program != self._old_group_program:
+                if not profile.direction or profile.direction == self._old_group_program:
+                    profile.direction = new_program
+
+        if commit:
+            profile.save()
+            self.save_m2m()
+        return profile
+
     def save_user(self):
         """Переносит ФИО и почту в ``User``; вызывается внутри транзакции вьюхи."""
         if self.user is None:
@@ -185,6 +296,29 @@ class ProfileEditForm(forms.ModelForm):
         user.email = self.cleaned_data['email']
         user.save(update_fields=['last_name', 'first_name', 'email'])
         return user
+
+
+class ProfileFactsForm(ProfileEditForm):
+    """Блок 01 «Данные студента»: только пять полей, без ФИО, почты и фото.
+
+    Форма используется для редактирования прямо на странице профиля:
+    институт, группа, подгруппа и курс — выпадающие списки, год поступления —
+    числовое поле. Остальные поля профиля форма не трогает, поэтому чужие
+    данные (и занятость почты) здесь не проверяются.
+    """
+
+    FACT_FIELDS = ('institute', 'group', 'subgroup', 'course', 'enrollment_year')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name in list(self.fields):
+            if name not in self.FACT_FIELDS:
+                del self.fields[name]
+        self.order_fields(self.FACT_FIELDS)
+        # В компактной форме подсказки не выводятся — убираем и связь с ними.
+        for field in self.fields.values():
+            field.help_text = ''
+            field.widget.attrs.pop('aria-describedby', None)
 
 
 # --- Доп. контакты -----------------------------------------------------------

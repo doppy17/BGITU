@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load bgitu %}
+{% load static %}
 
 {% block title %}Профиль{% endblock %}
 
@@ -21,13 +22,11 @@
       <p class="profile-hero__tags">
         <span class="badge badge--accent">{% firstof role.name p.role.name current_role.name 'Студент' %}</span>
       </p>
-      {% if p.group or p.course or p.institute %}
       <p class="profile-hero__meta">
-        {% if p.group %}<span class="profile-hero__meta-item">{{ p.group.code }}</span>{% endif %}
-        {% if p.course %}<span class="profile-hero__meta-item">{{ p.course }} курс</span>{% endif %}
-        {% if p.institute %}<span class="profile-hero__meta-item">{{ p.institute }}</span>{% endif %}
+        <span class="profile-hero__meta-item" data-hero-group>{{ p.group.code|default:'' }}</span>
+        <span class="profile-hero__meta-item" data-hero-course>{% if p.course %}{{ p.course }} курс{% endif %}</span>
+        <span class="profile-hero__meta-item" data-hero-institute>{{ p.institute|default:'' }}</span>
       </p>
-      {% endif %}
     </div>
 
     <a class="btn btn--ghost btn--sm profile-hero__edit" href="{% url 'accounts:profile_edit' %}">
@@ -37,48 +36,7 @@
   </section>
 
   <!-- ============ 01 · Данные студента ============ -->
-  <section class="panel profile-panel" aria-labelledby="profileFactsTitle">
-    <header class="panel__head profile-panel__head">
-      <span class="panel__num mono">01</span>
-      <div class="panel__title">
-        <h2 id="profileFactsTitle">Данные студента</h2>
-      </div>
-    </header>
-
-    <dl class="profile-spec">
-      <div class="profile-spec__row">
-        <dt class="profile-spec__key mono">Институт</dt>
-        <dd class="profile-spec__val">{{ p.institute|default:'—' }}</dd>
-      </div>
-      <div class="profile-spec__row">
-        <dt class="profile-spec__key mono">Группа</dt>
-        <dd class="profile-spec__val">{{ p.group.code|default:'—' }}</dd>
-      </div>
-      {% if p.subgroup %}
-      <div class="profile-spec__row">
-        <dt class="profile-spec__key mono">Подгруппа</dt>
-        <dd class="profile-spec__val">{% if p.subgroup == 'а' %}«а»{% elif p.subgroup == 'б' %}«б»{% else %}{{ p.subgroup }}{% endif %}</dd>
-      </div>
-      {% endif %}
-      <div class="profile-spec__row">
-        <dt class="profile-spec__key mono">Курс</dt>
-        <dd class="profile-spec__val">{{ p.course|default:'—' }}</dd>
-      </div>
-      <div class="profile-spec__row">
-        <dt class="profile-spec__key mono">Год поступления</dt>
-        <dd class="profile-spec__val">{{ p.enrollment_year|default:'—' }}</dd>
-      </div>
-      <div class="profile-spec__row">
-        <dt class="profile-spec__key mono">Год окончания</dt>
-        <dd class="profile-spec__val">
-          {% if p.graduation_year %}{{ p.graduation_year }}
-          {% elif p.study_years_label %}{{ p.study_years_label }}
-          {% elif p.enrollment_year %}{{ p.enrollment_year|add:4 }}
-          {% else %}—{% endif %}
-        </dd>
-      </div>
-    </dl>
-  </section>
+  {% include 'portal/_profile_facts.html' with profile=p facts_form=facts_form %}
 
   <!-- ============ 02 · Студенческий билет ============ -->
   <section class="panel profile-panel profile-ticket" aria-labelledby="profileTicketTitle">
@@ -109,11 +67,11 @@
         <dl class="profile-ticket__grid">
           <div class="profile-ticket__cell profile-ticket__cell--wide">
             <dt class="mono">Направление подготовки</dt>
-            <dd>{{ p.direction_display|default:'—' }}</dd>
+            <dd data-ticket-direction>{{ p.direction_display|default:'—' }}</dd>
           </div>
           <div class="profile-ticket__cell">
             <dt class="mono">Курс</dt>
-            <dd>{{ p.course|default:'—' }}</dd>
+            <dd data-ticket-course>{{ p.course|default:'—' }}</dd>
           </div>
           <div class="profile-ticket__cell">
             <dt class="mono">Уровень образования</dt>
@@ -212,4 +170,8 @@
 
 </div>
 {% endwith %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/profile-inline.js' %}" defer></script>
 {% endblock %}

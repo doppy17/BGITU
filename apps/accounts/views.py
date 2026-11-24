@@ -15,6 +15,7 @@ from django.db import IntegrityError, transaction
 from django.db.models import Count, Max
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
@@ -22,7 +23,7 @@ from django.views.decorators.http import require_POST
 
 from apps.education.models import Group
 
-from .forms import ContactForm, ProfileEditForm, TicketForm
+from .forms import ContactForm, ProfileEditForm, ProfileFactsForm, TicketForm
 from .models import Contact, Profile, Role, RoleRequest
 from .permissions import get_role, role_can, role_required
 
@@ -320,6 +321,37 @@ def manage_student_update(request, user_id):
 # Допустимые темы оформления сайта.
 THEMES = ('paper', 'surik', 'latun', 'brass')
 
+# --- Профиль: блок 01 «Данные студента» редактируется прямо на странице -----
+INLINE_PROFILE_SCOPE = 'profile-facts'
+
+
+def profile_facts_payload(profile):
+    """Данные блока 01 для JSON-ответа — с учётом вычисленных свойств."""
+    return {
+        'institute': profile.institute,
+        'institute_override': profile.institute_override,
+        'group': profile.group.code if profile.group_id else '',
+        'group_id': profile.group_id,
+        'subgroup': profile.subgroup,
+        'course': profile.course,
+        'enrollment_year': profile.enrollment_year,
+        'graduation_year': profile.graduation_year,
+        'direction': profile.direction_display,
+    }
+
+
+def render_profile_facts(request, profile):
+    """HTML блока 01 в режиме просмотра — им JS заменяет блок после сохранения."""
+    return render_to_string(
+        'portal/_profile_facts.html',
+        {
+            'profile': profile,
+            'p': profile,
+            'facts_form': ProfileFactsForm(instance=profile, user=request.user),
+        },
+        request=request,
+    )
+
 
 @login_required
 def profile_edit(request):
@@ -329,15 +361,51 @@ def profile_edit(request):
     остальное — в ``Profile``. Обе записи сохраняются в одной транзакции,
     чтобы не осталось полу-обновлённого профиля. Смена группы попадает в
     ``ProfileHistory`` через сигнал ``pre_save`` (apps/accounts/signals.py).
+
+    Блок 01 профиля редактируется на месте: та же вьюха принимает POST с
+    ``scope=profile-facts`` (только пять полей) и на AJAX отвечает JSON с
+    готовым HTML блока, а без JS — обычным переходом в профиль.
     """
     profile, _ = Profile.objects.get_or_create(user=request.user)
+    inline = (request.POST.get('scope') or '').strip() == INLINE_PROFILE_SCOPE
     if request.method == 'POST':
-        form = ProfileEditForm(request.POST, request.FILES, instance=profile, user=request.user)
+        form_class = ProfileFactsForm if inline else ProfileEditForm
+        form = form_class(request.POST, request.FILES, instance=profile, user=request.user)
         if form.is_valid():
             with transaction.atomic():
-                form.save_user()
+                if not inline:
+                    form.save_user()
                 profile = form.save()
-            messages.success(request, 'Профиль обновлён.')
+            message = 'Данные студента обновлены.' if inline else 'Профиль обновлён.'
+            if inline:
+                if wants_json(request):
+                    return JsonResponse({
+                        'ok': True,
+                        'message': message,
+                        'profile': profile_facts_payload(profile),
+                        'html': render_profile_facts(request, profile),
+                    })
+                messages.success(request, message)
+                return redirect('portal:profile')
+            messages.success(request, message)
+            return redirect('portal:profile')
+
+        errors = form_error_messages(form)
+        if inline:
+            # AJAX получает ошибки по полям и остаётся в режиме правки;
+            # без JS (fallback) — обычный переход с сообщениями.
+            if wants_json(request):
+                return JsonResponse({
+                    'ok': False,
+                    'message': errors[0] if errors else 'Не удалось сохранить данные.',
+                    'errors': errors,
+                    'fields': {
+                        name: [str(error) for error in field_errors]
+                        for name, field_errors in form.errors.items()
+                    },
+                }, status=400)
+            for error in errors:
+                messages.error(request, error)
             return redirect('portal:profile')
     else:
         form = ProfileEditForm(instance=profile, user=request.user)

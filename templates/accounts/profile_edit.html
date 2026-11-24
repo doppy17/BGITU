@@ -48,8 +48,9 @@
       <div class="profile-edit__grid">
         {% include 'accounts/_profile_edit_field.html' with field=form.group wide=1 %}
         {% include 'accounts/_profile_edit_field.html' with field=form.subgroup %}
+        {% include 'accounts/_profile_edit_field.html' with field=form.course %}
         {% include 'accounts/_profile_edit_field.html' with field=form.enrollment_year %}
-        {% include 'accounts/_profile_edit_field.html' with field=form.institute_override %}
+        {% include 'accounts/_profile_edit_field.html' with field=form.institute %}
         {% include 'accounts/_profile_edit_field.html' with field=form.department %}
         {% include 'accounts/_profile_edit_field.html' with field=form.record_book %}
       </div>

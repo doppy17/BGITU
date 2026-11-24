@@ -85,6 +85,9 @@
   min-width: 0;
   overflow-wrap: anywhere;
 }
+/* Пустой пункт не показываем: шапка обновляется после правки блока 01. */
+.profile-hero__meta-item:empty { display: none; }
+.profile-hero__meta:not(:has(.profile-hero__meta-item:not(:empty))) { display: none; }
 /* Разделитель между соседними пунктами — вертикальный hairline */
 .profile-hero__meta-item + .profile-hero__meta-item::before {
   content: "";
@@ -95,6 +98,7 @@
   background: var(--line-strong);
   vertical-align: -0.05em;
 }
+.profile-hero__meta-item:empty + .profile-hero__meta-item::before { display: none; }
 .profile-hero__edit {
   justify-self: end;
   align-self: start;
@@ -175,6 +179,96 @@
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
 }
+
+/* ---------- 01 · Режим редактирования прямо в профиле ---------- */
+/* Авторский display (grid/flex) перебивает UA-правило [hidden] — иначе
+   «скрытая» форма и просмотр остаются видимыми одновременно. */
+.profile-facts-panel [hidden] { display: none !important; }
+.profile-facts-panel__edit { white-space: nowrap; }
+/* Пока блок в режиме правки, верхняя кнопка не нужна — но место занимает,
+   чтобы заголовок не сдвигался. */
+.profile-facts-panel.is-editing .profile-facts-panel__edit { visibility: hidden; }
+/* Строка под списком зарезервирована: сообщение «Сохранено» появляется
+   без сдвига содержимого блока. */
+.profile-facts-panel__saved {
+  min-height: 1.35em;
+  margin: 10px 0 0;
+  color: var(--accent-text);
+  font-size: 0.8125rem;
+  line-height: 1.35;
+}
+
+.profile-edit-inline { margin: 0; }
+.profile-edit-inline__grid {
+  display: grid;
+  min-width: 0;
+}
+.profile-edit-inline__row {
+  display: grid;
+  grid-template-columns: minmax(7.5em, 12em) minmax(0, 1fr);
+  align-items: center;
+  gap: 4px 20px;
+  min-width: 0;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+}
+.profile-edit-inline__row:first-child { padding-top: 0; }
+.profile-edit-inline__row--static { border-bottom: 0; }
+.profile-edit-inline__key {
+  color: var(--text-muted);
+  font-size: 0.625rem;
+  line-height: 1.5;
+}
+.profile-edit-inline__control {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.profile-edit-inline__control .input,
+.profile-edit-inline__control .sel {
+  width: 100%;
+  min-width: 0;
+}
+.profile-edit-inline__control .sel__btn { min-height: 46px; }
+.profile-edit-inline__static {
+  display: flex;
+  align-items: center;
+  min-height: 46px;
+  font: 500 1rem/1.4 var(--font-text);
+  font-variant-numeric: tabular-nums;
+}
+.profile-edit-inline__note {
+  color: var(--text-faint);
+  font-size: 0.625rem;
+  line-height: 1.4;
+}
+.profile-edit-inline__error {
+  margin: 0;
+  color: var(--accent-text);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+.profile-edit-inline__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  padding-top: 14px;
+}
+.profile-edit-inline__status {
+  margin: 0;
+  min-height: 1.35em;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  line-height: 1.35;
+}
+.profile-edit-inline__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: auto;
+}
+.profile-facts-panel.is-saving .profile-edit-inline { opacity: 0.72; }
 
 /* ---------- 02 · Студенческий билет ---------- */
 .profile-ticket__box { display: block; }
@@ -694,6 +788,20 @@
     gap: 3px;
   }
   .profile-spec__val { font-size: 0.9375rem; }
+
+  .profile-edit-inline__row {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    gap: 3px;
+  }
+  .profile-edit-inline__foot {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .profile-edit-inline__actions {
+    margin-left: 0;
+    justify-content: flex-start;
+  }
 
   .profile-ticket__h2 { grid-template-columns: auto minmax(0, 1fr) auto; }
   .profile-ticket__num { display: none; }

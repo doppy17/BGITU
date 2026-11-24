@@ -234,10 +234,10 @@ class ProfileEditTests(TestCase):
         response = self.client.post(self.url, {
             'last_name': 'Портнов', 'first_name': 'Георгий', 'email': 'student@example.ru',
             'group': self.group_a.pk,
-            'enrollment_year': '1800',
+            'enrollment_year': '1999',
         })
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'не может быть раньше 1990')
+        self.assertContains(response, 'не может быть раньше 2000')
 
     def test_profile_page_has_edit_link(self):
         self.login()
