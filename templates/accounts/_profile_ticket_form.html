@@ -1,0 +1,59 @@
+{% comment %}
+Форма студенческого билета (задача PC): студент сам заполняет приказ,
+дату выдачи, уровень, форму обучения и направление. Все поля необязательны —
+билет заполняет деканат, но если данных нет, их можно внести здесь.
+Ожидает в контексте ``p`` — профиль пользователя.
+{% endcomment %}
+<details class="contact-ticket"{% if not p.education_level or not p.study_form %} open{% endif %}>
+  <summary class="contact-ticket__summary mono">Заполнить данные билета</summary>
+
+  <form class="contact-ticket__form" method="post" action="{% url 'accounts:ticket_save' %}">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.path }}">
+
+    <div class="contact-ticket__grid">
+      <label class="contact-form__field">
+        <span class="contact-form__label mono">Приказ о зачислении</span>
+        <input class="input" type="text" name="ticket_order" maxlength="60"
+               value="{{ p.ticket_order }}" placeholder="№ 1234-с от 01.09.2025">
+      </label>
+
+      <label class="contact-form__field">
+        <span class="contact-form__label mono">Дата выдачи</span>
+        <input class="input" type="date" name="ticket_issue_date"
+               value="{{ p.ticket_issue_date|date:'Y-m-d' }}">
+      </label>
+
+      <label class="contact-form__field">
+        <span class="contact-form__label mono">Уровень образования</span>
+        <select class="input" name="education_level">
+          <option value="">— не указано —</option>
+          {% for value, label in p.EDUCATION_LEVEL_CHOICES %}
+          <option value="{{ value }}"{% if p.education_level == value %} selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </label>
+
+      <label class="contact-form__field">
+        <span class="contact-form__label mono">Форма обучения</span>
+        <select class="input" name="study_form">
+          <option value="">— не указано —</option>
+          {% for value, label in p.STUDY_FORM_CHOICES %}
+          <option value="{{ value }}"{% if p.study_form == value %} selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </label>
+
+      <label class="contact-form__field contact-ticket__wide">
+        <span class="contact-form__label mono">Направление подготовки</span>
+        <input class="input" type="text" name="direction" maxlength="160"
+               value="{{ p.direction }}" placeholder="например, 09.03.02 Информационные системы и технологии">
+      </label>
+    </div>
+
+    <div class="contact-form__actions">
+      <button class="btn btn--accent btn--sm" type="submit">Сохранить билет</button>
+      <span class="contact-form__hint">Поля необязательны: если билет уже выдан, данные подставит деканат.</span>
+    </div>
+  </form>
+</details>

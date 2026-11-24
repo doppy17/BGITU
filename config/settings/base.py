@@ -46,6 +46,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'apps.accounts.context_processors.role_context',
+                'apps.accounts.context_processors.dev_access',
                 'apps.site.context_processors.search_index',
             ],
         },
@@ -109,3 +110,12 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 25 * 1024 * 1024
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 30
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+
+# --- Одноразовые ключи доступа разработчика (временная функция) ---
+# Флаг выключает страницу /access/ и команду выпуска ключей без правки кода:
+#   BGITU_DEV_KEYS=0 python manage.py runserver
+DEV_ACCESS_KEYS = os.environ.get('BGITU_DEV_KEYS', '1').strip().lower() not in ('0', 'false', 'no', 'off')
+DEV_ACCESS_KEYS_TTL_DAYS = int(os.environ.get('BGITU_DEV_KEYS_TTL_DAYS', '14'))
+# Куда `manage.py dev_key` пишет выпущенный код (первая строка файла).
+DEV_ACCESS_KEYS_FILE = os.environ.get('BGITU_DEV_KEYS_FILE', '~/.hermes/status/bgitu-dev-key.txt')

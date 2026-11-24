@@ -1,0 +1,103 @@
+{% comment %}
+Блок «Доп. контакты» (задача PC): список контактов, которые пользователь
+добавил сам, и форма добавления. Число контактов не ограничено, один из
+них помечается основным. Параметр include: contacts (queryset) — необязателен,
+по умолчанию берутся все контакты текущего пользователя.
+{% endcomment %}
+{% with contact_list=contacts|default:user.contacts.all %}
+<div class="contact-block" id="profile-contacts">
+
+  {% if contact_list %}
+  <ul class="contact-list" role="list">
+    {% for contact in contact_list %}
+    <li class="contact-item{% if contact.is_primary %} contact-item--primary{% endif %}">
+      <span class="contact-item__kind mono">{{ contact.get_kind_display }}</span>
+
+      <div class="contact-item__body">
+        <span class="contact-item__value">
+          {% if contact.kind == 'email' %}
+            <a href="mailto:{{ contact.value }}">{{ contact.value }}</a>
+          {% elif contact.kind == 'phone' %}
+            <a href="tel:{{ contact.value|cut:' ' }}">{{ contact.value }}</a>
+          {% elif contact.kind == 'telegram' %}
+            {% if contact.value|slice:':1' == '@' %}
+              <a href="https://t.me/{{ contact.value|slice:'1:' }}" rel="noopener noreferrer" target="_blank">{{ contact.value }}</a>
+            {% elif contact.value|slice:':4' == 'http' %}
+              <a href="{{ contact.value }}" rel="noopener noreferrer" target="_blank">{{ contact.value }}</a>
+            {% else %}{{ contact.value }}{% endif %}
+          {% elif contact.kind == 'vk' %}
+            {% if contact.value|slice:':1' == '@' %}
+              <a href="https://vk.com/{{ contact.value|slice:'1:' }}" rel="noopener noreferrer" target="_blank">{{ contact.value }}</a>
+            {% elif contact.value|slice:':4' == 'http' %}
+              <a href="{{ contact.value }}" rel="noopener noreferrer" target="_blank">{{ contact.value }}</a>
+            {% else %}{{ contact.value }}{% endif %}
+          {% else %}{{ contact.value }}{% endif %}
+        </span>
+
+        {% if contact.label or contact.is_primary %}
+        <span class="contact-item__meta">
+          {% if contact.is_primary %}<span class="contact-item__badge">основной</span>{% endif %}
+          {% if contact.label %}<span class="contact-item__label">{{ contact.label }}</span>{% endif %}
+        </span>
+        {% endif %}
+      </div>
+
+      <div class="contact-item__actions">
+        {% if not contact.is_primary %}
+        <form method="post" action="{% url 'accounts:contact_primary' contact.pk %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.path }}">
+          <button class="btn btn--ghost btn--sm" type="submit">Сделать основным</button>
+        </form>
+        {% endif %}
+        <form method="post" action="{% url 'accounts:contact_delete' contact.pk %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.path }}">
+          <button class="btn btn--ghost btn--sm contact-item__delete" type="submit">Удалить</button>
+        </form>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="contact-empty">Контактов пока нет — добавьте телефон, почту или мессенджер.</p>
+  {% endif %}
+
+  <form class="contact-form" method="post" action="{% url 'accounts:contact_add' %}">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.path }}">
+    <div class="contact-form__grid">
+      <label class="contact-form__field" for="contactKind">
+        <span class="contact-form__label mono">Тип</span>
+        <select class="input" id="contactKind" name="kind" required>
+          {% for kind_value, kind_label in user.contacts.model.KIND_CHOICES %}
+          <option value="{{ kind_value }}">{{ kind_label }}</option>
+          {% endfor %}
+        </select>
+      </label>
+
+      <label class="contact-form__field" for="contactValue">
+        <span class="contact-form__label mono">Контакт</span>
+        <input class="input" id="contactValue" type="text" name="value" maxlength="200" required
+               autocomplete="off" placeholder="+7 900 000-00-00, name@example.ru или @nickname">
+      </label>
+
+      <label class="contact-form__field" for="contactLabel">
+        <span class="contact-form__label mono">Подпись</span>
+        <input class="input" id="contactLabel" type="text" name="label" maxlength="60"
+               autocomplete="off" placeholder="например, «личный»">
+      </label>
+
+      <label class="contact-form__check" for="contactPrimary">
+        <input id="contactPrimary" type="checkbox" name="is_primary" value="1">
+        <span>Сделать основным</span>
+      </label>
+    </div>
+
+    <div class="contact-form__actions">
+      <button class="btn btn--accent btn--sm" type="submit">Добавить контакт</button>
+      <span class="contact-form__hint">Телефон, почта и мессенджеры проверяются по типу. Количество контактов не ограничено.</span>
+    </div>
+  </form>
+</div>
+{% endwith %}

@@ -1,4 +1,7 @@
 """Во всех шаблонах доступны роль и флаги текущего пользователя."""
+from django.conf import settings
+from django.urls import NoReverseMatch, reverse
+
 from .permissions import get_role, role_can
 
 PERMISSIONS = {
@@ -34,7 +37,21 @@ def role_context(request):
         'perms': {key: role_can(user, field) for key, field in PERMISSIONS.items()},
         'ui_theme': ui_theme(chosen),
     }
-    return {
-        'current_role': get_role(user),
-        'perms': {key: role_can(user, field) for key, field in PERMISSIONS.items()},
-    }
+
+
+def dev_access(request):
+    """Ссылка «Ввести ключ доступа» — только когда ключи включены в настройках.
+
+    Если настройки нет или страница /access/ ещё не подключена, флаг остаётся
+    выключенным: шаблон не роняет страницу входа.
+    """
+    try:
+        enabled = bool(getattr(settings, 'DEV_ACCESS_KEYS', None))
+    except Exception:
+        enabled = False
+    if enabled:
+        try:
+            reverse('accounts:dev_key')
+        except NoReverseMatch:
+            enabled = False
+    return {'dev_keys_enabled': enabled}

@@ -1,0 +1,18 @@
+{% comment %}
+Своя разметка ClearableFileInput: строка «текущее фото» + компактная
+кнопка удаления. Классы префиксом .profile-edit*, чтобы не задевать
+другие формы Django.
+{% endcomment %}
+{% if widget.is_initial %}
+<div class="profile-edit__current">
+  <span class="profile-edit__current-label mono">текущее фото</span>
+  <a class="profile-edit__current-link" href="{{ widget.value.url }}">{{ widget.value.name|cut:"profiles/" }}</a>
+  {% if not widget.required %}
+    <label class="profile-edit__clear" for="{{ widget.checkbox_id }}">
+      <input type="checkbox" name="{{ widget.checkbox_name }}" id="{{ widget.checkbox_id }}">
+      <span>удалить</span>
+    </label>
+  {% endif %}
+</div>
+{% endif %}
+<input type="{{ widget.type }}" name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>

@@ -1,0 +1,263 @@
+/* ============================================================
+   Вкладки профиля (E4): «Личная информация», «Доп. контакты»,
+   «Безопасность». Все цвета — из токенов темы (paper / brass /
+   surik / latun), поэтому файл не задаёт ни одного hex.
+   ============================================================ */
+
+/* ---------- Полоса вкладок ---------- */
+.profile-tabs {
+  display: flex;
+  width: max-content;
+  min-width: 0;
+  max-width: 100%;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--bg-glass);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+.profile-tabs__list {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.profile-tabs__item { display: flex; min-width: 0; }
+.profile-tabs__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  color: var(--text-muted);
+  font: 600 0.9375rem/1.2 var(--font-text);
+  white-space: nowrap;
+  transition: color var(--dur-fast), background var(--dur-fast), border-color var(--dur-fast);
+}
+.profile-tabs__link:hover {
+  color: var(--text);
+  background: color-mix(in oklab, var(--brand-ink) 7%, transparent);
+}
+.profile-tabs__link:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+/* Активная вкладка — заливка акцента: текст берёт --accent-ink,
+   поэтому контраст держится во всех четырёх темах. */
+.profile-tabs__link.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  box-shadow: 0 6px 18px color-mix(in oklab, var(--accent) 24%, transparent);
+}
+.profile-tabs__link.is-active:hover {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.profile-tabs__icon {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+
+/* На узких экранах три равные колонки: подписи переносятся,
+   горизонтального скролла нет даже при a11y-fs2. */
+@media (max-width: 700px) {
+  .profile-tabs {
+    width: 100%;
+    border-radius: var(--radius-m);
+  }
+  .profile-tabs__list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+    width: 100%;
+  }
+  .profile-tabs__link {
+    height: 100%;
+    padding: 8px 8px;
+    font-size: 0.8125rem;
+    line-height: 1.25;
+    white-space: normal;
+    text-align: center;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+  }
+  .profile-tabs__icon { display: none; }
+}
+
+/* ---------- Общая обвязка подстраниц профиля ---------- */
+.profile-subpage__lead {
+  margin: 0;
+  max-width: 70ch;
+  color: var(--text-muted);
+}
+.profile-subpage__note {
+  margin: 14px 0 0;
+  color: var(--text-faint);
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+}
+
+/* ---------- «Доп. контакты» ---------- */
+.profile-facts--duo { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.profile-contacts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.profile-contact-card {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m);
+  background: var(--bg-panel);
+}
+.profile-contact-card__icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+.profile-contact-card__icon svg { width: 20px; height: 20px; }
+.profile-contact-card__glyph {
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+.profile-contact-card__body {
+  display: grid;
+  gap: 3px;
+  flex: 1 1 130px;
+  min-width: 0;
+}
+.profile-contact-card__name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.profile-contact-card__value {
+  color: var(--text-faint);
+  font-size: 0.875rem;
+}
+.profile-contact-card .badge { flex: none; }
+
+/* ---------- «Безопасность» ---------- */
+.profile-security {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 16px;
+  align-items: start;
+  min-width: 0;
+}
+.profile-security > * { min-width: 0; }
+
+.profile-security__form {
+  display: grid;
+  gap: 16px;
+}
+.profile-security__actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.profile-security__alert,
+.profile-security__error {
+  color: var(--accent-text);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+.profile-security__alert {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border: 1px solid color-mix(in oklab, var(--accent) 55%, transparent);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-s);
+  background: var(--bg-raised);
+}
+.profile-security__alert .errorlist,
+.profile-security__error .errorlist {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Подсказка с валидаторами Django приходит списком */
+.field-hint ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+.field-hint li + li { margin-top: 2px; }
+
+/* «Последний вход» — крупная дата табличными цифрами */
+.profile-lastlogin {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin: 4px 0 0;
+  font-variant-numeric: tabular-nums;
+}
+.profile-lastlogin__date {
+  font: 700 clamp(1.5rem, 1.15rem + 1vw, 2rem)/1 var(--font-display);
+  letter-spacing: -0.02em;
+}
+.profile-lastlogin__time {
+  color: var(--text-muted);
+  font-size: 0.9375rem;
+}
+.profile-lastlogin__empty { margin: 4px 0 0; }
+
+.profile-security__meta {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.profile-security__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  min-width: 0;
+  font-size: 0.875rem;
+}
+.profile-security__row dt {
+  color: var(--text-faint);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+}
+.profile-security__row dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+@media (max-width: 900px) {
+  .profile-security { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  .profile-facts--duo { grid-template-columns: minmax(0, 1fr); }
+  .profile-contacts { grid-template-columns: minmax(0, 1fr); }
+  .profile-security__actions .btn { width: 100%; }
+}

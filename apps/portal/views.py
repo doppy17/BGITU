@@ -5,7 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.shortcuts import redirect, render
 
-from apps.accounts.models import RoleRequest
+from apps.accounts.models import ProfileHistory, RoleRequest
+from apps.accounts.performance import performance_by_semester, total_average
 from apps.accounts.permissions import get_role, role_can
 from apps.education.models import Assignment, Enrollment, Grade, Submission
 from apps.schedule.import_service import WEEKDAYS
@@ -40,7 +41,16 @@ def stipendia_view(request):
 
 @login_required
 def profile_view(request):
-    return render(request, 'portal/profile.html')
+    """Профиль: данные студента, билет, контакты, успеваемость, история."""
+    user = request.user
+    profile = getattr(user, 'profile', None)
+    return render(request, 'portal/profile.html', {
+        'profile': profile,
+        'role': get_role(user),
+        'performance': performance_by_semester(user),
+        'total_average': total_average(user),
+        'histories': ProfileHistory.objects.filter(user=user),
+    })
 
 
 @login_required

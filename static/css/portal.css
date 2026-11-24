@@ -327,11 +327,6 @@ code { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--text-mu
   text-decoration: none;
 }
 .auth-alt a:hover { color: var(--accent-text-hover); }
-.auth-demo { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--line); }
-.auth-demo summary { cursor: pointer; font-size: 0.6875rem; letter-spacing: 0.06em; }
-.auth-demo ul { display: grid; gap: 4px; margin-top: 8px; padding-left: 0; list-style: none; }
-.auth-demo li { color: var(--text-muted); font-size: 0.8125rem; }
-.auth-demo b { color: var(--text); font-family: var(--font-mono); font-weight: 500; }
 .error-card { text-align: left; }
 .error-card .btn { margin-top: 18px; text-decoration: none; }
 
@@ -411,4 +406,193 @@ code { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--text-mu
 }
 @media (prefers-reduced-motion: reduce) {
   .footer__word { transition: none; }
+}
+
+/* ============================================================
+   Редактирование профиля (D2): фото, личные данные, учёба.
+   Все правила с префиксом .profile-edit*, чтобы не задевать
+   остальные страницы кабинета.
+   ============================================================ */
+.profile-edit {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.profile-edit > * { min-width: 0; }
+.profile-edit__head h1 {
+  margin: 0 0 6px;
+  hyphens: none;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+.profile-edit__lead {
+  margin: 0;
+  max-width: 68ch;
+  color: var(--text-muted);
+}
+
+.profile-edit__form {
+  display: grid;
+  gap: 26px;
+}
+.profile-edit__section {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+.profile-edit__legend {
+  margin: 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+  color: var(--text-muted);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+/* Подписи и подсказки этой формы — чуть контрастнее глобального .field-hint */
+.profile-edit .field > label,
+.profile-edit .field__label,
+.profile-edit .field-hint {
+  color: var(--text-muted);
+}
+
+.profile-edit__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 20px;
+}
+
+/* Фото: круглое превью и поле загрузки рядом */
+.profile-edit__photo {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(16px, 2.5vw, 24px);
+  flex-wrap: wrap;
+}
+.profile-edit__avatar {
+  width: 104px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  background: var(--bg-panel, var(--bg-raised));
+  box-shadow: 0 0 0 6px color-mix(in oklab, var(--accent) 8%, transparent);
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+.profile-edit__avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.profile-edit__avatar-empty {
+  color: var(--text-faint);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  user-select: none;
+}
+.profile-edit__photo-field {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+/* Строка «текущее фото» и компактное «удалить» */
+.profile-edit__current {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin: 0 0 4px;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+.profile-edit__current-label {
+  color: var(--text-muted);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.profile-edit__current-link {
+  color: var(--accent-text);
+  overflow-wrap: anywhere;
+}
+.profile-edit__clear {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+.profile-edit__clear input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+/* Нативный file-input: аккуратная рамка и перенос имени файла */
+.profile-edit__file {
+  height: auto;
+  min-height: 46px;
+  padding: 10px 12px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+.profile-edit__file::file-selector-button {
+  margin-right: 12px;
+  padding: 8px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-s);
+  background: var(--bg);
+  color: var(--text);
+  font: 500 0.8125rem/1 var(--font-text);
+  cursor: pointer;
+}
+.profile-edit__file::file-selector-button:hover {
+  border-color: var(--accent-text);
+  color: var(--accent-text);
+}
+
+/* Ошибки полей и формы — в цвете акцента, как .flash--error */
+.profile-edit__req { color: var(--accent-text); }
+.profile-edit__error,
+.profile-edit__alert {
+  color: var(--accent-text);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+.profile-edit__error .errorlist,
+.profile-edit__alert .errorlist {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.profile-edit__alert {
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid color-mix(in oklab, var(--accent) 55%, transparent);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-s);
+  background: var(--bg-raised);
+}
+
+/* Кнопки: «Отмена» слева от «Сохранить», на мобиле — столбиком */
+.profile-edit__actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 720px) {
+  .profile-edit__grid { grid-template-columns: minmax(0, 1fr); }
+  .profile-edit__avatar { width: 84px; }
+  .profile-edit__actions { flex-direction: column-reverse; }
+  .profile-edit__actions .btn { width: 100%; }
 }

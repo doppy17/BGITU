@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Доп. контакты{% endblock %}
+{% block content %}
+<div class="profile-page profile-subpage">
+  <header class="page-head">
+    <p class="mono dim">личный кабинет · профиль</p>
+    <h1>Доп. контакты</h1>
+    <p class="profile-subpage__lead">Телефон и почта для связи с вами — основные данные профиля. Дополнительные контакты добавляются в блоке «Мои контакты» ниже.</p>
+  </header>
+
+  {% include 'accounts/_profile_tabs.html' %}
+
+  <section class="panel profile-panel" aria-labelledby="profileContactsTitle">
+    <header class="panel__head profile-panel__head">
+      <span class="panel__num mono">01</span>
+      <div class="panel__title">
+        <h2 id="profileContactsTitle">Контактные данные</h2>
+      </div>
+      <a class="btn btn--ghost btn--sm" href="{% url 'accounts:profile_edit' %}">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4l10-10-4-4L4 16v4Z"/><path d="m13 5 4 4"/></svg>
+        Изменить
+      </a>
+    </header>
+
+    <dl class="profile-facts profile-facts--duo">
+      <div class="profile-fact">
+        <dt class="profile-fact__label mono">Телефон</dt>
+        <dd class="profile-fact__value">
+          {% if profile.phone %}<a href="tel:{{ profile.phone|cut:' ' }}">{{ profile.phone }}</a>{% else %}<span class="muted">не указан</span>{% endif %}
+        </dd>
+      </div>
+      <div class="profile-fact">
+        <dt class="profile-fact__label mono">Почта</dt>
+        <dd class="profile-fact__value">
+          {% if user.email %}<a href="mailto:{{ user.email }}">{{ user.email }}</a>{% else %}<span class="muted">не указана</span>{% endif %}
+        </dd>
+      </div>
+      <div class="profile-fact">
+        <dt class="profile-fact__label mono">Группа</dt>
+        <dd class="profile-fact__value">{{ profile.group.code|default:'—' }}</dd>
+      </div>
+      <div class="profile-fact">
+        <dt class="profile-fact__label mono">Кафедра</dt>
+        <dd class="profile-fact__value">{{ profile.department|default:'—' }}</dd>
+      </div>
+    </dl>
+
+    <p class="profile-subpage__note mono">Почта — логин в кабинете, поэтому адрес уникален. Оба поля меняются на странице «Изменить».</p>
+  </section>
+
+  <section class="panel profile-panel" aria-labelledby="profileMessengersTitle">
+    <header class="panel__head profile-panel__head">
+      <span class="panel__num mono">02</span>
+      <div class="panel__title">
+        <h2 id="profileMessengersTitle">Мои контакты</h2>
+      </div>
+    </header>
+
+    <p class="profile-subpage__lead">Добавьте телефон, почту или мессенджер — количество контактов не ограничено. Один из них можно отметить основным.</p>
+
+    {% include 'accounts/_profile_contacts.html' %}
+  </section>
+</div>
+{% endblock %}

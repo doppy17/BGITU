@@ -1,0 +1,243 @@
+/* ============================================================
+   Контакты пользователя (задача PC): список, действия и форма
+   добавления. Только новые классы .contact-*; цвета — из токенов
+   темы, поэтому файл работает во всех четырёх оформлениях.
+   ============================================================ */
+
+.contact-block {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+/* ---------- Список контактов ---------- */
+.contact-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.contact-item {
+  display: grid;
+  grid-template-columns: minmax(96px, 140px) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px 18px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.contact-item--primary {
+  /* Основной контакт отмечается тонкой линией акцента слева. */
+  box-shadow: inset 2px 0 0 var(--accent);
+  padding-left: 14px;
+}
+
+.contact-item__kind {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.contact-item__body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.contact-item__value {
+  font: 500 1rem/1.35 var(--font-text);
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.contact-item__value a {
+  color: var(--accent-text);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--dur-fast);
+}
+
+.contact-item__value a:hover {
+  border-bottom-color: currentColor;
+}
+
+.contact-item__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.contact-item__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px;
+  border: 1px solid color-mix(in oklab, var(--accent) 45%, transparent);
+  border-radius: var(--radius-pill);
+  color: var(--accent-text);
+  font: 600 0.6875rem/1.6 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.contact-item__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.contact-item__actions form { margin: 0; }
+
+.contact-item__delete {
+  color: var(--text-muted);
+}
+
+.contact-item__delete:hover,
+.contact-item__delete:focus-visible {
+  color: var(--text);
+  border-color: var(--line-strong);
+}
+
+/* ---------- Пустое состояние ---------- */
+.contact-empty {
+  margin: 0;
+  padding: 18px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-m);
+  color: var(--text-muted);
+  font-size: 0.9375rem;
+  text-align: center;
+}
+
+/* ---------- Форма добавления ---------- */
+.contact-form {
+  display: grid;
+  gap: 14px;
+  padding-top: 4px;
+}
+
+.contact-form__grid {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.7fr) minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: end;
+}
+
+.contact-form__field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.contact-form__label {
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.contact-form__check {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.contact-form__check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}
+
+.contact-form__check input:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.contact-form__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+}
+
+.contact-form__hint {
+  color: var(--text-faint);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+/* ---------- Блок билета: компактная форма ---------- */
+.contact-ticket {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.contact-ticket__summary {
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.contact-ticket__summary:hover { color: var(--text); }
+
+.contact-ticket__summary:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.contact-ticket__form {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.contact-ticket__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.contact-ticket__wide { grid-column: 1 / -1; }
+
+/* ---------- Адаптив ---------- */
+@media (max-width: 900px) {
+  .contact-item {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .contact-item__kind {
+    grid-column: 1 / -1;
+  }
+  .contact-form__grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .contact-ticket__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .contact-item {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+  .contact-item__actions {
+    justify-content: flex-start;
+  }
+  .contact-form__grid,
+  .contact-ticket__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

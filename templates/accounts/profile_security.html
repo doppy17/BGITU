@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Безопасность{% endblock %}
+{% block content %}
+<div class="profile-page profile-subpage">
+  <header class="page-head">
+    <p class="mono dim">личный кабинет · профиль</p>
+    <h1>Безопасность</h1>
+    <p class="profile-subpage__lead">Пароль от учётной записи и сведения о последнем входе.</p>
+  </header>
+
+  {% include 'accounts/_profile_tabs.html' %}
+
+  <div class="profile-security">
+    <section class="panel profile-panel" aria-labelledby="profilePasswordTitle">
+      <header class="panel__head profile-panel__head">
+        <span class="panel__num mono">01</span>
+        <div class="panel__title">
+          <h2 id="profilePasswordTitle">Смена пароля</h2>
+        </div>
+      </header>
+
+      {% if form.non_field_errors %}
+        <div class="profile-security__alert" role="alert">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <form class="profile-security__form" method="post" action="{% url 'accounts:profile_security' %}">
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="field">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}<small class="field-hint" id="{{ field.id_for_label }}-hint">{{ field.help_text }}</small>{% endif %}
+            {% if field.errors %}<div class="profile-security__error" role="alert">{{ field.errors }}</div>{% endif %}
+          </div>
+        {% endfor %}
+
+        <div class="profile-security__actions">
+          <button class="btn btn--accent" type="submit">Сменить пароль</button>
+        </div>
+      </form>
+    </section>
+
+    <aside class="panel profile-panel profile-security__aside" aria-labelledby="profileLastLoginTitle">
+      <header class="panel__head profile-panel__head">
+        <span class="panel__num mono">02</span>
+        <div class="panel__title">
+          <h2 id="profileLastLoginTitle">Последний вход</h2>
+        </div>
+      </header>
+
+      {% if user.last_login %}
+        <p class="profile-lastlogin">
+          <span class="profile-lastlogin__date">{{ user.last_login|date:"d.m.Y" }}</span>
+          <span class="profile-lastlogin__time mono">{{ user.last_login|date:"H:i" }}</span>
+        </p>
+      {% else %}
+        <p class="profile-lastlogin__empty muted">Вход ещё не зафиксирован.</p>
+      {% endif %}
+
+      <dl class="profile-security__meta">
+        <div class="profile-security__row">
+          <dt class="mono">Учётная запись</dt>
+          <dd>{{ user.username }}</dd>
+        </div>
+        <div class="profile-security__row">
+          <dt class="mono">Почта</dt>
+          <dd>{% if user.email %}{{ user.email }}{% else %}—{% endif %}</dd>
+        </div>
+        <div class="profile-security__row">
+          <dt class="mono">Роль</dt>
+          <dd>{% if profile.role %}{{ profile.role.name }}{% elif current_role %}{{ current_role.name }}{% else %}—{% endif %}</dd>
+        </div>
+      </dl>
+
+      <p class="profile-subpage__note mono">Время последнего входа обновляется при каждом входе в кабинет. После смены пароля остальные сессии завершаются, текущая — остаётся.</p>
+    </aside>
+  </div>
+</div>
+{% endblock %}

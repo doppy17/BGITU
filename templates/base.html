@@ -9,15 +9,20 @@
   <meta name="theme-color" content="#f2eee6">
   <link rel="icon" href="{{ ui_theme|favicon_uri }}">
   <script src="{% static 'js/theme.js' %}"></script>
+  <script src="{% static 'js/motion.js' %}"></script>
   <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
   <link rel="stylesheet" href="{% static 'css/tokens.css' %}">
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
   <link rel="stylesheet" href="{% static 'css/components.css' %}">
   <link rel="stylesheet" href="{% static 'css/cabinet.css' %}">
   <link rel="stylesheet" href="{% static 'css/portal.css' %}">
+  <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+  <link rel="stylesheet" href="{% static 'css/profile-tabs.css' %}">
+  <link rel="stylesheet" href="{% static 'css/contacts.css' %}">
   <link rel="stylesheet" href="{% static 'site/css/header.css' %}">
   <link rel="stylesheet" href="{% static 'site/css/search.css' %}">
   <link rel="stylesheet" href="{% static 'site/css/a11y.css' %}">
+  <link rel="stylesheet" href="{% static 'css/motion.css' %}">
 </head>
 <body id="top">
 <canvas class="bg-canvas" aria-hidden="true"></canvas>
@@ -62,7 +67,7 @@
       <svg class="cab-nav__icon cab-nav__icon--roles" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.6-3 7.6-7 9-4-1.4-7-4.4-7-9V6l7-3Z"/><path d="M9 12l2 2 4-4.2"/></svg>
       <span class="cab-nav__lbl">Роли</span>
     </button>
-    <button class="cab-nav__item" type="button" data-href="{% url 'portal:profile' %}" {% if request.path == '/cabinet/profile/' %}aria-current="page"{% endif %} data-tip="Профиль" style="--i: 7">
+    <button class="cab-nav__item" type="button" data-href="{% url 'portal:profile' %}" {% if '/cabinet/profile/' in request.path %}aria-current="page"{% endif %} data-tip="Профиль" style="--i: 7">
       <svg class="cab-nav__icon cab-nav__icon--profile" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="8.5" r="3.5"/><path d="M4.5 20c1.5-3.5 4.2-5 7.5-5s6 1.5 7.5 5"/></svg>
       <span class="cab-nav__lbl">Профиль</span>
     </button>

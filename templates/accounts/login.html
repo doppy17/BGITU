@@ -27,14 +27,7 @@
 
 <p class="auth-alt">Нет аккаунта? <a href="{% url 'accounts:register' %}">Зарегистрироваться</a></p>
 
-<details class="auth-demo">
-  <summary class="mono dim">демо-доступы · пароль demo12345</summary>
-  <ul>
-    <li><b>student</b> — студент ИСТ-201</li>
-    <li><b>teacher</b> — преподаватель</li>
-    <li><b>dean</b> — деканат</li>
-    <li><b>admin</b> — администратор</li>
-    <li><b>developer</b> — разработчик (полный доступ)</li>
-  </ul>
-</details>
+{% if dev_keys_enabled %}
+<p class="auth-alt">Есть ключ доступа? <a href="{% url 'accounts:dev_key' %}">Ввести ключ доступа →</a></p>
+{% endif %}
 {% endblock %}

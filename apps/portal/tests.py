@@ -169,13 +169,17 @@ class NavCompositionTests(TestCase):
         self.assertContains(response, 'cab-nav__user')
 
     def test_all_sections_are_wip(self):
-        """Все разделы в режиме «в разработке»."""
+        """Разделы-заглушки в режиме «в разработке»; профиль уже реализован."""
         self.client.force_login(self.dev)
         for url in ('/cabinet/', '/cabinet/grades/', '/courses/', '/works/',
-                    '/roles/', '/cabinet/stipendia/', '/cabinet/profile/', '/manage/students/'):
+                    '/roles/', '/cabinet/stipendia/', '/manage/students/'):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200, url)
             self.assertContains(response, 'Раздел в разработке')
+
+        profile = self.client.get('/cabinet/profile/')
+        self.assertEqual(profile.status_code, 200)
+        self.assertNotContains(profile, 'Раздел в разработке')
 
     def test_student_does_not_see_students_link(self):
         self.client.force_login(self.student)
