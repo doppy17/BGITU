@@ -24,13 +24,17 @@
               <a href="https://t.me/{{ contact.value|slice:'1:' }}" rel="noopener noreferrer" target="_blank">{{ contact.value }}</a>
             {% elif contact.value|slice:':4' == 'http' %}
               <a href="{{ contact.value }}" rel="noopener noreferrer" target="_blank">{{ contact.value }}</a>
-            {% else %}{{ contact.value }}{% endif %}
+            {% else %}
+              <a href="https://t.me/{{ contact.value }}" rel="noopener noreferrer" target="_blank">{{ contact.value }}</a>
+            {% endif %}
           {% elif contact.kind == 'vk' %}
             {% if contact.value|slice:':1' == '@' %}
               <a href="https://vk.com/{{ contact.value|slice:'1:' }}" rel="noopener noreferrer" target="_blank">{{ contact.value }}</a>
             {% elif contact.value|slice:':4' == 'http' %}
               <a href="{{ contact.value }}" rel="noopener noreferrer" target="_blank">{{ contact.value }}</a>
-            {% else %}{{ contact.value }}{% endif %}
+            {% else %}
+              <a href="https://vk.com/{{ contact.value }}" rel="noopener noreferrer" target="_blank">{{ contact.value }}</a>
+            {% endif %}
           {% else %}{{ contact.value }}{% endif %}
         </span>
 
@@ -63,7 +67,7 @@
   <p class="contact-empty">Контактов пока нет — добавьте телефон, почту или мессенджер.</p>
   {% endif %}
 
-  <form class="contact-form" method="post" action="{% url 'accounts:contact_add' %}">
+  <form class="contact-form" id="profile-contact-add" method="post" action="{% url 'accounts:contact_add' %}">
     {% csrf_token %}
     <input type="hidden" name="next" value="{{ request.path }}">
     <div class="contact-form__grid">

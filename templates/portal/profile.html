@@ -25,13 +25,13 @@
       <p class="profile-hero__meta">
         <span class="profile-hero__meta-item" data-hero-group>{{ p.group.code|default:'' }}</span>
         <span class="profile-hero__meta-item" data-hero-course>{% if p.course %}{{ p.course }} курс{% endif %}</span>
-        <span class="profile-hero__meta-item" data-hero-institute>{{ p.institute|default:'' }}</span>
+        <span class="profile-hero__meta-item" data-hero-subgroup>{% if p.subgroup %}подгруппа «{{ p.subgroup }}»{% endif %}</span>
       </p>
     </div>
 
     <a class="btn btn--ghost btn--sm profile-hero__edit" href="{% url 'accounts:profile_edit' %}">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4l10-10-4-4L4 16v4Z"/><path d="m13 5 4 4"/></svg>
-      Изменить
+      Фото и ФИО
     </a>
   </section>
 
@@ -45,7 +45,7 @@
         <h2 class="profile-ticket__h2" id="profileTicketTitle">
           <span class="panel__num mono">02</span>
           <span class="profile-ticket__caption">Студенческий билет</span>
-          <span class="profile-ticket__num mono dim">№ {{ p.ticket_number|default:'—' }}</span>
+          <span class="profile-ticket__num mono dim">№ {{ p.ticket_number_or_record|default:'—' }}</span>
           <svg class="profile-ticket__chev" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
         </h2>
       </summary>
@@ -60,7 +60,7 @@
           <p class="profile-ticket__name">{{ p.full_name|default:'—' }}</p>
           <p class="profile-ticket__serial">
             <span class="profile-ticket__serial-cap mono">№</span>
-            <b class="profile-ticket__serial-num mono">{{ p.ticket_number|default:'—' }}</b>
+            <b class="profile-ticket__serial-num mono">{{ p.ticket_number_or_record|default:'—' }}</b>
           </p>
         </div>
 
@@ -80,6 +80,10 @@
           <div class="profile-ticket__cell">
             <dt class="mono">Форма обучения</dt>
             <dd>{{ p.get_study_form_display|default:'—' }}</dd>
+          </div>
+          <div class="profile-ticket__cell">
+            <dt class="mono">Годы обучения</dt>
+            <dd data-ticket-years>{{ p.study_years_label|default:'—' }}</dd>
           </div>
           <div class="profile-ticket__cell">
             <dt class="mono">Дата выдачи</dt>
@@ -103,7 +107,7 @@
       <div class="panel__title">
         <h2 id="profileContactsTitle">Контакты</h2>
       </div>
-      <a class="btn btn--ghost btn--sm" href="{% url 'accounts:profile_edit' %}">
+      <a class="btn btn--ghost btn--sm" href="#profile-contact-add" data-contact-focus>
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
         Добавить
       </a>

@@ -9,12 +9,14 @@ from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from apps.accounts.models import Profile, Role, RoleRequest
+from apps.accounts.models import Contact, Profile, ProfileHistory, Role, RoleRequest
 from apps.education.models import Assignment, Attendance, Course, Enrollment, Grade, Group, Submission
 from apps.schedule.models import ScheduleImport
 from apps.schedule.services import run_import
 
 DEMO_PASSWORD = 'demo12345'
+DEMO_STUDENTS = ('student', 'monitor', 'student1', 'student2', 'student3',
+                 'student4', 'student5', 'student6', 'student7', 'student8')
 SCHEDULE_FILE = 'fixtures/schedule/bgitu-2026-27-1semestr-IVT-IST-PI-PRI.xls'
 SCHEDULE_URL = 'https://bgitu.ru/studentu/raspisanie/ochnoe-obuchenie/2026-27/1-semestr/v8/'
 
@@ -50,6 +52,7 @@ class Command(BaseCommand):
         users = self.make_users(roles)
         self.make_schedule(users['developer'], options)
         groups = self.assign_groups(users)
+        self.fill_student_profiles(users, groups)
         self.make_courses(users, groups)
         self.make_requests(users)
         self.stdout.write(self.style.SUCCESS('Демо-данные готовы.'))
@@ -83,7 +86,8 @@ class Command(BaseCommand):
         user.save()
         profile, _ = Profile.objects.get_or_create(user=user)
         profile.role = role
-        profile.group = group
+        if group is not None:
+            profile.group = group
         profile.record_book = record
         profile.save()
         return user
@@ -141,6 +145,7 @@ class Command(BaseCommand):
         ist201, _ = Group.objects.get_or_create(code='ИСТ-201', defaults={'course': 2, 'program': '09.03.02'})
         ist101, _ = Group.objects.get_or_create(code='ИСТ-101', defaults={'course': 1, 'program': '09.03.02'})
         members = ['student', 'monitor', 'student1', 'student2', 'student3', 'student4', 'student5']
+        ProfileHistory.objects.filter(user__username__in=DEMO_STUDENTS).delete()
         for index, key in enumerate(members):
             profile = users[key].profile
             profile.group = ist201
@@ -151,7 +156,44 @@ class Command(BaseCommand):
             profile.group = ist101
             profile.record_book = f'ИСТ-101/{12 + int(key[-1]):02d}'
             profile.save()
+
+        # история перемещений: демо-студент переведён с ИСТ-101 на ИСТ-201.
+        # Пишем запись сами: имитация смены группы через сигнал давала
+        # дубль «ИСТ-201 → ИСТ-101» при повторном запуске seed.
+        ProfileHistory.objects.get_or_create(
+            user=users['student'], kind=ProfileHistory.KIND_GROUP,
+            from_value='ИСТ-101', to_value='ИСТ-201',
+            defaults={'comment': 'Курс: 1 → 2'},
+        )
         return {'ИСТ-201': ist201, 'ИСТ-101': ist101}
+
+    def fill_student_profiles(self, users, groups):
+        """Дозаполняет то, что в ЭОС выдаёт деканат: билет, уровень, срок и контакты."""
+        year = timezone.localdate().year
+        contacts = {
+            'student': [('phone', '+7 900 123-45-67', 'личный', True),
+                        ('email', 'g.portnov@bgitu.ru', 'учебная', False),
+                        ('telegram', '@gportnov', '', False)],
+            'monitor': [('phone', '+7 900 765-43-21', 'личный', True),
+                        ('email', 'a.smirnova@bgitu.ru', '', False)],
+            'student1': [('email', 'i.petrov@bgitu.ru', '', True)],
+        }
+        for index, key in enumerate(DEMO_STUDENTS):
+            profile = users[key].profile
+            profile.subgroup = 'а' if index % 2 == 0 else 'б'
+            profile.education_level = Profile.LEVEL_BACHELOR
+            profile.study_form = Profile.FORM_FULL_TIME
+            profile.enrollment_year = year - (profile.course - 1 if profile.course else 0)
+            profile.ticket_issue_date = date(profile.enrollment_year, 9, 1)
+            profile.ticket_order = f'№ {1240 + index}-с от 01.09.{profile.enrollment_year}'
+            profile.ticket_number = f'{profile.enrollment_year % 100}-2-{40 + index:03d}'
+            profile.save()
+
+            for kind, value, label, primary in contacts.get(key, []):
+                Contact.objects.get_or_create(
+                    user=users[key], kind=kind, value=value,
+                    defaults={'label': label, 'is_primary': primary},
+                )
 
     def make_courses(self, users, groups):
         group = groups['ИСТ-201']

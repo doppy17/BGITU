@@ -101,6 +101,10 @@
     }
     const direction = document.querySelector('[data-ticket-direction]');
     if (direction && profile.direction) direction.textContent = profile.direction;
+    const years = document.querySelector('[data-ticket-years]');
+    if (years && profile.enrollment_year && profile.graduation_year) {
+      years.textContent = profile.enrollment_year + '–' + profile.graduation_year;
+    }
   }
 
   /* Шапка профиля: «ИСТ-101 · 1 курс · институт» — тоже из вычисленных полей. */
@@ -110,8 +114,10 @@
     if (group) group.textContent = profile.group || '';
     const course = document.querySelector('[data-hero-course]');
     if (course) course.textContent = profile.course ? profile.course + ' курс' : '';
-    const institute = document.querySelector('[data-hero-institute]');
-    if (institute) institute.textContent = profile.institute || '';
+    const subgroup = document.querySelector('[data-hero-subgroup]');
+    if (subgroup) {
+      subgroup.textContent = profile.subgroup ? 'подгруппа «' + profile.subgroup + '»' : '';
+    }
   }
 
   /* Замена блока готовым HTML из ответа: скролл компенсируется, чтобы блок
