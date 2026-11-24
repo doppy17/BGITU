@@ -10,6 +10,7 @@ from apps.accounts.models import ProfileHistory, RoleRequest
 from apps.accounts.performance import performance_by_semester, total_average
 from apps.accounts.permissions import get_role, role_can
 from apps.education.models import Assignment, Enrollment, Grade, Submission
+from apps.education.rating import course_rating
 from apps.schedule.import_service import WEEKDAYS
 from apps.schedule.models import Bell, Lesson
 from apps.schedule.services import parity_of_monday
@@ -40,6 +41,34 @@ def stipendia_view(request):
     return render(request, 'portal/stipendia.html')
 
 
+def study_overview(user):
+    """Дисциплины студента с рейтингом — связка профиля с разделом «Курсы».
+
+    Рейтинг считается той же функцией, что и в журнале преподавателя,
+    поэтому цифры в профиле и в курсе всегда совпадают.
+    """
+    enrollments = (
+        Enrollment.objects.filter(student=user)
+        .select_related('course', 'course__teacher')
+        .prefetch_related('course__control_points__weights')
+        .order_by('course__title')
+    )
+    rows = []
+    for enrollment in enrollments:
+        course = enrollment.course
+        rating = course_rating(course, student=user)
+        rows.append({
+            'course': course,
+            'rating': rating['rating'],
+            'possible': rating['possible'],
+            'threshold': rating['threshold'],
+            'verdict': rating['verdict'],
+            'verdict_label': rating['verdict_label'],
+            'reasons': rating['reasons'],
+        })
+    return rows
+
+
 @login_required
 def profile_view(request):
     """Профиль: данные студента, билет, контакты, успеваемость, история."""
@@ -53,6 +82,7 @@ def profile_view(request):
         'performance': performance_by_semester(user),
         'total_average': total_average(user),
         'histories': ProfileHistory.objects.filter(user=user),
+        'study': study_overview(user),
     })
 
 

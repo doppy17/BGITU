@@ -137,10 +137,44 @@
     {% else %}{% include 'portal/_profile_performance.html' %}{% endif %}
   </section>
 
-  <!-- ============ 05 · История перемещений ============ -->
-  <section class="panel profile-panel" aria-labelledby="profileHistoryTitle">
+  <!-- ============ 05 · Дисциплины и рейтинг ============ -->
+  <section class="panel profile-panel" aria-labelledby="profileStudyTitle">
     <header class="panel__head profile-panel__head">
       <span class="panel__num mono">05</span>
+      <div class="panel__title">
+        <h2 id="profileStudyTitle">Дисциплины и рейтинг</h2>
+      </div>
+      <a class="btn btn--ghost btn--sm" href="{% url 'education:courses' %}">Все курсы</a>
+    </header>
+
+    {% if study %}
+    <ul class="profile-study">
+      {% for row in study %}
+      <li class="profile-study__item">
+        <div class="profile-study__main">
+          <a class="profile-study__title" href="{% url 'education:course_detail' row.course.pk %}">{{ row.course.title }}</a>
+          <p class="profile-study__meta mono">{{ row.course.code }} · {{ row.course.control_label }}{% if row.course.teacher %} · {{ row.course.teacher.get_full_name }}{% endif %}</p>
+        </div>
+        <div class="profile-study__rating">
+          <p class="profile-study__score">
+            <span class="profile-study__value">{{ row.rating|floatformat:0 }}</span>
+            <span class="profile-study__max mono">/ 100</span>
+          </p>
+          <progress class="rating-bar{% if row.verdict == 'no' %} is-fail{% endif %}" value="{{ row.rating }}" max="100" aria-label="рейтинг по дисциплине">{{ row.rating }}</progress>
+        </div>
+        <p class="profile-study__verdict profile-study__verdict--{{ row.verdict }}">{{ row.verdict_label }}</p>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="profile-empty mono">Дисциплины не назначены</p>
+    {% endif %}
+  </section>
+
+  <!-- ============ 06 · История перемещений ============ -->
+  <section class="panel profile-panel" aria-labelledby="profileHistoryTitle">
+    <header class="panel__head profile-panel__head">
+      <span class="panel__num mono">06</span>
       <div class="panel__title">
         <h2 id="profileHistoryTitle">История перемещений</h2>
       </div>
@@ -152,11 +186,11 @@
     {% else %}{% include 'portal/_profile_history.html' %}{% endif %}
   </section>
 
-  <!-- ============ 06 · Доступ разработчика (временная функция) ============ -->
+  <!-- ============ 07 · Доступ разработчика (временная функция) ============ -->
   {% if dev_keys_enabled %}
   <section class="panel profile-panel" aria-labelledby="profileDevKeyTitle">
     <header class="panel__head profile-panel__head">
-      <span class="panel__num mono">06</span>
+      <span class="panel__num mono">07</span>
       <div class="panel__title">
         <h2 id="profileDevKeyTitle">Доступ разработчика</h2>
       </div>

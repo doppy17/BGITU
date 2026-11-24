@@ -824,6 +824,86 @@
   .profile-ticket__card::after { display: none; }
 }
 
+/* --- 05 · Дисциплины и рейтинг: связка с разделом «Курсы» ------------- */
+.profile-study {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.profile-study__item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 12em 9.5em;
+  gap: 4px 24px;
+  align-items: center;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+}
+.profile-study__item:first-child { border-top: 0; padding-top: 4px; }
+.profile-study__title {
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+  text-underline-offset: 3px;
+}
+.profile-study__title:hover { text-decoration: underline; }
+.profile-study__meta {
+  margin-top: 2px;
+  color: var(--text-faint);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+}
+.profile-study__rating { min-width: 0; }
+.profile-study__score {
+  display: flex;
+  gap: 4px;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+.profile-study__value {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+}
+.profile-study__max { color: var(--text-faint); font-size: 0.75rem; }
+.profile-study__verdict {
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  text-align: right;
+  color: var(--text-muted);
+}
+.profile-study__verdict--yes { color: var(--accent-text); }
+.profile-study__verdict--no { color: var(--warn); }
+
+.profile-study .rating-bar {
+  width: 100%;
+  height: 4px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--line);
+  overflow: hidden;
+  appearance: none;
+}
+.profile-study .rating-bar::-webkit-progress-bar {
+  background: var(--line);
+  border-radius: var(--radius-pill);
+}
+.profile-study .rating-bar::-webkit-progress-value {
+  background: var(--accent);
+  border-radius: var(--radius-pill);
+}
+.profile-study .rating-bar::-moz-progress-bar {
+  background: var(--accent);
+  border-radius: var(--radius-pill);
+}
+.profile-study .rating-bar.is-fail::-webkit-progress-value { background: var(--warn); }
+.profile-study .rating-bar.is-fail::-moz-progress-bar { background: var(--warn); }
+
+@media (max-width: 720px) {
+  .profile-study__item { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .profile-study__verdict { text-align: left; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .profile-ticket__chev,
   .profile-ticket__caption { transition: none; }
