@@ -639,3 +639,112 @@ class CurriculumDirectionScopeTests(TestCase):
     def test_unknown_or_empty_direction_has_no_plan(self):
         self.assertEqual(resolve_curriculum(''), [])
         self.assertEqual(resolve_curriculum('нет-такого'), [])
+
+
+class JournalTests(TestCase):
+    """Журнал дисциплины: сетка «студенты × даты», формы контроля и аттестация."""
+
+    def setUp(self):
+        self.student_role = Role.objects.create(code='student', name='Студент', can_upload_works=True)
+        self.teacher_role = Role.objects.create(code='teacher', name='Преподаватель',
+                                                can_create_courses=True, can_grade=True)
+        self.group = Group.objects.create(code='ИСТ-201', course=2)
+        self.student = self.make_user('jstudent', self.student_role, self.group)
+        self.teacher = self.make_user('jteacher', self.teacher_role)
+        self.course = Course.objects.create(
+            title='Базы данных', code='БД-201', group=self.group, teacher=self.teacher, semester=3,
+            control_form=Course.FORM_CREDIT, has_coursework=True,
+        )
+        Enrollment.objects.create(course=self.course, student=self.student)
+
+    def make_user(self, username, role, group=None):
+        user = User.objects.create_user(username=username, password='demo12345')
+        profile = user.profile
+        profile.role = role
+        profile.group = group
+        profile.save()
+        return user
+
+    def test_journal_shows_attendance_grid_and_attestation_column(self):
+        for day, status in ((date(2026, 11, 10), Attendance.STATUS_PRESENT),
+                            (date(2026, 11, 17), Attendance.STATUS_ABSENT)):
+            Attendance.objects.create(course=self.course, student=self.student, date=day, status=status,
+                                      marked_by=self.teacher)
+        self.client.force_login(self.teacher)
+        response = self.client.get(reverse('education:journal', args=[self.course.id]))
+        self.assertEqual(response.status_code, 200)
+        # колонки-даты
+        self.assertContains(response, '10.11')
+        self.assertContains(response, '17.11')
+        # отметки: был/не был
+        self.assertContains(response, '>б<')
+        self.assertContains(response, '>н<')
+        # колонка аттестации по форме контроля курса (зачёт) + признак курсовой
+        self.assertContains(response, 'Итог')
+        self.assertContains(response, 'курсовая')
+        self.assertContains(response, 'не выставлен')
+        # колонка курсовой появляется по флагу дисциплины, даже без оценок
+        self.assertGreaterEqual(response.content.decode().count('курсовая'), 2)
+
+    def test_attestation_uses_course_control_form(self):
+        from apps.education.views import _attestation_kind
+        self.assertEqual(_attestation_kind(self.course), Grade.KIND_CREDIT)
+        self.course.control_form = Course.FORM_EXAM
+        self.assertEqual(_attestation_kind(self.course), Grade.KIND_EXAM)
+        self.course.control_form = Course.FORM_COURSEWORK
+        self.assertEqual(_attestation_kind(self.course), Grade.KIND_COURSEWORK)
+        self.course.control_form = Course.FORM_NONE
+        self.assertEqual(_attestation_kind(self.course), Grade.KIND_EXAM)
+
+    def test_attestation_mark_appears_in_journal(self):
+        Grade.objects.create(course=self.course, student=self.student, kind=Grade.KIND_CREDIT,
+                             value='зачтено', date=date(2026, 11, 20), created_by=self.teacher)
+        self.client.force_login(self.teacher)
+        response = self.client.get(reverse('education:journal', args=[self.course.id]))
+        self.assertContains(response, 'зачтено')
+        self.assertContains(response, '20.11.2026')
+
+    def test_student_cannot_open_journal(self):
+        self.client.force_login(self.student)
+        response = self.client.get(reverse('education:journal', args=[self.course.id]))
+        self.assertEqual(response.status_code, 403)
+
+    def test_attendance_page_lists_sessions_and_marks_date(self):
+        Attendance.objects.create(course=self.course, student=self.student, marked_by=self.teacher,
+                                  date=date(2026, 11, 10), status=Attendance.STATUS_LATE)
+        self.client.force_login(self.teacher)
+        response = self.client.get(reverse('education:attendance', args=[self.course.id]))
+        self.assertContains(response, 'Проведённые занятия')
+        self.assertContains(response, '10.11.2026')
+
+        self.client.post(reverse('education:attendance', args=[self.course.id]), {
+            'date': '2026-11-24',
+            f'status_{self.student.id}': Attendance.STATUS_EXCUSED,
+        })
+        self.assertTrue(Attendance.objects.filter(
+            course=self.course, student=self.student, date=date(2026, 11, 24),
+            status=Attendance.STATUS_EXCUSED,
+        ).exists())
+
+    def test_course_form_accepts_control_form_and_coursework(self):
+        self.client.force_login(self.teacher)
+        self.client.post(reverse('education:course_create'), {
+            'title': 'Философия', 'code': 'ФИЛ-201', 'group': self.group.id, 'semester': '3',
+            'control_form': 'diff', 'has_coursework': '1',
+        })
+        course = Course.objects.get(code='ФИЛ-201')
+        self.assertEqual(course.control_form, Course.FORM_DIFF)
+        self.assertTrue(course.has_coursework)
+
+    def test_student_sees_own_attendance_on_course_card(self):
+        Attendance.objects.create(course=self.course, student=self.student, marked_by=self.teacher,
+                                  date=date(2026, 11, 10), status=Attendance.STATUS_PRESENT)
+        Attendance.objects.create(course=self.course, student=self.student, marked_by=self.teacher,
+                                  date=date(2026, 11, 17), status=Attendance.STATUS_ABSENT)
+        self.client.force_login(self.student)
+        response = self.client.get(reverse('education:course_detail', args=[self.course.id]))
+        self.assertContains(response, 'был: 1')
+        self.assertContains(response, 'не был: 1')
+
+        response = self.client.get(reverse('education:courses'))
+        self.assertContains(response, 'пропусков: 1')

@@ -1,15 +1,258 @@
 {% extends 'base.html' %}
-{% block title %}Курс{% endblock %}
+{% load static bgitu %}
+{% block title %}{{ course.title }}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/courses.css' %}">{% endblock %}
 {% block content %}
-<header class="page-head">
-  <p class="mono dim">личный кабинет</p>
-  <h1>Курс</h1>
-  <p>Раздел готовится — наполнение появится по мере разработки.</p>
+<div class="view view--courses">
+
+<header class="page-head course-head">
+  <p class="mono dim"><a href="{% url 'education:courses' %}">курсы</a> · {{ course.group.code }} · {{ course.semester }} семестр</p>
+  <h1>{{ course.title }}</h1>
+  <div class="course-meta">
+    <span class="course-meta__chip">преподаватель · {{ course.teacher|fio }}</span>
+    <span class="course-meta__chip">{{ course.control_label }}</span>
+    {% if course.has_coursework %}<span class="course-meta__chip">курсовая</span>{% endif %}
+    <span class="course-meta__chip">занятий <b>{{ sessions }}</b></span>
+  </div>
+  {% if course.description %}<p class="panel-note">{{ course.description }}</p>{% endif %}
 </header>
+
+{% if my_rating %}
 <section class="panel">
-  <div class="empty">
-    <b>Раздел в разработке</b>
-    <p>Здесь скоро появится курс — пока пусто.</p>
+  <div class="panel__head">
+    <div class="panel__title">
+      <span class="panel__num mono">01</span>
+      <h2>Мои аттестации</h2>
+    </div>
+    <span class="badge badge--status {% if my_rating.verdict == 'no' %}badge--warn{% elif my_rating.verdict == 'wait' %}badge--soft{% endif %}">{{ my_rating.verdict_label }}</span>
+  </div>
+
+  <div class="rating-hero">
+    <div class="rating-hero__top">
+      <div>
+        <p class="mono dim">рейтинг по дисциплине</p>
+        <p class="rating-hero__num{% if my_rating.verdict == 'no' %} rating-hero__num--fail{% endif %}">{{ my_rating.rating }}<small> из 100</small></p>
+      </div>
+      <div class="rating-hero__scale">
+        <progress class="rating-bar{% if my_rating.verdict == 'no' %} is-fail{% endif %}" value="{{ my_rating.rating }}" max="100" aria-label="Рейтинг {{ my_rating.rating }} из 100"></progress>
+        <div class="rating-hero__foot">
+          <span>порог допуска — {{ my_rating.threshold }} %</span>
+          <span>{% if my_rating.possible > my_rating.rating %}максимум сейчас — {{ my_rating.possible }} %{% else %}все точки закрыты{% endif %}</span>
+          <span>сумма весов точек — {{ my_rating.weight_sum }} %</span>
+        </div>
+      </div>
+    </div>
+    {% if my_rating.reasons %}
+    <p class="mark-legend">{% for reason in my_rating.reasons %}<span><b>!</b> {{ reason }}</span>{% endfor %}</p>
+    {% endif %}
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr><th>Аттестация</th><th class="ta-c">Вес</th><th class="ta-c">Балл</th><th class="ta-c">В рейтинг</th><th class="ta-c">Статус</th></tr>
+      </thead>
+      <tbody>
+        {% for res in my_rating.points %}
+        <tr>
+          <td>
+            КТ{{ res.point.number }}{% if res.point.title %} · {{ res.point.title }}{% endif %}
+            {% if res.point.date %}<span class="cell-sub">{{ res.point.date|date:'d.m.Y' }}</span>{% endif %}
+          </td>
+          <td class="ta-c mono">{{ res.weight }}%</td>
+          <td class="ta-c"><span class="pg-total{% if res.status == 'failed' %} pg-total--fail{% endif %}">{{ res.total }}<small>/ 100</small></span></td>
+          <td class="ta-c mono">{{ res.weighted }}</td>
+          <td class="ta-c">
+            <span class="badge badge--status {% if res.status == 'failed' %}badge--warn{% elif res.status != 'attested' %}badge--soft{% endif %}">{{ res.status_label }}</span>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="dim">Контрольные точки ещё не заданы</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 </section>
+{% endif %}
+
+<section class="panel">
+  <div class="panel__head">
+    <div class="panel__title">
+      <span class="panel__num mono">{% if my_rating %}02{% else %}01{% endif %}</span>
+      <h2>Дисциплина</h2>
+    </div>
+    {% if is_teacher %}
+    <div class="panel__tools">
+      <a class="btn btn--sm" href="{% url 'education:journal' course.id %}">Открыть журнал</a>
+      <a class="btn btn--ghost btn--sm" href="{% url 'education:attendance' course.id %}">Отметить посещаемость</a>
+      <a class="btn btn--ghost btn--sm" href="{% url 'education:course_points' course.id %}">Веса аттестаций</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <tbody>
+        <tr>
+          <th>Форма аттестации</th>
+          <td><span class="badge badge--accent">{{ course.control_label }}</span></td>
+          <th>Курсовая</th>
+          <td>{% if course.has_coursework %}предусмотрена{% else %}не предусмотрена{% endif %}</td>
+          <th>Занятий в журнале</th>
+          <td class="mono">{{ sessions }}</td>
+        </tr>
+        {% if is_enrolled or is_teacher %}
+        <tr>
+          <th>Моя оценка</th>
+          <td colspan="3">
+            {% if my_grades %}
+              {% for kind, g in my_grades.items %}
+                <span class="badge">{{ g.get_kind_display }}: {{ g.value }}</span>
+              {% endfor %}
+            {% else %}—{% endif %}
+          </td>
+          <th>Моя посещаемость</th>
+          <td>
+            {% if my_attendance %}
+              был: {{ my_attendance.present|default:0 }} · не был: {{ my_attendance.absent|default:0 }} · опоздал: {{ my_attendance.late|default:0 }}
+            {% else %}—{% endif %}
+          </td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="panel__head">
+    <div class="panel__title">
+      <span class="panel__num mono">{% if my_rating %}03{% else %}02{% endif %}</span>
+      <h2>Задания</h2>
+    </div>
+    <span class="mono dim">{{ assignments|length }}</span>
+  </div>
+  {% if assignments %}
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Задание</th>
+          <th class="mono">Срок</th>
+          <th class="ta-r mono">Сдали</th>
+          <th>Мой статус</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for assignment in assignments %}
+        <tr>
+          <td>
+            {{ assignment.title }}
+            {% if assignment.description %}<span class="cell-sub">{{ assignment.description|truncatechars:110 }}</span>{% endif %}
+          </td>
+          <td class="mono">{{ assignment.due_date|date:'d.m.Y'|default:'—' }}</td>
+          <td class="ta-r mono">{{ assignment.submissions_count }}</td>
+          <td>
+            {% with sub=my_submissions|default_if_none:None %}
+              {% if assignment.id in my_submissions %}
+                {% with s=my_submissions|get_item:assignment.id %}
+                  <span class="badge {% if s.status == 'reviewed' %}badge--accent{% endif %}">{{ s.get_status_display }}</span>
+                  {% if s.grade %}<span class="mono">{{ s.grade }}</span>{% endif %}
+                {% endwith %}
+              {% else %}—{% endif %}
+            {% endwith %}
+          </td>
+          <td class="ta-r">
+            {% if assignment.material %}<a class="btn btn--ghost btn--sm" href="{{ assignment.material.url }}">Материал</a>{% endif %}
+            {% if not is_teacher and is_enrolled %}
+            <form method="post" action="{% url 'education:submit_work' assignment.id %}" enctype="multipart/form-data" class="jrn-form">
+              {% csrf_token %}
+              <input type="file" name="file" required>
+              <button class="btn btn--sm" type="submit">Сдать</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="panel-note">Заданий пока нет.</p>
+  {% endif %}
+</section>
+
+{% if submissions_to_review %}
+<section class="panel">
+  <div class="panel__head">
+    <div class="panel__title">
+      <span class="panel__num mono">04</span>
+      <h2>На проверку</h2>
+    </div>
+    <span class="mono dim">{{ submissions_to_review|length }}</span>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Студент</th><th>Задание</th><th class="mono">Сдано</th><th>Комментарий</th><th></th></tr></thead>
+      <tbody>
+        {% for submission in submissions_to_review %}
+        <tr>
+          <td>{{ submission.student|fio }}</td>
+          <td>{{ submission.assignment.title }}</td>
+          <td class="mono">{{ submission.submitted_at|date:'d.m H:i' }}</td>
+          <td>{{ submission.comment|truncatechars:80|default:'—' }}</td>
+          <td class="ta-r">
+            <form method="post" action="{% url 'education:review_submission' submission.id %}" class="review-form">
+              {% csrf_token %}
+              <input class="input review-form__grade" type="text" name="grade" placeholder="оценка">
+              <select class="select review-form__status" name="status">
+                <option value="reviewed">принято</option>
+                <option value="returned">на доработку</option>
+              </select>
+              <button class="btn btn--sm" type="submit">Проверить</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+
+{% if is_teacher %}
+<section class="panel">
+  <div class="panel__head">
+    <div class="panel__title">
+      <span class="panel__num mono">05</span>
+      <h2>Новое задание</h2>
+    </div>
+  </div>
+  <form method="post" action="{% url 'education:assignment_create' course.id %}" enctype="multipart/form-data" class="form-grid">
+    {% csrf_token %}
+    <div class="field field--wide">
+      <label class="field__label" for="t">Название</label>
+      <input class="input" id="t" name="title" required minlength="3" placeholder="Лабораторная №4. Триггеры">
+    </div>
+    <div class="field field--wide">
+      <label class="field__label" for="d">Описание</label>
+      <textarea class="textarea" id="d" name="description" rows="3"></textarea>
+    </div>
+    <div class="field">
+      <label class="field__label" for="due">Срок сдачи</label>
+      <input class="input" id="due" name="due_date" type="date">
+    </div>
+    <div class="field">
+      <label class="field__label" for="m">Материал</label>
+      <input class="input" id="m" name="material" type="file">
+    </div>
+    <div class="field">
+      <button class="btn btn--sm" type="submit" name="next" value="journal">Добавить</button>
+    </div>
+  </form>
+</section>
+{% endif %}
+
+</div>
 {% endblock %}

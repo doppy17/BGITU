@@ -2,6 +2,17 @@
 from django.conf import settings
 from django.db import models
 
+WORK_LECTURE = 'lecture'
+WORK_PRACTICE = 'practice'
+WORK_LAB = 'lab'
+WORK_OTHER = 'other'
+WORK_CHOICES = [
+    (WORK_LECTURE, 'лек.'),
+    (WORK_PRACTICE, 'пр.'),
+    (WORK_LAB, 'лаб.'),
+    (WORK_OTHER, 'др.'),
+]
+
 
 class Group(models.Model):
     code = models.CharField('код группы', max_length=16, unique=True)
@@ -20,12 +31,29 @@ class Group(models.Model):
 
 
 class Course(models.Model):
+    FORM_EXAM = 'exam'
+    FORM_CREDIT = 'credit'
+    FORM_DIFF = 'diff'
+    FORM_COURSEWORK = 'coursework'
+    FORM_NONE = 'none'
+    FORM_CHOICES = [
+        (FORM_EXAM, 'экзамен'),
+        (FORM_CREDIT, 'зачёт'),
+        (FORM_DIFF, 'диф. зачёт'),
+        (FORM_COURSEWORK, 'курсовая'),
+        (FORM_NONE, 'без аттестации'),
+    ]
+
     title = models.CharField('название', max_length=160)
     code = models.CharField('код', max_length=32)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='courses')
     teacher = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='teaching_courses')
     semester = models.PositiveSmallIntegerField('семестр', default=1)
     description = models.TextField('описание', blank=True)
+    control_form = models.CharField('форма аттестации', max_length=16, choices=FORM_CHOICES, default=FORM_EXAM)
+    has_coursework = models.BooleanField('предусмотрена курсовая', default=False)
+    attestation_count = models.PositiveSmallIntegerField('аттестаций за семестр', default=3)
+    admission_score = models.PositiveSmallIntegerField('порог допуска, %', default=50)
     created_at = models.DateTimeField('создан', auto_now_add=True)
 
     class Meta:
@@ -36,6 +64,14 @@ class Course(models.Model):
 
     def __str__(self):
         return f'{self.title} · {self.group.code}'
+
+    @property
+    def control_label(self):
+        return self.get_control_form_display()
+
+    @property
+    def is_credit_form(self):
+        return self.control_form in (self.FORM_CREDIT, self.FORM_DIFF)
 
 
 class Enrollment(models.Model):
@@ -174,6 +210,67 @@ class Grade(models.Model):
     @property
     def numeric(self):
         return int(self.value) if self.value in ('2', '3', '4', '5') else None
+
+
+class ControlPoint(models.Model):
+    """Контрольная точка (аттестация) дисциплины — КТ1…КТ3 как в ЭОС.
+
+    Вес точки задаёт её долю в итоговом рейтинге дисциплины, внутри точки
+    баллы распределяются по видам занятий (лекции/практика/лабораторные/другое).
+    """
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='control_points')
+    number = models.PositiveSmallIntegerField('номер аттестации', default=1)
+    title = models.CharField('название', max_length=120, blank=True)
+    weight = models.PositiveSmallIntegerField('вес точки в рейтинге, %', default=20)
+    pass_score = models.PositiveSmallIntegerField('проходной балл точки, %', default=50)
+    date = models.DateField('дата проведения', null=True, blank=True)
+    closed = models.BooleanField('закрыта', default=False)
+
+    class Meta:
+        verbose_name = 'контрольная точка'
+        verbose_name_plural = 'контрольные точки'
+        ordering = ['number']
+        constraints = [models.UniqueConstraint(fields=['course', 'number'], name='uniq_point_number')]
+
+    def __str__(self):
+        return f'КТ{self.number} · {self.course}'
+
+    @property
+    def kind_weights(self):
+        return {w.kind: w.weight for w in self.weights.all()}
+
+
+class PointWeight(models.Model):
+    """Вес вида занятий внутри контрольной точки (в сумме 100 % на точку)."""
+    point = models.ForeignKey(ControlPoint, on_delete=models.CASCADE, related_name='weights')
+    kind = models.CharField('вид занятий', max_length=16, choices=WORK_CHOICES)
+    weight = models.PositiveSmallIntegerField('вес, %', default=0)
+
+    class Meta:
+        verbose_name = 'вес вида занятий'
+        verbose_name_plural = 'веса видов занятий'
+        ordering = ['kind']
+        constraints = [models.UniqueConstraint(fields=['point', 'kind'], name='uniq_point_kind')]
+
+
+class PointMark(models.Model):
+    """Балл студента по виду занятий внутри контрольной точки (0…100)."""
+    point = models.ForeignKey(ControlPoint, on_delete=models.CASCADE, related_name='marks')
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='point_marks')
+    kind = models.CharField('вид занятий', max_length=16, choices=WORK_CHOICES)
+    score = models.PositiveSmallIntegerField('балл, %', null=True, blank=True)
+    set_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
+                               related_name='set_point_marks', null=True, blank=True)
+    updated_at = models.DateTimeField('обновлён', auto_now=True)
+
+    class Meta:
+        verbose_name = 'балл по точке'
+        verbose_name_plural = 'баллы по точкам'
+        ordering = ['point__number', 'kind']
+        constraints = [models.UniqueConstraint(fields=['point', 'student', 'kind'], name='uniq_point_mark')]
+
+    def __str__(self):
+        return f'{self.student} · {self.point} · {self.kind}: {self.score}'
 
 
 class PlanSource(models.Model):

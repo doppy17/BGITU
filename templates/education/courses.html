@@ -1,15 +1,107 @@
 {% extends 'base.html' %}
+{% load static bgitu %}
 {% block title %}Курсы{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/courses.css' %}">{% endblock %}
 {% block content %}
-<header class="page-head">
+<div class="view view--courses">
+
+<header class="page-head course-head">
   <p class="mono dim">личный кабинет</p>
   <h1>Курсы</h1>
-  <p>Раздел готовится — наполнение появится по мере разработки.</p>
+  <div class="course-meta">
+    <span class="course-meta__chip">{% if mode == 'student' %}мои дисциплины{% elif mode == 'teaching' %}я веду{% else %}все дисциплины{% endif %}</span>
+    <span class="course-meta__chip">дисциплин <b>{{ courses|length }}</b></span>
+    {% if coursework_count %}<span class="course-meta__chip">с курсовой <b>{{ coursework_count }}</b></span>{% endif %}
+    {% if can_create %}
+    <span class="course-meta__chip course-meta__chip--accent"><a href="{% url 'education:course_create' %}">добавить дисциплину</a></span>
+    {% endif %}
+  </div>
 </header>
+
+{% if courses %}
 <section class="panel">
-  <div class="empty">
-    <b>Раздел в разработке</b>
-    <p>Здесь скоро появится курсы — пока пусто.</p>
+  <div class="panel__head">
+    <div class="panel__title">
+      <span class="panel__num mono">01</span>
+      <h2>Дисциплины</h2>
+    </div>
+    <span class="mono dim">форма контроля · курсовая · посещаемость</span>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Дисциплина</th>
+          <th class="mono">Группа</th>
+          <th>Преподаватель</th>
+          <th class="ta-r mono">Сем.</th>
+          <th>Форма аттестации</th>
+          <th class="ta-r mono">Занятий</th>
+          <th class="ta-r mono">Заданий</th>
+          {% if mode == 'student' %}<th class="ta-r mono">Посещено</th>{% else %}<th class="ta-r mono">Студентов</th>{% endif %}
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for course in courses %}
+        <tr>
+          <td>
+            <a href="{% url 'education:course_detail' course.id %}">{{ course.title }}</a>
+            <span class="cell-sub">{{ course.code }}</span>
+          </td>
+          <td class="mono">{{ course.group.code }}</td>
+          <td>{{ course.teacher|fio }}</td>
+          <td class="ta-r mono">{{ course.semester }}</td>
+          <td>
+            <span class="badge {% if course.control_form == 'credit' or course.control_form == 'diff' %}badge--soft{% endif %}">{{ course.control_label }}</span>
+            {% if course.has_coursework %}<span class="badge badge--accent">курсовая</span>{% endif %}
+          </td>
+          <td class="ta-r mono">{{ course.sessions_count }}</td>
+          <td class="ta-r mono">{{ course.assignments_count }}</td>
+          {% if mode == 'student' %}
+            <td class="ta-r">
+              {% if course.my_sessions %}
+                <span class="jrn-percent{% if course.my_attendance_percent < 50 %} jrn-percent--low{% endif %}">{{ course.my_attendance_percent }}%</span>
+                <span class="cell-sub">пропусков: {{ course.my_absent }}</span>
+              {% else %}—{% endif %}
+            </td>
+          {% else %}
+            <td class="ta-r mono">{{ course.students_count }}</td>
+          {% endif %}
+          <td class="ta-r">
+            {% if can_create and course.teacher_id == user.id %}
+              <a class="btn btn--ghost btn--sm" href="{% url 'education:journal' course.id %}">Журнал</a>
+              <a class="btn btn--ghost btn--sm" href="{% url 'education:attendance' course.id %}">Посещаемость</a>
+            {% else %}
+              <a class="btn btn--ghost btn--sm" href="{% url 'education:course_detail' course.id %}">Открыть</a>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 </section>
+{% else %}
+<section class="panel">
+  <div class="empty">
+    <b>Дисциплин пока нет</b>
+    <p>{% if can_create %}Создайте дисциплину — она появится у студентов группы.{% else %}Вы ещё не записаны ни на одну дисциплину.{% endif %}</p>
+  </div>
+</section>
+{% endif %}
+
+{% if mode == 'student' %}
+<section class="panel">
+  <div class="panel__head">
+    <div class="panel__title">
+      <span class="panel__num mono">02</span>
+      <h2>Мои работы</h2>
+    </div>
+  </div>
+  <p class="panel-note">Сданные и проверенные работы по всем дисциплинам — в разделе <a href="{% url 'education:works' %}">«Работы»</a>.</p>
+</section>
+{% endif %}
+
+</div>
 {% endblock %}

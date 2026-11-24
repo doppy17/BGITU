@@ -14,8 +14,10 @@ x-координаты семестровых колонок, а дисципл�
 """
 from __future__ import annotations
 
+import glob
 import os
 import re
+import shutil
 import subprocess
 import zipfile
 from xml.etree import ElementTree
@@ -303,6 +305,28 @@ def entries_from_table_sources(path):
 _PDF_CODE_RE = re.compile(r'^(?:Б\d+(?:\.[А-ЯЁA-Z]{1,3})?(?:\.\d+)?|ФТД(?:\.\d+)?)$')
 
 
+def _pdftotext_candidates():
+    """Кандидаты на pdftotext: настроенный путь, локальный poppler, PATH.
+
+    Xpdf из MSYS (`/mingw64/bin/pdftotext`) не умеет `-bbox-layout`, поэтому
+    явный путь poppler важнее того, что первым нашлось в PATH.
+    """
+    candidates = []
+    configured = os.environ.get('PDFTOTEXT')
+    if configured:
+        candidates.append(configured)
+    for pattern in (
+        'D:/tools/poppler/*/Library/bin/pdftotext.exe',
+        'D:/tools/poppler/*/bin/pdftotext.exe',
+        '/usr/bin/pdftotext',
+    ):
+        candidates.extend(sorted(glob.glob(pattern), reverse=True))
+    on_path = shutil.which('pdftotext')
+    if on_path:
+        candidates.append(on_path)
+    return list(dict.fromkeys(candidates))
+
+
 def _pdf_pages(path):
     """Страницы PDF → строки слов с координатами.
 
@@ -310,15 +334,22 @@ def _pdf_pages(path):
     горизонтали (в Excel-выгрузке шапка и цифры семестров попадают в один
     блок), поэтому строки собираем сами по y-координате.
     """
-    executable = 'pdftotext'
-    try:
-        result = subprocess.run(
-            [executable, '-bbox-layout', str(path), '-'],
-            capture_output=True, check=False, timeout=120,
-        )
-    except FileNotFoundError as exc:
-        raise ValueError('для разбора PDF нужен pdftotext (poppler)') from exc
-    if result.returncode != 0:
+    candidates = _pdftotext_candidates()
+    if not candidates:
+        raise ValueError('для разбора PDF нужен pdftotext (poppler)')
+    result = None
+    for executable in candidates:
+        try:
+            attempt = subprocess.run(
+                [executable, '-bbox-layout', str(path), '-'],
+                capture_output=True, check=False, timeout=120,
+            )
+        except (FileNotFoundError, OSError):
+            continue
+        if attempt.returncode == 0 and attempt.stdout.strip():
+            result = attempt
+            break
+    if result is None:
         raise ValueError('не удалось прочитать PDF')
     root = ElementTree.fromstring(result.stdout.decode('utf-8', errors='replace'))
     pages = []

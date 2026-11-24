@@ -1,0 +1,370 @@
+/* ============================================================
+   КУРСЫ · ЖУРНАЛ · АТТЕСТАЦИИ
+   Надстройка над дизайн-системой кабинета: только классы,
+   цвета и радиусы — из токенов темы (paper / surik / latun / brass).
+   Инлайновых стилей в шаблонах этого раздела быть не должно.
+   ============================================================ */
+
+/* ---------- Оболочка раздела ---------- */
+.view--courses {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.view--courses > * { min-width: 0; }
+
+/* ---------- Шапка дисциплины ---------- */
+.course-head { display: grid; gap: 10px; }
+.course-head h1 {
+  font-size: clamp(1.625rem, 1.15rem + 1.4vw, 2.375rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.course-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 0;
+  margin-top: 6px;
+  color: var(--text-faint);
+  font: 400 0.75rem/1.5 var(--font-mono);
+}
+.course-meta__chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  border: 0;
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  color: inherit;
+  font: inherit;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+}
+.course-meta__chip b { color: var(--text); font-weight: 600; }
+.course-meta__chip + .course-meta__chip::before {
+  content: '·';
+  margin: 0 12px 0 4px;
+  color: var(--line-strong);
+}
+.course-meta__chip--accent { color: var(--accent-text); }
+
+/* ---------- Кнопки в шапке панели ---------- */
+.panel__tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* ---------- Полоса статистики: 2 и 3 плитки ---------- */
+.stat-strip--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.stat-strip--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.stat b small { font-size: 0.5em; font-weight: 600; color: var(--text-faint); letter-spacing: 0; }
+.stat--accent b { color: var(--accent-text); }
+
+/* ---------- Журнал: посещаемость ---------- */
+.jrn-table th, .jrn-table td { white-space: nowrap; }
+.jrn-table td:first-child,
+.jrn-table th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--bg-raised);
+}
+.jrn-table tbody tr:hover td:first-child { background: var(--bg-panel); }
+.jrn-cell { font: 500 0.75rem/1 var(--font-mono); text-transform: uppercase; }
+.jrn-cell--present { color: var(--text-muted); }
+.jrn-cell--absent { color: var(--warn); font-weight: 600; }
+.jrn-cell--late { color: var(--accent-text); }
+.jrn-cell--excused { color: var(--text-faint); }
+.jrn-cell--empty { color: var(--line-strong); }
+.jrn-percent { font: 600 0.8125rem/1 var(--font-mono); font-variant-numeric: tabular-nums; }
+.jrn-percent--low { color: var(--warn); }
+.jrn-form { display: inline; }
+.jrn-form .select {
+  min-height: 32px;
+  padding: 0 26px 0 8px;
+  font-size: 0.75rem;
+  background-position: right 8px center;
+}
+
+/* ---------- Сетка контрольных точек ---------- */
+.points-grid { min-width: 980px; }
+.points-grid .badge { white-space: nowrap; }
+.points-grid .btn { white-space: nowrap; padding: 0 10px; }
+.points-grid .btn--icon {
+  width: 32px;
+  min-width: 32px;
+  padding: 0;
+  background: var(--bg-raised);
+  border: 1px solid var(--line-strong);
+  color: var(--accent-text);
+  font-size: 0.9375rem;
+  box-shadow: none;
+}
+.points-grid .btn--icon:hover { border-color: var(--accent-text); background: var(--accent-soft); }
+.stat-strip--3 .stat + .stat { border-left: 1px solid var(--line); padding-left: 18px; }
+.points-grid td:last-child { width: 1%; }
+.view--courses .btn, .view--courses .badge { white-space: nowrap; }
+.points-grid th { vertical-align: bottom; padding-bottom: 8px; }
+.points-grid thead tr:first-child th { border-bottom: 1px solid var(--line); }
+.points-grid tbody td { border-bottom: 1px solid var(--line); }
+.points-grid .pg-group {
+  border-left: 1px solid var(--line-strong);
+  padding-left: 14px;
+}
+.points-grid tbody td.pg-group { padding-left: 4px; }
+.points-grid tbody td.pg-group .mark-input { border-color: var(--line-strong); }
+.points-grid .pg-group-head {
+  white-space: nowrap;
+  color: var(--text);
+  font: 700 0.8125rem/1.3 var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: left;
+}
+.points-grid .pg-group-head small {
+  display: block;
+  margin-top: 3px;
+  color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+/* чередование групп: глаз цепляется за границу КТ1 / КТ2 / КТ3 */
+.points-grid .pg-alt { background: color-mix(in oklab, var(--text) 5%, transparent); }
+.points-grid tbody td.pg-group { border-left: 2px solid var(--line-strong); }
+.points-grid .pg-sum { border-left: 1px solid var(--line-strong); background: var(--bg-raised); }
+.points-grid .pg-ok { color: var(--accent-text); }
+.points-grid .pg-flag { color: var(--warn); font-weight: 600; }
+.points-grid .pg-kind {
+  color: var(--text-muted);
+  font: 500 0.75rem/1.2 var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+}
+.points-grid .pg-kind small { display: block; color: var(--text-faint); font-weight: 400; }
+.points-grid .pg-cell { padding: 8px 0; text-align: center; }
+.points-grid .verdict .badge { white-space: normal; line-height: 1.25; }
+.points-grid .pg-fio { min-width: 118px; max-width: 150px; font-size: 0.9375rem; line-height: 1.3; }
+
+/* Поле балла: компактное, но по правилам .input (фокус, радиус, токены) */
+.mark-input {
+  width: 34px;
+  min-height: 32px;
+  padding: 0 4px;
+  background: var(--bg-raised);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-s);
+  color: var(--text);
+  font: 500 0.8125rem/1 var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+}
+.mark-input:hover { border-color: var(--line-strong); }
+.mark-input:focus {
+  outline: none;
+  border-color: var(--accent-text);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.mark-input::-webkit-outer-spin-button,
+.mark-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.mark-input { -moz-appearance: textfield; appearance: textfield; }
+
+/* Итог точки */
+.pg-total {
+  white-space: nowrap;
+  font: 800 1rem/1 var(--font-display);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.pg-total small { display: block; margin-top: 2px; color: var(--text-faint); font: 400 0.5625rem/1.15 var(--font-mono); letter-spacing: 0; }
+.pg-total--fail { color: var(--warn); }
+
+/* ---------- Рейтинг и вердикт ---------- */
+.rating-cell { display: grid; gap: 4px; justify-items: end; min-width: 68px; }
+.rating-cell__num {
+  font: 800 1.125rem/1 var(--font-display);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+.rating-cell__num--fail { color: var(--warn); }
+.rating-bar {
+  width: 100%;
+  height: 4px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--line);
+  overflow: hidden;
+  appearance: none;
+}
+.rating-bar::-webkit-progress-bar { background: var(--line); border-radius: var(--radius-pill); }
+.rating-bar::-webkit-progress-value { background: var(--accent); border-radius: var(--radius-pill); }
+.rating-bar::-moz-progress-bar { background: var(--accent); border-radius: var(--radius-pill); }
+.rating-bar.is-fail::-webkit-progress-value { background: var(--warn); }
+.rating-bar.is-fail::-moz-progress-bar { background: var(--warn); }
+.rating-cell__max { color: var(--text-faint); font: 400 0.625rem/1 var(--font-mono); }
+
+.verdict { display: grid; gap: 4px; justify-items: start; min-width: 92px; max-width: 110px; }
+.verdict__why {
+  color: var(--text-faint);
+  font: 400 0.625rem/1.35 var(--font-mono);
+  max-width: 24ch;
+}
+
+/* ---------- Карточка дисциплины: мои аттестации ---------- */
+.rating-hero { display: grid; gap: 14px; }
+.rating-hero__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+.rating-hero__num {
+  font: 700 clamp(2.25rem, 1.5rem + 2.4vw, 3.125rem)/1 var(--font-display);
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.rating-hero__num small { font-size: 0.4em; font-weight: 600; color: var(--text-faint); letter-spacing: 0; }
+.rating-hero__num--fail { color: var(--warn); }
+.rating-hero__scale { display: grid; gap: 8px; min-width: min(320px, 100%); }
+.rating-hero__scale .rating-bar { height: 6px; }
+.rating-hero__foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  color: var(--text-faint);
+  font: 400 0.6875rem/1.5 var(--font-mono);
+}
+
+/* ---------- Легенда ---------- */
+.mark-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  color: var(--text-faint);
+  font: 400 0.6875rem/1.4 var(--font-mono);
+}
+.mark-legend span b { color: var(--text-muted); font-weight: 600; }
+
+/* ---------- Страница весов ---------- */
+.points-table .input,
+.points-table .select { min-height: 38px; padding: 0 8px; font-size: 0.8125rem; }
+.points-table .input--num { width: 72px; text-align: center; font-family: var(--font-mono); }
+.points-table th { vertical-align: bottom; }
+.points-table td { vertical-align: middle; }
+.points-table .pg-total { padding-left: 4px; color: var(--text-faint); font: 500 0.6875rem/1 var(--font-mono); }
+
+/* ---------- Подвал формы ---------- */
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 720px) {
+  .stat-strip--3 { grid-template-columns: 1fr; }
+  .panel__tools { width: 100%; margin-left: 0; }
+  .rating-hero__num { font-size: 2.25rem; }
+}
+
+/* ---------- Формы внутри строк таблицы ---------- */
+.review-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.review-form .input,
+.review-form .select { min-height: 34px; font-size: 0.8125rem; }
+.review-form__grade { width: 96px; }
+.review-form__status { width: auto; }
+
+/* ---------- Мелочи форм ---------- */
+.inline-form { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.inline-form .input { width: auto; min-height: 38px; }
+.status-picker { display: flex; flex-wrap: wrap; gap: 8px 14px; }
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0);
+  white-space: nowrap; border: 0;
+}
+
+/* ---------- Прокручиваемая сетка с закреплённой шапкой ---------- */
+.table-wrap--tall {
+  max-height: min(70vh, 640px);
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m);
+}
+.points-grid thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--bg-panel, var(--bg-raised));
+  box-shadow: inset 0 -1px 0 var(--line-strong);
+}
+.points-grid thead tr:first-child th { box-shadow: 0 8px 12px -12px color-mix(in oklab, var(--text) 55%, transparent); }
+.points-grid thead tr:first-child th { top: 0; }
+.points-grid thead tr:last-child th { top: 79px; }
+
+/* ---------- Статусы и контролы: спокойнее, ближе к «бумаге» ---------- */
+.verdict .badge {
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: var(--font-body, var(--font-mono));
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.3;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-align: left;
+  white-space: normal;
+}
+.view--courses select.input,
+.view--courses .select {
+  border-radius: 6px;
+  font-size: 0.8125rem;
+}
+/* тонкий скроллбар внутри прокручиваемой сетки */
+.table-wrap--tall { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+.table-wrap--tall::-webkit-scrollbar { width: 10px; height: 10px; }
+.table-wrap--tall::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--text) 22%, transparent);
+  border: 3px solid transparent;
+  background-clip: content-box;
+  border-radius: 8px;
+}
+.table-wrap--tall::-webkit-scrollbar-track { background: transparent; }
+
+.course-meta__chip--warn { color: var(--warn); }
+.mono.warn { color: var(--warn); }
+
+/* Статус-бейджи: обычный регистр, чтобы длинные фразы не кричали */
+.badge--status {
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: var(--font-body, var(--font-mono));
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 6px;
+}
+
+/* «не зачтено» / «2» должны читаться как проблема, а не как пустое поле */
+.view--courses .grade--none {
+  border-style: solid;
+  border-color: color-mix(in oklab, var(--warn) 55%, transparent);
+  color: var(--warn);
+}

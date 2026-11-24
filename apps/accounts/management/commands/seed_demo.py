@@ -158,24 +158,31 @@ class Command(BaseCommand):
         students = list(Profile.objects.filter(group=group).values_list('user_id', flat=True))
         courses = [
             ('Базы данных', 'БД-201', users['teacher2'], 3,
-             'Проектирование реляционных баз, нормализация, SQL и транзакции. Лабораторные — в аудитории 482.'),
+             'Проектирование реляционных баз, нормализация, SQL и транзакции. Лабораторные — в аудитории 482.',
+             Course.FORM_EXAM, True),
             ('Программирование на Python', 'ПРОГ-201', users['teacher3'], 3,
-             'Функции, модули, работа с файлами и ООП. Курс идёт параллельно с лабораторными в 227.'),
+             'Функции, модули, работа с файлами и ООП. Курс идёт параллельно с лабораторными в 227.',
+             Course.FORM_EXAM, False),
             ('Философия', 'ФИЛ-201', users['teacher4'], 3,
-             'Курс с зачётом: семинары, эссе и итоговая работа.'),
+             'Курс с зачётом: семинары, эссе и итоговая работа.',
+             Course.FORM_CREDIT, False),
         ]
         made = {}
-        for title, code, teacher, semester, description in courses:
+        for title, code, teacher, semester, description, control_form, has_coursework in courses:
             course, _ = Course.objects.get_or_create(
                 code=code, group=group,
-                defaults={'title': title, 'teacher': teacher, 'semester': semester, 'description': description},
+                defaults={'title': title, 'teacher': teacher, 'semester': semester, 'description': description,
+                          'control_form': control_form, 'has_coursework': has_coursework},
             )
             course.title = title
             course.teacher = teacher
             course.description = description
+            course.control_form = control_form
+            course.has_coursework = has_coursework
             course.save()
             Enrollment.objects.filter(course=course).delete()
             Enrollment.objects.bulk_create([Enrollment(course=course, student_id=sid) for sid in students])
+            self.make_points(course, students)
             made[code] = course
 
         db = made['БД-201']
@@ -252,6 +259,33 @@ class Command(BaseCommand):
                         'marked_by': users['teacher2'],
                     },
                 )
+
+    def make_points(self, course, students):
+        """Три аттестации за семестр с весами и демо-баллами (как ведомость в ЭОС)."""
+        from apps.education.models import PointMark, PointWeight
+        from apps.education.rating import ensure_points
+
+        for point in list(course.control_points.all()):
+            point.delete()
+        created = ensure_points(course)
+        demo_scores = [(78, 84, 70), (82, 88, 76), (74, 80, 68)]
+        for index, point in enumerate(created):
+            weights = list(PointWeight.objects.filter(point=point).values_list('kind', flat=True))
+            for position, student in enumerate(students):
+                # у каждого студента свой профиль: разброс ±14 и «слабый» последний в списке
+                spread = ((position * 7) % 29) - 14
+                weak = 0
+                if position == len(students) - 1:
+                    weak = -46          # демонстрирует «не будет аттестован»
+                elif position == len(students) - 2:
+                    weak = -18
+                # у одного студента КТ3 не выставлена — прогноз «под вопросом»
+                if position == 2 and index == len(created) - 1:
+                    continue
+                for pos, kind in enumerate(weights):
+                    base = demo_scores[index][pos % 3] + spread + weak + ((position + pos) % 5) - 2
+                    PointMark.objects.create(point=point, student_id=student, kind=kind,
+                                             score=max(0, min(100, base)), set_by=course.teacher)
 
     def make_requests(self, users):
         RoleRequest.objects.get_or_create(

@@ -308,6 +308,7 @@ body.menu-open { overflow: hidden; }
 }
 .badge--accent { border-color: color-mix(in oklab, var(--accent) 55%, transparent); color: var(--accent-text); }
 .badge--soft { background: var(--accent-soft); border-color: transparent; color: var(--accent-text); }
+.badge--warn { border-color: color-mix(in oklab, var(--warn) 55%, transparent); background: var(--warn-soft); color: var(--warn); }
 
 /* ---------- Формы ---------- */
 .field { display: grid; gap: 6px; align-content: start; }

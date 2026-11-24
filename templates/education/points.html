@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Контрольные точки · {{ course.title }}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/courses.css' %}">{% endblock %}
+{% block content %}
+<div class="view view--courses">
+
+<header class="page-head course-head">
+  <p class="mono dim"><a href="{% url 'education:courses' %}">курсы</a> · <a href="{% url 'education:journal' course.id %}">журнал</a> · {{ course.group.code }}</p>
+  <h1>Контрольные точки</h1>
+  <div class="course-meta">
+    <span class="course-meta__chip">{{ course.title }}</span>
+    <span class="course-meta__chip">{{ course.control_label }}</span>
+    <span class="course-meta__chip">семестр <b>{{ course.semester }}</b></span>
+    <span class="course-meta__chip">точек <b>{{ table|length }}</b></span>
+    <span class="course-meta__chip{% if not weight_ok %} course-meta__chip--warn{% endif %}">сумма весов <b>{{ weight_sum }} %</b></span>
+  </div>
+</header>
+
+<form method="post">
+  {% csrf_token %}
+  <section class="panel">
+    <div class="panel__head">
+      <div class="panel__title">
+        <span class="panel__num mono">01</span>
+        <h2>Веса аттестаций</h2>
+      </div>
+      <span class="mono {% if weight_ok %}dim{% else %}warn{% endif %}">{% if weight_ok %}сумма весов точек — 100 %{% else %}сумма весов {{ weight_sum }} % — должна быть 100 %{% endif %}</span>
+    </div>
+
+    <div class="form-grid">
+      <label class="field">
+        <span class="field__label">Аттестаций за семестр</span>
+        <input class="input" type="number" name="count" min="1" max="10" value="{{ course.attestation_count }}">
+        <span class="field__hint">Сколько раз преподаватель выставляет аттестацию. Обычно три.</span>
+      </label>
+      <label class="field">
+        <span class="field__label">Порог допуска, %</span>
+        <input class="input" type="number" name="admission_score" min="0" max="100" value="{{ course.admission_score }}">
+        <span class="field__hint">Рейтинг, ниже которого дисциплина считается неаттестованной.</span>
+      </label>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel__head">
+      <div class="panel__title">
+        <span class="panel__num mono">02</span>
+        <h2>Точки и виды занятий</h2>
+      </div>
+      <span class="mono dim">вес внутри точки — тоже 100 %</span>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table points-table">
+        <thead>
+          <tr>
+            <th>Аттестация</th>
+            <th>Название</th>
+            <th class="ta-c">Вес, %</th>
+            <th class="ta-c">Проходной, %</th>
+            <th>Дата</th>
+            {% for kind, label in work_choices %}<th class="ta-c">Вес {{ label }}</th>{% endfor %}
+            <th class="ta-c">Закрыта</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in table %}
+          {% with n=row.number %}
+          <tr>
+            <td class="mono">КТ{{ n }}</td>
+            <td><input class="input" name="title_{{ n }}" value="{{ row.point.title|default:'' }}" placeholder="Аттестация"></td>
+            <td class="ta-c"><input class="input input--num" type="number" min="0" max="100" name="weight_{{ n }}" value="{{ row.point.weight|default:20 }}"></td>
+            <td class="ta-c"><input class="input input--num" type="number" min="0" max="100" name="pass_{{ n }}" value="{{ row.point.pass_score|default:course.admission_score }}"></td>
+            <td><input class="input" type="date" name="date_{{ n }}" value="{{ row.point.date|date:'Y-m-d' }}"></td>
+            {% for kind, label, weight in row.cells %}
+            <td class="ta-c"><input class="input input--num" type="number" min="0" max="100" name="kw_{{ n }}_{{ kind }}" value="{{ weight }}"></td>
+            {% endfor %}
+            <td class="ta-c"><input type="checkbox" name="closed_{{ n }}" value="1" {% if row.point.closed %}checked{% endif %}></td>
+          </tr>
+          {% endwith %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn--accent" type="submit">Сохранить точки</button>
+      <a class="btn btn--ghost" href="{% url 'education:journal' course.id %}">Вернуться в журнал</a>
+    </div>
+  </section>
+</form>
+
+</div>
+{% endblock %}

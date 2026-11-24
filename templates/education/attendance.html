@@ -1,15 +1,120 @@
 {% extends 'base.html' %}
-{% block title %}Посещаемость{% endblock %}
+{% load static bgitu %}
+{% block title %}Посещаемость · {{ course.title }}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/courses.css' %}">{% endblock %}
 {% block content %}
-<header class="page-head">
-  <p class="mono dim">личный кабинет</p>
+<div class="view view--courses">
+
+<header class="page-head course-head">
+  <p class="mono dim"><a href="{% url 'education:courses' %}">курсы</a> · <a href="{% url 'education:journal' course.id %}">журнал</a> · {{ course.group.code }}</p>
   <h1>Посещаемость</h1>
-  <p>Раздел готовится — наполнение появится по мере разработки.</p>
+  <div class="course-meta">
+    <span class="course-meta__chip">{{ course.title }}</span>
+    <span class="course-meta__chip">{{ date|date:'d.m.Y' }}</span>
+    <span class="course-meta__chip">студентов <b>{{ rows|length }}</b></span>
+    {% if marked_count %}<span class="course-meta__chip">отмечено <b>{{ marked_count }}</b></span>{% endif %}
+  </div>
 </header>
+
 <section class="panel">
+  <div class="panel__head">
+    <div class="panel__title">
+      <span class="panel__num mono">01</span>
+      <h2>Занятие</h2>
+    </div>
+    <div class="panel__tools">
+      <form method="get" class="inline-form">
+        <label class="visually-hidden" for="d">Дата занятия</label>
+        <input class="input" id="d" name="date" type="date" value="{{ date|date:'Y-m-d' }}">
+        <button class="btn btn--ghost btn--sm" type="submit">Открыть дату</button>
+      </form>
+    </div>
+  </div>
+  <p class="mark-legend">
+    <span><b>б</b> — был</span><span><b>н</b> — не был</span><span><b>о</b> — опоздал</span><span><b>у</b> — уважительная</span>
+  </p>
+
+  {% if rows %}
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="date" value="{{ date|date:'Y-m-d' }}">
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>Студент</th><th class="mono">Зачётка</th><th>Отметка</th></tr>
+        </thead>
+        <tbody>
+          {% for row in rows %}
+          <tr>
+            <td>{{ row.student|fio }}</td>
+            <td class="mono">{{ row.student.profile.record_book|default:'—' }}</td>
+            <td>
+              <div class="status-picker">
+                {% for value, label in statuses %}
+                <label class="check">
+                  <input type="radio" name="status_{{ row.student.id }}" value="{{ value }}" {% if row.status == value %}checked{% endif %}>
+                  <span>{{ label }}</span>
+                </label>
+                {% endfor %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn--sm" type="submit">Сохранить за {{ date|date:'d.m.Y' }}</button>
+      <a class="btn btn--ghost btn--sm" href="{% url 'education:journal' course.id %}">Журнал дисциплины</a>
+    </div>
+  </form>
+  {% else %}
   <div class="empty">
-    <b>Раздел в разработке</b>
-    <p>Здесь скоро появится посещаемость — пока пусто.</p>
+    <b>На дисциплину никто не записан</b>
+    <p>Отмечать посещаемость пока некому.</p>
+  </div>
+  {% endif %}
+</section>
+
+{% if sessions %}
+<section class="panel">
+  <div class="panel__head">
+    <div class="panel__title">
+      <span class="panel__num mono">02</span>
+      <h2>Проведённые занятия</h2>
+    </div>
+    <span class="mono dim">{{ sessions|length }}</span>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th class="mono">Дата</th>
+          <th class="ta-r mono">Был</th>
+          <th class="ta-r mono">Не был</th>
+          <th class="ta-r mono">Опоздал</th>
+          <th class="ta-r mono">Уваж.</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for session in sessions %}
+        <tr>
+          <td class="mono">{{ session.date|date:'d.m.Y' }}</td>
+          <td class="ta-r mono">{{ session.present }}</td>
+          <td class="ta-r mono">{{ session.absent }}</td>
+          <td class="ta-r mono">{{ session.late }}</td>
+          <td class="ta-r mono">{{ session.excused }}</td>
+          <td class="ta-r">
+            <a class="btn btn--ghost btn--sm" href="?date={{ session.date|date:'Y-m-d' }}">Открыть</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 </section>
+{% endif %}
+
+</div>
 {% endblock %}

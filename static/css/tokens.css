@@ -41,6 +41,11 @@
   --aux-soft:     color-mix(in oklab, var(--brand-aux) 20%, transparent);
   --focus:        var(--accent-text);       /* видимый фокус ≥ 3:1 к фону               */
 
+  /* предупреждение: «не допущен», пропуски, риск незачёта.
+     Значение подобрано под тему (на тёмном — светлее, на светлом — темнее). */
+  --warn:         #ff8a6a;
+  --warn-soft:    color-mix(in oklab, var(--warn) 16%, transparent);
+
   /* ---------- 3. ТИПОГРАФИКА ---------- */
   --font-display: 'Unbounded', 'Arial Black', 'Helvetica Neue', sans-serif;
   --font-text:    'Inter Tight', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -82,6 +87,7 @@
 
 [data-theme="paper"] {
   --trail-op: 0.38;
+  --warn:            #b4432f;
   --brand-base:      #f2eee6;
   --brand-ink:       #171614;
   --brand-accent:    #b8322a;
@@ -127,6 +133,7 @@
   --brand-on-accent: #1b1712;
   --brand-aux:       #d4af37;
   --aurora-blend:    multiply;
+  --warn:            #b4432f;
   /* затемнённые состояния: hover-заливка сохраняет 5.48:1 с тёмными чернилами */
   --accent-text:     #8c6408;
   --accent-hover:    #b8860b;

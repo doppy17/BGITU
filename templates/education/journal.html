@@ -1,15 +1,267 @@
 {% extends 'base.html' %}
-{% block title %}Журнал{% endblock %}
+{% load static bgitu %}
+{% block title %}Журнал · {{ course.title }}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/courses.css' %}">{% endblock %}
 {% block content %}
-<header class="page-head">
-  <p class="mono dim">личный кабинет</p>
-  <h1>Журнал</h1>
-  <p>Раздел готовится — наполнение появится по мере разработки.</p>
+<div class="view view--courses">
+
+<header class="page-head course-head">
+  <p class="mono dim"><a href="{% url 'education:courses' %}">курсы</a> · {{ course.group.code }} · {{ course.semester }} семестр</p>
+  <h1>Журнал · {{ course.title }}</h1>
+  <div class="course-meta">
+    <span class="course-meta__chip">{{ course.teacher|fio }}</span>
+    <span class="course-meta__chip">{{ course.control_label }}</span>
+    {% if course.has_coursework %}<span class="course-meta__chip">курсовая</span>{% endif %}
+    <span class="course-meta__chip">занятий <b>{{ sessions }}</b></span>
+    <span class="course-meta__chip">студентов <b>{{ rows|length }}</b></span>
+    <span class="course-meta__chip">порог <b>{{ course.admission_score }} %</b></span>
+  </div>
 </header>
+
 <section class="panel">
+  <div class="panel__head">
+    <div class="panel__title">
+      <span class="panel__num mono">01</span>
+      <h2>Посещаемость и оценки</h2>
+    </div>
+    <div class="panel__tools">
+      <a class="btn btn--sm" href="{% url 'education:attendance' course.id %}">Отметить занятие</a>
+      <a class="btn btn--ghost btn--sm" href="{% url 'education:course_detail' course.id %}">Карточка</a>
+    </div>
+  </div>
+  <p class="mark-legend">
+    <span><b>б</b> — был</span><span><b>н</b> — не был</span><span><b>о</b> — опоздал</span><span><b>у</b> — уважительная</span>
+  </p>
+
+  {% if rows %}
+  <div class="table-wrap">
+    <table class="data-table jrn-table">
+      <thead>
+        <tr>
+          <th>Студент</th>
+          {% for d in dates %}<th class="mono ta-c">{{ d|date:'d.m' }}</th>{% endfor %}
+          <th class="ta-r mono">Был</th>
+          <th class="ta-r mono">Нет</th>
+          <th class="ta-r mono">%</th>
+          {% for kind, label in kinds %}<th class="ta-c">{{ label }}</th>{% endfor %}
+          <th class="ta-c">Итог</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td>
+            {{ row.student|fio }}
+            {% if row.profile.record_book %}<span class="cell-sub">{{ row.profile.record_book }}</span>{% endif %}
+          </td>
+          {% for cell in row.cells %}
+            {% if cell.code == 'н' %}
+              <td class="ta-c jrn-cell jrn-cell--absent">{{ cell.code }}</td>
+            {% elif cell.code == 'о' %}
+              <td class="ta-c jrn-cell jrn-cell--late">{{ cell.code }}</td>
+            {% elif cell.code == 'у' %}
+              <td class="ta-c jrn-cell jrn-cell--excused">{{ cell.code }}</td>
+            {% elif cell.code == 'б' %}
+              <td class="ta-c jrn-cell jrn-cell--present">{{ cell.code }}</td>
+            {% else %}
+              <td class="ta-c jrn-cell jrn-cell--empty">·</td>
+            {% endif %}
+          {% endfor %}
+          <td class="ta-r mono">{{ row.present }}</td>
+          <td class="ta-r mono">{{ row.absent }}</td>
+          <td class="ta-r">
+            <span class="jrn-percent{% if row.attendance_percent is not None and row.attendance_percent < 50 %} jrn-percent--low{% endif %}">
+              {% if row.attendance_percent is None %}—{% else %}{{ row.attendance_percent }}%{% endif %}
+            </span>
+          </td>
+          {% for kind, label in kinds %}
+            {% with g=row.grades|get_item:kind %}
+              <td class="ta-c">
+                {% if g %}
+                  <form method="post" action="{% url 'education:set_grade' course.id %}" class="jrn-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="student" value="{{ row.student.id }}">
+                    <input type="hidden" name="kind" value="{{ kind }}">
+                    <input type="hidden" name="date" value="{{ today|date:'Y-m-d' }}">
+                    <button class="grade {% if g.value == '5' %}grade--5{% elif g.value == '4' %}grade--4{% elif g.value == '2' or g.value == 'не зачтено' %}grade--none{% elif g.value == 'зачтено' %}grade--pass{% endif %}" type="submit" title="Оценка от {{ g.date|date:'d.m.Y' }} — нажмите, чтобы сменить">{{ g.value }}</button>
+                  </form>
+                {% else %}
+                  <form method="post" action="{% url 'education:set_grade' course.id %}" class="jrn-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="student" value="{{ row.student.id }}">
+                    <input type="hidden" name="kind" value="{{ kind }}">
+                    <input type="hidden" name="date" value="{{ today|date:'Y-m-d' }}">
+                    <select class="select" name="value" onchange="this.form.submit()" aria-label="Выставить оценку">
+                      <option value="">—</option>
+                      {% for value, label in values %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+                    </select>
+                  </form>
+                {% endif %}
+              </td>
+            {% endwith %}
+          {% endfor %}
+          <td class="ta-c">
+            {% if row.attestation %}
+              <span class="badge badge--accent">{{ row.attestation.value }}</span>
+              <span class="cell-sub">{{ row.attestation.date|date:'d.m.Y' }}</span>
+            {% else %}
+              <span class="badge">не выставлен</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
   <div class="empty">
-    <b>Раздел в разработке</b>
-    <p>Здесь скоро появится журнал — пока пусто.</p>
+    <b>На дисциплину никто не записан</b>
+    <p>Студенты группы появятся после создания дисциплины.</p>
+  </div>
+  {% endif %}
+</section>
+
+{% if points %}
+<section class="panel">
+  <div class="panel__head">
+    <div class="panel__title">
+      <span class="panel__num mono">02</span>
+      <h2>Аттестации по рейтингу</h2>
+    </div>
+    <div class="panel__tools">
+      <span class="mono dim">порог допуска {{ course.admission_score }} %</span>
+      <a class="btn btn--ghost btn--sm" href="{% url 'education:course_points' course.id %}">Веса и даты</a>
+    </div>
+  </div>
+
+  <div class="stat-strip stat-strip--3">
+    <div class="stat">
+      <small class="mono dim">средний рейтинг группы</small>
+      <b>{{ rating_stats.average }}<small> %</small></b>
+      <small>из 100 по {{ points|length }} точкам</small>
+    </div>
+    <div class="stat">
+      <small class="mono dim">аттестовано</small>
+      <b>{{ rating_stats.attested }}<small> / {{ rating_stats.students }}</small></b>
+      <small>рейтинг не ниже порога</small>
+    </div>
+    <div class="stat{% if rating_stats.risk %} stat--accent{% endif %}">
+      <small class="mono dim">в зоне риска</small>
+      <b>{{ rating_stats.risk }}<small> / {{ rating_stats.students }}</small></b>
+      <small>{% if rating_stats.pending %}под вопросом: {{ rating_stats.pending }}{% else %}нет невыставленных точек{% endif %}</small>
+    </div>
+  </div>
+
+  {% for row in rows %}
+    <form id="pf{{ row.student.id }}" method="post" action="{% url 'education:set_point_marks' course.id %}">
+      {% csrf_token %}<input type="hidden" name="student" value="{{ row.student.id }}">
+    </form>
+  {% endfor %}
+
+  <div class="table-wrap table-wrap--tall">
+    <table class="data-table points-grid">
+      <thead>
+        <tr>
+          <th rowspan="2">Студент</th>
+          <th rowspan="2" class="ta-r">Рейтинг</th>
+          <th rowspan="2">Аттестация</th>
+          {% for item in points %}
+          <th colspan="{{ item.kinds|length|add:1 }}" class="pg-group-head{% if forloop.counter|divisibleby:2 %} pg-alt{% endif %}">
+            КТ{{ item.point.number }}
+            <small>вес {{ item.point.weight }}%{% if item.point.date %} · {{ item.point.date|date:'d.m' }}{% endif %}{% if item.point.closed %} · закрыта{% endif %}</small>
+          </th>
+          {% endfor %}
+          <th rowspan="2" class="pg-kind">сохр.</th>
+        </tr>
+        <tr>
+          {% for item in points %}
+            {% for kind, label, weight in item.kinds %}
+              <th class="pg-kind{% if forloop.first %} pg-group{% endif %}">{{ label }}<small>{{ weight }}%</small></th>
+            {% endfor %}
+            <th class="pg-kind">итог</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td class="pg-fio">
+            {{ row.student|fio }}
+            {% if row.profile.record_book %}<span class="cell-sub">{{ row.profile.record_book }}</span>{% endif %}
+          </td>
+          <td>
+            <div class="rating-cell">
+              <span class="rating-cell__num{% if row.rating.verdict == 'no' %} rating-cell__num--fail{% endif %}">{{ row.rating.rating }}</span>
+              <progress class="rating-bar{% if row.rating.verdict == 'no' %} is-fail{% endif %}" value="{{ row.rating.rating }}" max="100" aria-label="Рейтинг {{ row.rating.rating }} из 100"></progress>
+              <span class="rating-cell__max" title="Сколько баллов доступно на текущий момент">{% if row.rating.possible > row.rating.rating %}макс {{ row.rating.possible }}{% else %}из 100{% endif %}</span>
+            </div>
+          </td>
+          <td>
+            <div class="verdict">
+              <span class="badge {% if row.rating.verdict == 'no' %}badge--warn{% elif row.rating.verdict == 'wait' %}badge--soft{% endif %}">{{ row.rating.verdict_label }}</span>
+              {% if row.rating.reasons %}<span class="verdict__why">{{ row.rating.reasons.0 }}</span>{% endif %}
+            </div>
+          </td>
+          {% for res in row.rating.points %}
+            {% for kind, weight in res.weights.items %}
+              <td class="pg-cell{% if forloop.first %} pg-group{% endif %}{% if forloop.parentloop.counter|divisibleby:2 %} pg-alt{% endif %}">
+                <input form="pf{{ row.student.id }}" class="mark-input" type="number" min="0" max="100"
+                       inputmode="numeric" aria-label="{{ row.student|fio }} · КТ{{ res.point.number }} · {{ kind }}"
+                       name="p{{ res.point.id }}_{{ kind }}"
+                       value="{{ res.scores|get_item:kind|default_if_none:'' }}">
+              </td>
+            {% endfor %}
+            <td class="pg-cell pg-sum ta-c{% if forloop.counter|divisibleby:2 %} pg-alt{% endif %}">
+              <span class="pg-total{% if res.status == 'failed' %} pg-total--fail{% endif %}">{{ res.total }}
+                {% if res.status == 'attested' %}<small class="pg-ok" title="{{ res.status_label }}">✓</small>
+                {% elif res.status == 'failed' %}<small class="pg-flag">{{ res.status_label }}</small>
+                {% else %}<small>{{ res.status_label }}</small>{% endif %}
+              </span>
+            </td>
+          {% endfor %}
+          <td class="ta-c">
+            <button form="pf{{ row.student.id }}" class="btn btn--sm btn--icon" type="submit" title="Сохранить баллы студента" aria-label="Сохранить баллы: {{ row.student|fio }}">✓</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <p class="panel-note">
+    Балл по виду занятий — 0…100. Итог точки — сумма баллов с весами видов занятий,
+    рейтинг дисциплины — сумма итогов точек с весами точек.
+    Вердикт считается автоматически: «будет аттестован» — рейтинг не ниже порога и все точки выставлены,
+    «под вопросом» — пока есть невыставленные баллы.
+  </p>
+</section>
+{% endif %}
+
+{% if assignments %}
+<section class="panel">
+  <div class="panel__head">
+    <div class="panel__title">
+      <span class="panel__num mono">03</span>
+      <h2>Задания дисциплины</h2>
+    </div>
+    <span class="mono dim">{{ assignments|length }}</span>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Задание</th><th class="mono">Срок</th><th class="ta-r mono">Сдали</th></tr></thead>
+      <tbody>
+        {% for assignment in assignments %}
+        <tr>
+          <td>{{ assignment.title }}</td>
+          <td class="mono">{{ assignment.due_date|date:'d.m.Y'|default:'—' }}</td>
+          <td class="ta-r mono">{{ assignment.submissions_count }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 </section>
+{% endif %}
+
+</div>
 {% endblock %}
