@@ -1,43 +1,114 @@
 {% extends 'base.html' %}
-{% block title %}Новый курс{% endblock %}
+{% load static bgitu %}
+{% block title %}Новая дисциплина{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/courses.css' %}">{% endblock %}
 {% block content %}
-<div class="page-head">
-  <p class="mono dim">учебный процесс</p>
-  <h1>Новый курс</h1>
-  <p class="muted">Курс привязывается к группе: все студенты группы зачисляются автоматически.</p>
-</div>
+<div class="view view--courses">
 
-<section class="panel">
-  <form method="post" class="form-grid">
-    {% csrf_token %}
-    <div class="field field--wide"><label for="cTitle">Название *</label><input class="input" id="cTitle" name="title" required minlength="3" value="{{ form_data.title|default:'' }}"></div>
-    <div class="field"><label for="cCode">Код *</label><input class="input" id="cCode" name="code" required value="{{ form_data.code|default:'' }}" placeholder="БД-201"></div>
-    <div class="field"><label for="cGroup">Группа *</label>
-      <select class="select" id="cGroup" name="group" required>
-        <option value="">— выберите —</option>
-        {% for group in groups %}<option value="{{ group.id }}" {% if form_data.group == group.id|stringformat:"s" %}selected{% endif %}>{{ group.code }} · {{ group.course }} курс</option>{% endfor %}
-      </select>
+<header class="page-head course-head">
+  <p class="mono dim">учебный процесс · <a href="{% url 'education:courses' %}">курсы</a></p>
+  <h1>Новая дисциплина</h1>
+  <div class="course-meta">
+    <span class="course-meta__chip">зачисление группы — автоматически</span>
+    <span class="course-meta__chip">журнал и ведомость создаются сразу</span>
+    <span class="course-meta__chip">вы — преподаватель дисциплины</span>
+  </div>
+</header>
+
+<form method="post" class="course-form">
+  {% csrf_token %}
+
+  <section class="panel" aria-labelledby="courseMainTitle">
+    <header class="panel__head">
+      <div class="panel__title">
+        <span class="panel__num mono">01</span>
+        <h2 id="courseMainTitle">Дисциплина</h2>
+      </div>
+      <span class="mono dim">название · код · описание</span>
+    </header>
+    <div class="form-grid">
+      <div class="field field--wide">
+        <label for="cTitle">Название <span class="field__req" aria-hidden="true">*</span></label>
+        <input class="input" id="cTitle" name="title" required minlength="3" maxlength="160"
+               value="{{ form_data.title|default:'' }}" placeholder="Программирование на Python"
+               autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="cCode">Код <span class="field__req" aria-hidden="true">*</span></label>
+        <input class="input input--code" id="cCode" name="code" required maxlength="32"
+               value="{{ form_data.code|default:'' }}" placeholder="ПРОГ-201"
+               autocomplete="off" spellcheck="false">
+        <p class="field__hint">Короткое обозначение для журнала и ведомости; латиница сохраняется в верхнем регистре.</p>
+      </div>
+      <div class="field">
+        <label for="cSemester">Семестр</label>
+        <input class="input" id="cSemester" name="semester" type="number" min="1" max="12"
+               value="{{ form_data.semester|default:'3' }}" inputmode="numeric">
+        <p class="field__hint">Номер семестра в учебном плане, от 1 до 12.</p>
+      </div>
+      <div class="field field--wide">
+        <label for="cDesc">Описание</label>
+        <textarea class="textarea" id="cDesc" name="description" rows="3"
+                  placeholder="Что разбираем, какие инструменты, что сдаётся по итогу">{{ form_data.description|default:'' }}</textarea>
+      </div>
     </div>
-    <div class="field"><label for="cSemester">Семестр</label><input class="input" id="cSemester" name="semester" type="number" min="1" max="12" value="{{ form_data.semester|default:'3' }}"></div>
-    <div class="field"><label for="cControl">Форма аттестации *</label>
-      <select class="select" id="cControl" name="control_form" required>
-        <option value="exam" {% if form_data.control_form == 'exam' or not form_data.control_form %}selected{% endif %}>экзамен</option>
-        <option value="credit" {% if form_data.control_form == 'credit' %}selected{% endif %}>зачёт</option>
-        <option value="diff" {% if form_data.control_form == 'diff' %}selected{% endif %}>диф. зачёт</option>
-        <option value="coursework" {% if form_data.control_form == 'coursework' %}selected{% endif %}>курсовая</option>
-        <option value="none" {% if form_data.control_form == 'none' %}selected{% endif %}>без аттестации</option>
-      </select>
+  </section>
+
+  <section class="panel" aria-labelledby="courseBindTitle">
+    <header class="panel__head">
+      <div class="panel__title">
+        <span class="panel__num mono">02</span>
+        <h2 id="courseBindTitle">Привязка и аттестация</h2>
+      </div>
+      <span class="mono dim">группа · аттестация · допуск</span>
+    </header>
+    <div class="form-grid">
+      <div class="field field--wide">
+        <label for="cGroup">Группа <span class="field__req" aria-hidden="true">*</span></label>
+        <select class="select" id="cGroup" name="group" required>
+          <option value="">— выберите группу —</option>
+          {% for group in groups %}
+          <option value="{{ group.id }}" {% if form_data.group == group.id|stringformat:"s" %}selected{% endif %}>{{ group.code }} · {{ group.course }} курс{% if group.program %} · {{ group.program }}{% endif %}</option>
+          {% endfor %}
+        </select>
+        <p class="field__hint">Все студенты группы, включая старосту, зачисляются на дисциплину сразу.</p>
+      </div>
+      <div class="field">
+        <label for="cControl">Форма аттестации <span class="field__req" aria-hidden="true">*</span></label>
+        <select class="select" id="cControl" name="control_form" required>
+          {% for value, label in control_forms %}
+          <option value="{{ value }}"{% if form_data.control_form == value %} selected{% elif not form_data.control_form and value == 'exam' %} selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+        <p class="field__hint">Определяет итоговую колонку и оценку в ведомости.</p>
+      </div>
+      <div class="field">
+        <label for="cPoints">Аттестаций за семестр</label>
+        <input class="input" id="cPoints" name="attestation_count" type="number" min="1" max="6"
+               value="{{ form_data.attestation_count|default:'3' }}" inputmode="numeric">
+        <p class="field__hint">Контрольные точки КТ1…КТn, веса в сумме 100 %.</p>
+      </div>
+      <div class="field">
+        <label for="cAdmission">Порог допуска, %</label>
+        <input class="input" id="cAdmission" name="admission_score" type="number" min="0" max="100"
+               value="{{ form_data.admission_score|default:'50' }}" inputmode="numeric">
+        <p class="field__hint">Ниже порога — «не допуск» к аттестации.</p>
+      </div>
+      <div class="field">
+        <label class="check">
+          <input type="checkbox" name="has_coursework" value="1" {% if form_data.has_coursework %}checked{% endif %}>
+          <span>Курсовая работа<small>В журнале появится колонка «курсовая» с оценкой и датой защиты.</small></span>
+        </label>
+      </div>
     </div>
-    <div class="field">
-      <label class="field__label" for="cCw">Курсовая работа</label>
-      <label class="check"><input type="checkbox" id="cCw" name="has_coursework" value="1" {% if form_data.has_coursework %}checked{% endif %}><span>предусмотрена по дисциплине</span></label>
-      <p class="field__hint">В журнале появится колонка «курсовая» с местом для оценки и даты защиты.</p>
-    </div>
-    <div class="field field--wide"><label for="cDesc">Описание</label><textarea class="textarea" id="cDesc" name="description" rows="4">{{ form_data.description|default:'' }}</textarea></div>
-    <div class="field field--wide action-row">
-      <button class="btn btn--accent" type="submit">Создать курс</button>
-      <a class="btn btn--ghost" href="{% url 'education:courses' %}">Отмена</a>
-    </div>
-  </form>
-</section>
+  </section>
+
+  <div class="form-actions">
+    <button class="btn btn--accent" type="submit">Создать дисциплину</button>
+    <a class="btn btn--ghost" href="{% url 'education:courses' %}">Отмена</a>
+    <p class="form-actions__note mono">* обязательные поля</p>
+  </div>
+</form>
+
+</div>
 {% endblock %}

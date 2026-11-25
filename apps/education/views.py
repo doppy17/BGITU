@@ -95,6 +95,15 @@ def course_create(request):
             errors.append('Выберите группу.')
         if not semester.isdigit() or not 1 <= int(semester) <= 12:
             errors.append('Семестр — число от 1 до 12.')
+        attestation_count = request.POST.get('attestation_count', '3')
+        if not attestation_count.isdigit() or not 1 <= int(attestation_count) <= 6:
+            errors.append('Аттестаций за семестр — число от 1 до 6.')
+        admission_score = request.POST.get('admission_score', '50')
+        if not admission_score.isdigit() or not 0 <= int(admission_score) <= 100:
+            errors.append('Порог допуска — число от 0 до 100.')
+        control_form = request.POST.get('control_form') or Course.FORM_EXAM
+        if control_form not in dict(Course.FORM_CHOICES):
+            errors.append('Неизвестная форма аттестации.')
         if group and Course.objects.filter(code=code, group=group).exists():
             errors.append('Курс с таким кодом у группы уже есть.')
         if errors:
@@ -103,11 +112,14 @@ def course_create(request):
             return render(request, 'education/course_form.html', {
                 'groups': groups,
                 'form_data': request.POST,
+                'control_forms': Course.FORM_CHOICES,
             })
         course = Course.objects.create(
             title=title, code=code, group=group, teacher=request.user,
             semester=int(semester), description=description,
-            control_form=request.POST.get('control_form') or Course.FORM_EXAM,
+            control_form=control_form,
+            attestation_count=int(attestation_count),
+            admission_score=int(admission_score),
             has_coursework=bool(request.POST.get('has_coursework')),
         )
         students = Profile.objects.filter(
@@ -118,7 +130,10 @@ def course_create(request):
         )
         messages.success(request, f'Курс «{title}» создан, зачислено студентов: {len(students)}.')
         return redirect('education:course_detail', course_id=course.id)
-    return render(request, 'education/course_form.html', {'groups': groups})
+    return render(request, 'education/course_form.html', {
+        'groups': groups,
+        'control_forms': Course.FORM_CHOICES,
+    })
 
 
 @login_required

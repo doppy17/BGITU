@@ -270,6 +270,55 @@
   border-top: 1px solid var(--line);
 }
 
+/* ---------- Форма дисциплины ---------- */
+.course-form {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.course-form .field {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 0;
+}
+.course-form .field__hint { margin-top: auto; padding-top: 4px; }
+.course-form .check { align-items: flex-start; }
+.course-form .panel__head .dim { opacity: 0.72; font-size: 0.6875rem; }
+.course-form .form-actions {
+  margin-top: 0;
+  padding-inline: clamp(20px, 3vw, 32px);
+}
+.form-actions__note {
+  margin: 0 0 0 auto;
+  align-self: center;
+  color: var(--text-faint);
+  font: 400 0.75rem/1.5 var(--font-mono);
+}
+.field__req {
+  margin-left: 2px;
+  color: var(--accent-text);
+  font-weight: 600;
+}
+.course-form .field__hint,
+.course-form .check small {
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.input--code {
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.input--code::placeholder { text-transform: none; letter-spacing: 0; }
+
+@media (max-width: 720px) {
+  .form-actions__note { margin-left: 0; }
+}
+
 @media (max-width: 720px) {
   .stat-strip--3 { grid-template-columns: 1fr; }
   .panel__tools { width: 100%; margin-left: 0; }

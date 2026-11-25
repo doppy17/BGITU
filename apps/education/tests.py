@@ -57,6 +57,30 @@ class EducationFlowTests(TestCase):
         self.assertEqual(course.enrollments.count(), 2)
         self.assertEqual(course.teacher, self.teacher)
 
+    def test_course_form_saves_attestation_settings(self):
+        self.client.force_login(self.teacher)
+        self.client.post(reverse('education:course_create'), {
+            'title': 'Веб-разработка', 'code': 'WEB-201', 'group': self.group.id,
+            'semester': '4', 'attestation_count': '4', 'admission_score': '45',
+            'control_form': 'credit',
+        })
+        course = Course.objects.get(code='WEB-201')
+        self.assertEqual(course.attestation_count, 4)
+        self.assertEqual(course.admission_score, 45)
+        self.assertEqual(course.control_form, Course.FORM_CREDIT)
+
+    def test_course_form_rejects_bad_attestation_count(self):
+        self.client.force_login(self.teacher)
+        response = self.client.post(reverse('education:course_create'), {
+            'title': 'Веб-разработка', 'code': 'WEB-202', 'group': self.group.id,
+            'semester': '4', 'attestation_count': '9', 'admission_score': '140',
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Course.objects.filter(code='WEB-202').exists())
+        messages = [str(m) for m in response.context['messages']]
+        self.assertTrue(any('Аттестаций' in m for m in messages))
+        self.assertTrue(any('Порог допуска' in m for m in messages))
+
     def test_student_uploads_work_and_teacher_reviews(self):
         assignment = Assignment.objects.create(
             course=self.course, title='Лабораторная 1', created_by=self.teacher,
