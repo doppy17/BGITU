@@ -1,7 +1,10 @@
 """Шаблонные фильтры проекта."""
+import os
 from urllib.parse import quote
 
 from django import template
+from django.contrib.staticfiles import finders
+from django.templatetags.static import static
 
 register = template.Library()
 
@@ -67,3 +70,16 @@ def money(value):
         return f'{int(value):,}'.replace(',', '\u00a0')
     except (TypeError, ValueError):
         return value
+
+
+@register.simple_tag
+def asset(path):
+    """Ссылка на статику с меткой времени файла: правки CSS/JS видны сразу, без Ctrl+F5."""
+    url = static(path)
+    found = finders.find(path)
+    if found:
+        try:
+            url = f'{url}?v={int(os.path.getmtime(found)):x}'
+        except OSError:
+            pass
+    return url

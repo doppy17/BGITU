@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static bgitu %}
 {% block title %}Журнал · {{ course.title }}{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'css/courses.css' %}">{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% asset 'css/courses.css' %}">{% endblock %}
 {% block content %}
 <div class="view view--courses">
 
@@ -34,6 +34,7 @@
   </p>
 
   {% if rows %}
+<p class="scroll-hint">→ таблица шире окна, прокручивается вбок</p>
   <div class="table-wrap">
     <table class="data-table jrn-table">
       <thead>
@@ -158,6 +159,7 @@
     </form>
   {% endfor %}
 
+<p class="scroll-hint">→ таблица шире окна, прокручивается вбок</p>
   <div class="table-wrap table-wrap--tall">
     <table class="data-table points-grid">
       <thead>
@@ -166,19 +168,19 @@
           <th rowspan="2" class="ta-r">Рейтинг</th>
           <th rowspan="2">Аттестация</th>
           {% for item in points %}
-          <th colspan="{{ item.kinds|length|add:1 }}" class="pg-group-head{% if forloop.counter|divisibleby:2 %} pg-alt{% endif %}">
+          <th colspan="{{ item.kinds|length|add:1 }}" class="pg-group-head">
             КТ{{ item.point.number }}
             <small>вес {{ item.point.weight }}%{% if item.point.date %} · {{ item.point.date|date:'d.m' }}{% endif %}{% if item.point.closed %} · закрыта{% endif %}</small>
           </th>
           {% endfor %}
-          <th rowspan="2" class="pg-kind">сохр.</th>
+          <th rowspan="2" class="pg-kind pg-head-save">сохр.</th>
         </tr>
         <tr>
           {% for item in points %}
             {% for kind, label, weight in item.kinds %}
               <th class="pg-kind{% if forloop.first %} pg-group{% endif %}">{{ label }}<small>{{ weight }}%</small></th>
             {% endfor %}
-            <th class="pg-kind">итог</th>
+            <th class="pg-kind pg-head-sum">итог<small>балл точки</small></th>
           {% endfor %}
         </tr>
       </thead>
@@ -214,8 +216,8 @@
             <td class="pg-cell pg-sum ta-c{% if forloop.counter|divisibleby:2 %} pg-alt{% endif %}">
               <span class="pg-total{% if res.status == 'failed' %} pg-total--fail{% endif %}">{{ res.total }}
                 {% if res.status == 'attested' %}<small class="pg-ok" title="{{ res.status_label }}">✓</small>
-                {% elif res.status == 'failed' %}<small class="pg-flag">{{ res.status_label }}</small>
-                {% else %}<small>{{ res.status_label }}</small>{% endif %}
+                {% elif res.status == 'failed' %}<small class="pg-flag" title="{{ res.status_label }}">✕</small>
+                {% else %}<small title="{{ res.status_label }}">·</small>{% endif %}
               </span>
             </td>
           {% endfor %}
@@ -265,3 +267,4 @@
 
 </div>
 {% endblock %}
+{% block scripts %}<script src="{% asset 'js/scroll-hint.js' %}" defer></script>{% endblock %}

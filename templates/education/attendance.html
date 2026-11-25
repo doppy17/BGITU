@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static bgitu %}
 {% block title %}Посещаемость · {{ course.title }}{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'css/courses.css' %}">{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% asset 'css/courses.css' %}">{% endblock %}
 {% block content %}
 <div class="view view--courses">
 

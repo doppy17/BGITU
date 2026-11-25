@@ -1,5 +1,4 @@
-{% load static %}
-{% load bgitu %}
+{% load static bgitu %}
 <!DOCTYPE html>
 <html lang="ru" data-theme="{{ ui_theme|default:'paper' }}" data-auth="{% if user.is_authenticated %}1{% else %}0{% endif %}">
 <head>
@@ -16,7 +15,7 @@
   <link rel="stylesheet" href="{% static 'css/components.css' %}">
   <link rel="stylesheet" href="{% static 'css/cabinet.css' %}">
   <link rel="stylesheet" href="{% static 'css/portal.css' %}">
-  <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+  <link rel="stylesheet" href="{% asset 'css/profile.css' %}">
   <link rel="stylesheet" href="{% static 'css/profile-tabs.css' %}">
   <link rel="stylesheet" href="{% static 'css/contacts.css' %}">
   {% block extra_css %}{% endblock %}
