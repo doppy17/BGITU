@@ -596,3 +596,95 @@ code { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--text-mu
   .profile-edit__actions { flex-direction: column-reverse; }
   .profile-edit__actions .btn { width: 100%; }
 }
+
+
+/* =========================================================================
+   Обзор (дашборд) + компонент пустого состояния
+   .empty--card — общее пустое состояние кабинета: иконка, заголовок,
+   пояснение и одно действие. Базовый .empty (cabinet.css) не трогаем,
+   чтобы не менять блоки, которые уже используют его как сетку.
+   ========================================================================= */
+.ov-head-note {
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.ov-lessons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
+  gap: 12px;
+}
+.ov-foot { margin-top: 16px; }
+
+.ov-study__title {
+  font: 600 0.9375rem/1.35 var(--font-text);
+  color: var(--text);
+  text-decoration: none;
+}
+.ov-study__title:hover { text-decoration: underline; text-underline-offset: 3px; }
+.ov-study__meta {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.ov-study__teacher { color: var(--text-muted); font-size: 0.875rem; }
+.ov-study__score { font: 700 0.9375rem/1 var(--font-mono); font-variant-numeric: tabular-nums; }
+.ov-study .rating-bar { margin-top: 6px; max-width: 190px; }
+.ov-badge { background: var(--bg-panel); border-color: var(--line-strong); color: var(--text-muted); }
+.ov-badge--yes { background: var(--accent-soft); border-color: transparent; color: var(--accent-text); }
+.ov-badge--wait { background: var(--warn-soft); border-color: color-mix(in oklab, var(--warn) 45%, transparent); color: var(--warn); }
+.ov-badge--no { background: transparent; border-color: color-mix(in oklab, var(--warn) 55%, transparent); color: var(--warn); }
+.ov-study td:last-child { white-space: nowrap; }
+
+.ov-tasks { display: grid; border-top: 1px solid var(--line); }
+.ov-task {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 16px;
+  align-items: baseline;
+  padding: 12px 2px;
+  border-bottom: 1px solid var(--line);
+}
+.ov-task__title { font: 600 0.9375rem/1.35 var(--font-text); color: var(--text); text-decoration: none; }
+.ov-task__title:hover { text-decoration: underline; text-underline-offset: 3px; }
+.ov-task__course { color: var(--text-faint); font-size: 0.6875rem; letter-spacing: 0.04em; text-transform: uppercase; }
+.ov-task__due { color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; }
+.ov-task__due.is-over { color: var(--brand-ink); }
+
+/* ---------- Пустое состояние ---------- */
+.empty--card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  border-style: solid;
+  border-color: var(--line);
+  background: color-mix(in oklab, var(--brand-ink) 2%, var(--bg-panel));
+}
+.empty__mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-s);
+  color: var(--text-faint);
+  background: var(--bg-panel);
+}
+.empty__mark svg { width: 20px; height: 20px; }
+.empty__body { min-width: 0; }
+.empty__body b { font: 600 0.9375rem/1.4 var(--font-text); color: var(--text); }
+.empty__body p { margin-top: 3px; max-width: 62ch; font-size: 0.875rem; line-height: 1.5; color: var(--text-muted); }
+.empty__action { flex: none; margin-left: auto; }
+
+@media (max-width: 640px) {
+  .ov-task { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .empty--card { flex-wrap: wrap; }
+  .empty__action { margin-left: 0; width: 100%; }
+}

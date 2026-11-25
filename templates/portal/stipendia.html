@@ -7,9 +7,6 @@
   <p>Стипендии, надбавки и статусы выплат.</p>
 </header>
 <section class="panel">
-  <div class="empty">
-    <b>Раздел в разработке</b>
-    <p>Здесь появится наполнение — пока пусто.</p>
-  </div>
+  {% include 'partials/empty.html' with empty_title="Раздел в разработке" empty_hint="Расчёт появится, когда подключим бухгалтерские данные, — пока раздел пустой." empty_icon="overview" %}
 </section>
 {% endblock %}

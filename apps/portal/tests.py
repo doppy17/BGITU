@@ -168,14 +168,32 @@ class NavCompositionTests(TestCase):
         # ФИО и роль видны в ящике (cab-nav__user)
         self.assertContains(response, 'cab-nav__user')
 
-    def test_all_sections_are_wip(self):
-        """Разделы-заглушки в режиме «в разработке»; курсы и профиль реализованы."""
+    def test_remaining_sections_are_wip(self):
+        """Оставшиеся разделы-заглушки в режиме «в разработке»."""
         self.client.force_login(self.dev)
-        for url in ('/cabinet/', '/cabinet/grades/', '/works/',
+        for url in ('/cabinet/grades/', '/works/',
                     '/roles/', '/cabinet/stipendia/', '/manage/students/'):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200, url)
             self.assertContains(response, 'Раздел в разработке')
+
+    def test_dashboard_is_overview(self):
+        """Обзор — рабочая страница: сводка, дисциплины и задания вместо заглушки."""
+        self.client.force_login(self.dev)
+        response = self.client.get(reverse('portal:dashboard'))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'Раздел в разработке')
+        self.assertContains(response, '<h1>Обзор</h1>')
+        self.assertContains(response, 'stat-strip')
+        self.assertContains(response, 'Ближайшие занятия')
+        self.assertContains(response, 'Дисциплины и рейтинг')
+
+    def test_empty_state_is_a_component(self):
+        """Пустое состояние — единый партиал с иконкой, заголовком и действием."""
+        self.client.force_login(self.dev)
+        response = self.client.get('/cabinet/stipendia/')
+        self.assertContains(response, 'empty empty--card')
+        self.assertContains(response, 'empty__mark')
 
     def test_courses_section_is_implemented(self):
         """«Курсы» больше не заглушка: список дисциплин отдаёт таблицу."""

@@ -1,15 +1,13 @@
 {% extends 'base.html' %}
 {% block title %}Мои работы{% endblock %}
 {% block content %}
+{% url 'education:courses' as courses_url %}
 <header class="page-head">
   <p class="mono dim">личный кабинет</p>
   <h1>Мои работы</h1>
-  <p>Раздел готовится — наполнение появится по мере разработки.</p>
+  <p>Задания по дисциплинам и отправленные работы.</p>
 </header>
 <section class="panel">
-  <div class="empty">
-    <b>Раздел в разработке</b>
-    <p>Здесь скоро появится мои работы — пока пусто.</p>
-  </div>
+  {% include 'partials/empty.html' with empty_title="Раздел в разработке" empty_hint="Раздел собирается вместе с заданиями курсов — пока работы сдаются из карточки дисциплины." empty_icon="courses" empty_url=courses_url empty_label="Открыть курсы" %}
 </section>
 {% endblock %}

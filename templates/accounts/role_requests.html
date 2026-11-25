@@ -4,12 +4,9 @@
 <header class="page-head">
   <p class="mono dim">личный кабинет</p>
   <h1>Заявки на роли</h1>
-  <p>Раздел готовится — наполнение появится по мере разработки.</p>
+  <p>Очередь заявок на изменение роли.</p>
 </header>
 <section class="panel">
-  <div class="empty">
-    <b>Раздел в разработке</b>
-    <p>Здесь скоро появится заявки на роли — пока пусто.</p>
-  </div>
+  {% include 'partials/empty.html' with empty_title="Раздел в разработке" empty_hint="Здесь будет список заявок с решением и историей." empty_icon="students" %}
 </section>
 {% endblock %}

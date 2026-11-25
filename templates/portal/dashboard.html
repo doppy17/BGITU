@@ -1,15 +1,170 @@
 {% extends 'base.html' %}
+{% load bgitu %}
 {% block title %}Обзор{% endblock %}
 {% block content %}
+{% url 'schedule:schedule' as sched_url %}
+{% url 'education:course_create' as create_url %}
+
 <header class="page-head">
-  <p class="mono dim">личный кабинет</p>
+  <p class="mono dim">личный кабинет{% if group %} · группа {{ group.code }}{% endif %}</p>
   <h1>Обзор</h1>
-  <p>Раздел готовится — наполнение появится по мере разработки.</p>
+  <p>{% if weekday_name %}{{ weekday_name }}, {% endif %}{{ today|date:"j E Y" }}{% if has_parity %} · {{ week_label }} неделя{% endif %}{% if pending_role_requests %} · заявок на роль: {{ pending_role_requests }}{% endif %}</p>
 </header>
-<section class="panel">
-  <div class="empty">
-    <b>Раздел в разработке</b>
-    <p>Здесь скоро появится обзор — пока пусто.</p>
+
+<section class="stat-strip" aria-label="Сводка по учёбе">
+  <div class="stat">
+    <b>{% if average %}{{ average }}{% else %}—{% endif %}</b>
+    <small>{% if grades_count %}средний балл по {{ grades_count }} оценкам{% else %}оценок пока нет{% endif %}</small>
+  </div>
+  <div class="stat">
+    <b>{{ study|length }}</b>
+    <small>{% if study %}дисциплин с рейтингом{% else %}дисциплины не назначены{% endif %}</small>
+  </div>
+  <div class="stat">
+    <b>{{ debts|length }}</b>
+    <small>{% if debts %}задолженностей{% else %}задолженностей нет{% endif %}</small>
+  </div>
+  <div class="stat">
+    <b>{{ stipend.total }} ₽</b>
+    <small>{% if stipend.boosted %}стипендия, повышенная{% else %}стипендия, прогноз за месяц{% endif %}</small>
   </div>
 </section>
+
+<!-- ============ 01 · Ближайшие занятия (студент) ============ -->
+{% if not teaching %}
+<section class="panel" aria-labelledby="ovLessonsTitle">
+  <header class="panel__head">
+    <div class="panel__title">
+      <span class="panel__num mono">01</span>
+      <h2 id="ovLessonsTitle">Ближайшие занятия</h2>
+    </div>
+    <span class="mono dim ov-head-note">
+      {% if lessons_is_today %}сегодня{% else %}{{ lessons_day|date:"j E" }} · {{ lessons_day_name }}{% endif %}{% if has_parity %} · {{ lessons_week_label }} неделя{% endif %}
+    </span>
+  </header>
+
+  {% if today_lessons %}
+  <div class="ov-lessons">
+    {% for item in today_lessons %}
+      {% include 'schedule/_sched_card.html' with lesson=item.lesson mode='group' %}
+    {% endfor %}
+  </div>
+  <p class="ov-foot"><a class="btn btn--ghost btn--sm" href="{% url 'schedule:schedule' %}">Всё расписание</a></p>
+  {% elif group %}
+    {% include 'partials/empty.html' with empty_title="Занятий нет" empty_hint="На ближайшие дни в расписании группы ничего не стоит." empty_url=sched_url empty_label="Открыть расписание" %}
+  {% else %}
+    {% include 'partials/empty.html' with empty_title="Группа не назначена" empty_hint="Расписание появится, когда администратор зачислит вас в группу." empty_icon="students" %}
+  {% endif %}
+</section>
+{% endif %}
+
+<!-- ============ 02 · Дисциплины и рейтинг ============ -->
+{% if not teaching %}
+<section class="panel" aria-labelledby="ovStudyTitle">
+  <header class="panel__head">
+    <div class="panel__title">
+      <span class="panel__num mono">02</span>
+      <h2 id="ovStudyTitle">Дисциплины и рейтинг</h2>
+    </div>
+    {% if study %}<a class="btn btn--ghost btn--sm" href="{% url 'education:courses' %}">Все курсы</a>{% endif %}
+  </header>
+
+  {% if study %}
+  <div class="table-wrap">
+    <table class="data-table ov-study">
+      <thead>
+        <tr><th>дисциплина</th><th>преподаватель</th><th class="ta-r">рейтинг</th><th>статус</th></tr>
+      </thead>
+      <tbody>
+        {% for row in study %}
+        <tr>
+          <td>
+            <a class="ov-study__title" href="{% url 'education:course_detail' row.course.pk %}">{{ row.course.title }}</a>
+            <span class="ov-study__meta mono">{{ row.course.code }} · {{ row.course.control_label }}</span>
+          </td>
+          <td class="ov-study__teacher">{{ row.course.teacher.get_full_name|default:"—" }}</td>
+          <td class="ta-r">
+            <span class="ov-study__score">{{ row.rating|floatformat:0 }}<span class="mono dim"> / {{ row.possible|floatformat:0 }}</span></span>
+            <progress class="rating-bar{% if row.verdict == 'no' %} is-fail{% endif %}" value="{{ row.rating }}" max="{{ row.possible|default:100 }}" aria-label="рейтинг по дисциплине">{{ row.rating }}</progress>
+          </td>
+          <td><span class="badge ov-badge ov-badge--{{ row.verdict }}">{{ row.verdict_label }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    {% include 'partials/empty.html' with empty_title="Дисциплины не назначены" empty_hint="Рейтинг появится, когда вас зачислят на курс." empty_icon="courses" %}
+  {% endif %}
+</section>
+{% endif %}
+
+<!-- ============ 03 · Задания к сдаче ============ -->
+{% if not teaching %}
+<section class="panel" aria-labelledby="ovTasksTitle">
+  <header class="panel__head">
+    <div class="panel__title">
+      <span class="panel__num mono">03</span>
+      <h2 id="ovTasksTitle">Задания к сдаче</h2>
+    </div>
+    {% if pending_assignments %}<span class="mono dim ov-head-note">{{ pending_assignments|length }} в работе</span>{% endif %}
+  </header>
+
+  {% if pending_assignments %}
+  <ul class="ov-tasks">
+    {% for task in pending_assignments %}
+    <li class="ov-task">
+      <a class="ov-task__title" href="{% url 'education:course_detail' task.course.pk %}">{{ task.title }}</a>
+      <span class="ov-task__course mono">{{ task.course.title }}</span>
+      <span class="ov-task__due mono{% if task.due_date and task.due_date < today %} is-over{% endif %}">
+        {% if task.due_date %}до {{ task.due_date|date:"j.m.Y" }}{% else %}без срока{% endif %}
+      </span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    {% include 'partials/empty.html' with empty_title="Всё сдано" empty_hint="Заданий без отправки нет — ничего не висит." empty_icon="courses" %}
+  {% endif %}
+</section>
+{% endif %}
+
+<!-- ============ 01 · Мои дисциплины (преподаватель) ============ -->
+{% if teaching %}
+<section class="panel" aria-labelledby="ovTeachTitle">
+  <header class="panel__head">
+    <div class="panel__title">
+      <span class="panel__num mono">01</span>
+      <h2 id="ovTeachTitle">Мои дисциплины</h2>
+    </div>
+    <a class="btn btn--ghost btn--sm" href="{% url 'education:course_create' %}">Новая дисциплина</a>
+  </header>
+
+  {% if teaching %}
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr><th>дисциплина</th><th>группа</th><th class="ta-r">студентов</th><th>контроль</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for course in teaching %}
+        <tr>
+          <td>
+            <a class="ov-study__title" href="{% url 'education:course_detail' course.pk %}">{{ course.title }}</a>
+            <span class="ov-study__meta mono">{{ course.code }}</span>
+          </td>
+          <td class="mono">{{ course.group.code|default:"—" }}</td>
+          <td class="ta-r mono">{{ course.students_count }}</td>
+          <td class="mono">{{ course.control_label }}</td>
+          <td class="ta-r"><a class="btn btn--ghost btn--sm" href="{% url 'education:course_points' course.pk %}">Журнал</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    {% include 'partials/empty.html' with empty_title="Дисциплин нет" empty_hint="Создайте первую дисциплину — журнал и ведомость появятся сразу." empty_icon="courses" empty_url=create_url empty_label="Создать" %}
+  {% endif %}
+</section>
+{% endif %}
+
 {% endblock %}

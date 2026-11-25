@@ -22,6 +22,14 @@ def home(request):
     return redirect('accounts:login')
 
 
+DAY_NAMES = {number: name for name, number in WEEKDAYS.items()}
+
+
+def day_name(weekday):
+    """Русское название дня недели по номеру 1–7 (WEEKDAYS хранит обратное соответствие)."""
+    return DAY_NAMES.get(weekday, '').capitalize()
+
+
 def parity_for(day):
     """Чётность учебной недели — по номеру недели семестра, как в файле БГИТУ."""
     return parity_of_monday(day)
@@ -160,13 +168,14 @@ def dashboard(request):
         'role': get_role(user),
         'group': group,
         'today': today,
-        'weekday_name': WEEKDAYS.get(weekday, '').capitalize(),
+        'weekday_name': day_name(weekday),
         'has_parity': has_parity,
         'week_label': 'нечётная' if lessons_week == 'odd' else 'чётная',
         'today_lessons': today_lessons,
         'lessons_day': lessons_day,
         'lessons_is_today': lessons_day == today,
         'lessons_week_label': 'нечётная' if lessons_week == 'odd' else 'чётная',
+        'lessons_day_name': day_name(lessons_day.weekday() + 1),
         'average': average,
         'grades_count': len(grades),
         'debts': debts,
@@ -175,6 +184,7 @@ def dashboard(request):
         'pending_assignments': pending_assignments,
         'recent_submissions': recent_submissions,
         'stipend': stipend,
+        'study': study_overview(user),
         'pending_role_requests': RoleRequest.objects.filter(user=user, status=RoleRequest.STATUS_PENDING).count(),
     })
 

@@ -1,0 +1,28 @@
+{% comment %}
+  Пустое состояние — один компонент на весь кабинет.
+
+  Контекст:
+    empty_title — заголовок, empty_hint — одна строка пояснения,
+    empty_url / empty_label — ссылка действия,
+    empty_icon — overview | courses | students | search.
+{% endcomment %}
+<div class="empty empty--card">
+  <span class="empty__mark" aria-hidden="true">
+    {% if empty_icon == 'courses' %}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15.5H6.5A2.5 2.5 0 0 0 4 21V5.5Z"/><path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20"/></svg>
+    {% elif empty_icon == 'students' %}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="9" cy="9" r="3"/><circle cx="16.5" cy="10" r="2.4"/><path d="M3.5 19.5c1-3 3-4.5 5.5-4.5s4.5 1.5 5.5 4.5"/><path d="M14.8 15.2c1.9.3 3.6 1.4 4.7 4.3"/></svg>
+    {% elif empty_icon == 'search' %}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>
+    {% else %}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3.5" y="3.5" width="7.2" height="7.2" rx="1.6"/><rect x="13.3" y="3.5" width="7.2" height="7.2" rx="1.6"/><rect x="3.5" y="13.3" width="7.2" height="7.2" rx="1.6"/><path d="M13.3 17h7.2"/></svg>
+    {% endif %}
+  </span>
+  <div class="empty__body">
+    <b>{{ empty_title|default:"Пока пусто" }}</b>
+    {% if empty_hint %}<p>{{ empty_hint }}</p>{% endif %}
+  </div>
+  {% if empty_url %}
+  <a class="btn btn--ghost btn--sm empty__action" href="{{ empty_url }}">{{ empty_label|default:"Перейти" }}</a>
+  {% endif %}
+</div>
